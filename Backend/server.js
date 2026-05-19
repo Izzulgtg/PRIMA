@@ -1,0 +1,24 @@
+const express = require('express');
+const cors = require('cors');
+const dotenv = require('dotenv');
+const authRoutes = require('./src/routes/auth-routes'); // Import route auth
+
+dotenv.config();
+
+const app = express();
+const PORT = process.env.PORT || 5000;
+
+// Middleware
+app.use(cors());
+app.use(express.json());
+
+// Daftarkan API Routing PRIMA di sini
+app.use('/api/auth', authRoutes);
+
+app.get('/', (req, res) => {
+  res.json({ message: 'Welcome to PRIMA Backend API Server' });
+});
+
+app.listen(PORT, () => {
+  console.log(`Server backend PRIMA berjalan lancar di port ${PORT}`);
+});
