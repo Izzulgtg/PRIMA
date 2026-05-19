@@ -1,0 +1,13 @@
+@import "tailwindcss";
+
+@theme {
+  /* Menyisipkan palet warna wajib PRIMA (Natural & Calm) */
+  --color-prima-bg: #F5F0E8;         /* Warm Off-White */
+  --color-prima-card: #FFFFFF;       /* Putih Bersih */
+  --color-prima-text-main: #1E1E1E;  /* Hitam Lembut */
+  --color-prima-text-sec: #6B7280;   /* Abu-abu */
+  --color-prima-green: #6B8F71;      /* Sage Green */
+  --color-prima-teal: #4A7C8E;       /* Dusty Teal */
+  --color-prima-terracotta: #C4846A; /* Muted Terracotta */
+  --color-prima-sand: #EDE8DC;       /* Sand Background */
+}
