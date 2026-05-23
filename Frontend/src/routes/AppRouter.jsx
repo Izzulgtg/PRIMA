@@ -2,7 +2,6 @@ import {
   BrowserRouter,
   Routes,
   Route,
-  Navigate,
 } from "react-router-dom"
 
 import AdminLayout from "../layouts/admin-layout"
@@ -12,15 +11,38 @@ import MaintenancePage from "../pages/admin/maintenance-page"
 import SupportPage from "../pages/admin/support-page"
 import DataManagerPage from "../pages/admin/data-manager-page"
 
+import RegisterPage from "../pages/auth/register-page"
+import LoginPage from "../pages/auth/login-page"
+
+import LandingPage from "../pages/landing-page"
 function AppRouter() {
   return (
     <BrowserRouter>
 
       <Routes>
 
-        <Route path="/" element={<Navigate to="/admin/dashboard" />} />
+        {/* LANDING PAGE */}
+        <Route
+          path="/"
+          element={<LandingPage />}
+        />
 
-        <Route path="/admin" element={<AdminLayout />}>
+        {/* AUTH ROUTES */}
+        <Route
+          path="/login"
+          element={<LoginPage />}
+        />
+
+        <Route
+          path="/register"
+          element={<RegisterPage />}
+        />
+
+        {/* ADMIN ROUTES */}
+        <Route
+          path="/admin"
+          element={<AdminLayout />}
+        >
 
           <Route
             path="dashboard"
