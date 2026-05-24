@@ -15,6 +15,7 @@ import RegisterPage from "../pages/auth/register-page"
 import LoginPage from "../pages/auth/login-page"
 
 import LandingPage from "../pages/landing-page"
+
 function AppRouter() {
   return (
     <BrowserRouter>
@@ -27,7 +28,7 @@ function AppRouter() {
           element={<LandingPage />}
         />
 
-        {/* AUTH ROUTES */}
+        {/* AUTH */}
         <Route
           path="/login"
           element={<LoginPage />}
@@ -38,7 +39,7 @@ function AppRouter() {
           element={<RegisterPage />}
         />
 
-        {/* ADMIN ROUTES */}
+        {/* ADMIN */}
         <Route
           path="/admin"
           element={<AdminLayout />}

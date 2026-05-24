@@ -1,7 +1,11 @@
 import Button from "../../components/ui/button"
 import Input from "../../components/ui/input"
+import loginBanner from "../../assets/images/login-banner.webp"
+import { useNavigate } from "react-router-dom"
 
 function LoginPage() {
+const navigate = useNavigate()
+
   return (
   <div className="bg-prima-background min-h-screen p-6">
 
@@ -36,9 +40,12 @@ function LoginPage() {
           PRIMA
         </h1>
 
-        <Button variant="primary">
-          Masuk
-        </Button>
+        <Button
+  variant="primary"
+  onClick={() => navigate("/admin/dashboard")}
+>
+  Masuk
+</Button>
 
       </div>
 
@@ -64,66 +71,74 @@ function LoginPage() {
           "
         >
 
-          {/* LEFT IMAGE */}
-          <div
-            className="
-              relative
-              w-[520px]
-              h-[650px]
-              rounded-[36px]
-              overflow-hidden
-              shadow-lg
-              bg-[#D8CCBC]
-              flex-shrink-0
-            "
-          >
+         <div
+  className="
+    relative
+    w-[480px]
+    h-[620px]
+    rounded-[40px]
+    overflow-hidden
+    shadow-xl
+  "
+>
 
-            {/* IMAGE PLACEHOLDER */}
-            <div className="w-full h-full bg-[#CDBBA5]" />
+  <img
+    src={loginBanner}
+    alt="Login Banner"
+    className="
+      w-full
+      h-full
+      object-cover
+    "
+  />
 
-            {/* OVERLAY */}
-            <div
-              className="
-                absolute
-                inset-0
-                bg-black/10
-              "
-            />
+  {/* OVERLAY */}
+  <div
+    className="
+      absolute
+      inset-0
+      bg-black/20
+    "
+  />
 
-            {/* TEXT */}
-            <div
-              className="
-                absolute
-                bottom-10
-                left-10
-                right-10
-                text-white
-              "
-            >
+  {/* TEXT */}
+  <div
+    className="
+      absolute
+      bottom-10
+      left-10
+      right-10
+      text-white
+    "
+  >
 
-              <h2
-                className="
-                  text-5xl
-                  font-bold
-                  leading-tight
-                "
-              >
-                Kesehatan bermula dari ketenangan.
-              </h2>
+    <h2
+      className="
+        text-5xl
+        font-bold
+        leading-tight
+      "
+    >
+      Kesehatan bermula dari ketenangan.
+    </h2>
 
-              <p className="mt-5 text-lg leading-relaxed">
+    <p
+      className="
+        mt-5
+        text-lg
+        text-white/90
+        leading-relaxed
+      "
+    >
+      Nikmati akses layanan kesehatan
+      profesional dengan sentuhan personal.
+     </p>
 
-                Nikmati akses layanan kesehatan
-                profesional dengan pengalaman
-                yang nyaman dan modern.
+  </div>
 
-              </p>
+</div>
 
-            </div>
-
-          </div>
-
-          {/* RIGHT FORM */}
+{/* RIGHT FORM */}
           <div className="flex-1 max-w-xl">
 
             <div>
@@ -180,9 +195,13 @@ function LoginPage() {
 
               <div className="mt-8">
 
-                <Button variant="primary">
-                  Masuk
-                </Button>
+                <Button
+  variant="primary"
+  onClick={() => navigate("/admin/dashboard")}
+>
+  Masuk
+</Button>
+
 
               </div>
 

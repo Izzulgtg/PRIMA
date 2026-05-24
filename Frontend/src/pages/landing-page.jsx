@@ -1,6 +1,9 @@
 import Button from "../components/ui/button"
+import landingHero from "../assets/images/landing-hero.webp"
+import { useNavigate } from "react-router-dom"
 
 function LandingPage() {
+const navigate = useNavigate()
   return (
     <div className="bg-prima-background min-h-screen">
 
@@ -21,13 +24,19 @@ function LandingPage() {
 
         <div className="flex items-center gap-4">
 
-          <Button variant="outline">
-            Login
-          </Button>
+              <Button
+        variant="outline"
+        onClick={() => navigate("/login")}
+      >
+        Login
+      </Button>
 
-          <Button variant="primary">
-            Register
-          </Button>
+                <Button
+        variant="primary"
+        onClick={() => navigate("/register")}
+      >
+        Register
+      </Button>
 
         </div>
 
@@ -96,20 +105,25 @@ function LandingPage() {
 
           <div className="flex gap-4 mt-10">
 
-            <Button variant="primary">
-              Daftar Berobat Sekarang
-            </Button>
+           <Button
+  variant="primary"
+  onClick={() => navigate("/register")}
+>
+  Daftar Berobat Sekarang
+</Button>
 
-            <Button variant="outline">
-              Lihat Layanan
-            </Button>
-
+          <Button
+  variant="outline"
+  onClick={() => navigate("/login")}
+>
+  Lihat Layanan
+</Button>
           </div>
 
         </div>
 
         {/* RIGHT CONTENT */}
-        <div
+          <div
           className="
             relative
             w-[520px]
@@ -121,15 +135,16 @@ function LandingPage() {
           "
         >
 
-          {/* IMAGE PLACEHOLDER */}
-          <div
+        {/* HERO IMAGE */}
+          <img
+            src={landingHero}
+            alt="PRIMA Hero"
             className="
               w-full
               h-full
-              bg-[#D8CCBC]
+              object-cover
             "
           />
-
           {/* FLOATING CARD */}
           <div
             className="
