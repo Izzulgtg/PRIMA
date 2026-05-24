@@ -1,287 +1,692 @@
+import { useState } from "react"
+
 import Card from "../../components/ui/card"
 import Badge from "../../components/ui/badge"
-import Table from "../../components/ui/table"
 import Button from "../../components/ui/button"
+import Table from "../../components/ui/table"
 
 function DataManagerPage() {
+
+  const [activeTab, setActiveTab] = useState("backup")
+
   return (
-    <div>
+    <div className="space-y-10">
 
-      <h1 className="text-3xl font-bold text-prima-text">
-        Data Manager
-      </h1>
+      {/* HEADER */}
+      <div className="flex items-start justify-between">
 
-      <p className="text-prima-muted mt-2">
-        Monitoring data, backup, dan validasi integritas sistem PRIMA.
-      </p>
+        <div>
 
-      <div className="grid grid-cols-3 gap-6 mt-10">
+          <p className="text-prima-teal font-medium">
+            PRIMA Admin
+          </p>
 
-  <Card>
+          <h1
+            className="
+              text-5xl
+              font-bold
+              text-prima-text
+              mt-4
+            "
+          >
+            Manajemen Data
+          </h1>
 
-    <div className="flex items-center justify-between">
+        </div>
 
-      <div>
+        <div className="text-right">
 
-        <p className="text-prima-muted text-sm">
-          Total Records
-        </p>
+          <p className="text-prima-muted text-sm">
+            Practice Status: Active
+          </p>
 
-        <h2 className="text-3xl font-bold text-prima-text mt-2">
-          12.540
-        </h2>
+          <p className="text-prima-teal mt-2 font-medium">
+            Last Backup: Today, 04:00 AM
+          </p>
 
-      </div>
-
-      <Badge variant="info">
-        Synced
-      </Badge>
-
-    </div>
-
-  </Card>
-
-  <Card>
-
-    <div className="flex items-center justify-between">
-
-      <div>
-
-        <p className="text-prima-muted text-sm">
-          Backup Status
-        </p>
-
-        <h2 className="text-3xl font-bold text-prima-text mt-2">
-          Active
-        </h2>
+        </div>
 
       </div>
 
-      <Badge variant="success">
-        Safe
-      </Badge>
+      {/* TABS */}
+      <div
+        className="
+          flex
+          gap-6
+          border-b
+          border-prima-sand
+          pb-5
+        "
+      >
 
-    </div>
+        <button
+          onClick={() => setActiveTab("backup")}
+          className={`
+            pb-3
+            font-medium
+            ${
+              activeTab === "backup"
+                ? "text-prima-green border-b-2 border-prima-green"
+                : "text-prima-muted"
+            }
+          `}
+        >
+          Backup & Restore
+        </button>
 
-  </Card>
+        <button
+          onClick={() => setActiveTab("audit")}
+          className={`
+            pb-3
+            font-medium
+            ${
+              activeTab === "audit"
+                ? "text-prima-green border-b-2 border-prima-green"
+                : "text-prima-muted"
+            }
+          `}
+        >
+          Audit Data
+        </button>
 
-  <Card>
-
-    <div className="flex items-center justify-between">
-
-      <div>
-
-        <p className="text-prima-muted text-sm">
-          Validation Errors
-        </p>
-
-        <h2 className="text-3xl font-bold text-prima-text mt-2">
-          3
-        </h2>
-
-      </div>
-
-      <Badge variant="warning">
-        Review
-      </Badge>
-
-    </div>
-
-  </Card>
-
-</div>
-
-<div className="grid grid-cols-2 gap-6 mt-10">
-
-  <Card>
-
-    <h2 className="text-xl font-semibold text-prima-text">
-      Backup System
-    </h2>
-
-    <p className="text-prima-muted mt-2">
-      Kelola backup data sistem PRIMA.
-    </p>
-
-    <div className="flex gap-4 mt-8">
-
-      <Button variant="primary">
-        Backup Data
-      </Button>
-
-      <Button variant="outline">
-        Restore
-      </Button>
-
-    </div>
-
-  </Card>
-
-  <Card>
-
-    <h2 className="text-xl font-semibold text-prima-text">
-      Data Validation
-    </h2>
-
-    <p className="text-prima-muted mt-2">
-      Validasi integritas dan konsistensi data sistem.
-    </p>
-
-    <div className="mt-8 space-y-5">
-
-      <div className="flex items-center justify-between">
-
-        <p className="text-prima-text">
-          Patient Records
-        </p>
-
-        <Badge variant="success">
-          Valid
-        </Badge>
+        <button
+          onClick={() => setActiveTab("validation")}
+          className={`
+            pb-3
+            font-medium
+            ${
+              activeTab === "validation"
+                ? "text-prima-green border-b-2 border-prima-green"
+                : "text-prima-muted"
+            }
+          `}
+        >
+          Validasi & Integritas
+        </button>
 
       </div>
 
-      <div className="flex items-center justify-between">
+      {/* BACKUP TAB */}
+      {activeTab === "backup" && (
 
-        <p className="text-prima-text">
-          Consultation Logs
-        </p>
+        <div className="space-y-8">
 
-        <Badge variant="success">
-          Valid
-        </Badge>
+          {/* BACKUP STATUS */}
+          <Card className="bg-[#E7F0E2]">
 
-      </div>
+            <div className="flex items-center justify-between">
 
-      <div className="flex items-center justify-between">
+              <div>
 
-        <p className="text-prima-text">
-          Backup Integrity
-        </p>
+                <h2
+                  className="
+                    text-3xl
+                    font-bold
+                    text-prima-text
+                  "
+                >
+                  Backup Otomatis Aktif
+                </h2>
 
-        <Badge variant="warning">
-          Review
-        </Badge>
+                <p className="text-prima-muted mt-3">
+                  Backup terakhir:
+                  Minggu, 29 Apr 2025 · 06.00 WIB
+                </p>
 
-      </div>
+              </div>
 
-    </div>
+              <Button variant="primary">
+                Backup Sekarang
+              </Button>
 
-  </Card>
+            </div>
 
-</div>
+          </Card>
 
-<div className="mt-10">
+          {/* GRID */}
+          <div className="grid grid-cols-3 gap-8">
 
-  <Card>
+            {/* LEFT */}
+            <Card>
 
-    <div className="flex items-center justify-between">
+              <h2
+                className="
+                  text-2xl
+                  font-bold
+                  text-prima-text
+                "
+              >
+                Pengaturan Backup
+              </h2>
 
-      <h2 className="text-xl font-semibold text-prima-text">
-        Audit Logs
-      </h2>
+              <div className="space-y-6 mt-8">
 
-      <Button variant="primary">
-        Export Logs
-      </Button>
+                <div>
 
-    </div>
+                  <p className="text-prima-muted mb-3">
+                    Frekuensi
+                  </p>
 
-    <div className="mt-8">
+                  <div
+                    className="
+                      bg-prima-background
+                      rounded-2xl
+                      p-4
+                    "
+                  >
+                    Harian
+                  </div>
 
-      <Table>
+                </div>
 
-        <thead>
+                <div>
 
-          <tr className="border-b border-prima-sand">
+                  <p className="text-prima-muted mb-3">
+                    Jam Backup
+                  </p>
 
-            <th className="text-left py-4 text-prima-muted">
-              Activity
-            </th>
+                  <div
+                    className="
+                      bg-prima-background
+                      rounded-2xl
+                      p-4
+                    "
+                  >
+                    06.00 WIB
+                  </div>
 
-            <th className="text-left py-4 text-prima-muted">
-              User
-            </th>
+                </div>
 
-            <th className="text-left py-4 text-prima-muted">
-              Status
-            </th>
+                <div>
 
-          </tr>
+                  <p className="text-prima-muted mb-3">
+                    Retensi Backup
+                  </p>
 
-        </thead>
+                  <div
+                    className="
+                      bg-prima-background
+                      rounded-2xl
+                      p-4
+                    "
+                  >
+                    30 Hari
+                  </div>
 
-        <tbody>
+                </div>
 
-          <tr className="border-b border-prima-sand">
+                <Button
+                  variant="primary"
+                  className="w-full"
+                >
+                  Simpan Pengaturan
+                </Button>
 
-            <td className="py-5 text-prima-text">
-              Database Backup
-            </td>
+              </div>
 
-            <td className="py-5 text-prima-text">
-              System Admin
-            </td>
+            </Card>
 
-            <td className="py-5">
+            {/* RIGHT */}
+            <div className="col-span-2">
 
-              <Badge variant="success">
-                Completed
-              </Badge>
+              <Card>
 
-            </td>
+                <div className="flex items-center justify-between">
 
-          </tr>
+                  <h2
+                    className="
+                      text-2xl
+                      font-bold
+                      text-prima-text
+                    "
+                  >
+                    Riwayat Backup
+                  </h2>
 
-          <tr className="border-b border-prima-sand">
+                  <Badge variant="success">
+                    Auto Backup
+                  </Badge>
 
-            <td className="py-5 text-prima-text">
-              Data Validation
-            </td>
+                </div>
 
-            <td className="py-5 text-prima-text">
-              Admin PRIMA
-            </td>
+                <div className="mt-8">
 
-            <td className="py-5">
+                  <Table>
 
-              <Badge variant="warning">
-                Review
-              </Badge>
+                    <thead>
 
-            </td>
+                      <tr className="border-b border-prima-sand">
 
-          </tr>
+                        <th className="text-left py-4 text-prima-muted">
+                          Tanggal
+                        </th>
 
-          <tr>
+                        <th className="text-left py-4 text-prima-muted">
+                          Ukuran
+                        </th>
 
-            <td className="py-5 text-prima-text">
-              Restore Backup
-            </td>
+                        <th className="text-left py-4 text-prima-muted">
+                          Status
+                        </th>
 
-            <td className="py-5 text-prima-text">
-              System Service
-            </td>
+                      </tr>
 
-            <td className="py-5">
+                    </thead>
 
-              <Badge variant="info">
-                Running
-              </Badge>
+                    <tbody>
 
-            </td>
+                      <tr className="border-b border-prima-sand">
 
-          </tr>
+                        <td className="py-5">
+                          29 Apr 2025
+                        </td>
 
-        </tbody>
+                        <td className="py-5">
+                          245 MB
+                        </td>
 
-      </Table>
+                        <td className="py-5">
 
-    </div>
+                          <Badge variant="success">
+                            Berhasil
+                          </Badge>
 
-  </Card>
+                        </td>
 
-</div>
+                      </tr>
+
+                      <tr>
+
+                        <td className="py-5">
+                          28 Apr 2025
+                        </td>
+
+                        <td className="py-5">
+                          242 MB
+                        </td>
+
+                        <td className="py-5">
+
+                          <Badge variant="danger">
+                            Gagal
+                          </Badge>
+
+                        </td>
+
+                      </tr>
+
+                    </tbody>
+
+                  </Table>
+
+                </div>
+
+              </Card>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      )}
+
+      {/* AUDIT TAB */}
+      {activeTab === "audit" && (
+
+        <div className="space-y-8">
+
+          <Card className="bg-[#DCECF5]">
+
+            <p className="text-prima-text leading-relaxed">
+
+              Audit log mencatat semua perubahan data penting
+              dalam sistem untuk keamanan dan akuntabilitas.
+
+            </p>
+
+          </Card>
+
+          {/* STATS */}
+          <div className="grid grid-cols-4 gap-6">
+
+            <Card>
+
+              <p className="text-prima-muted">
+                Total Aktivitas
+              </p>
+
+              <h2 className="text-5xl font-bold mt-4">
+                156
+              </h2>
+
+            </Card>
+
+            <Card>
+
+              <p className="text-prima-muted">
+                Perubahan Data
+              </p>
+
+              <h2 className="text-5xl font-bold mt-4">
+                34
+              </h2>
+
+            </Card>
+
+            <Card>
+
+              <p className="text-prima-muted">
+                Akses Rekam Medis
+              </p>
+
+              <h2 className="text-5xl font-bold mt-4">
+                28
+              </h2>
+
+            </Card>
+
+            <Card>
+
+              <p className="text-prima-muted">
+                Aktivitas Mencurigakan
+              </p>
+
+              <h2 className="text-5xl font-bold mt-4">
+                0
+              </h2>
+
+            </Card>
+
+          </div>
+
+          {/* TABLE */}
+          <Card>
+
+            <div className="flex items-center justify-between">
+
+              <h2
+                className="
+                  text-2xl
+                  font-bold
+                  text-prima-text
+                "
+              >
+                Audit Logs
+              </h2>
+
+              <Button variant="outline">
+                Unduh Audit Log
+              </Button>
+
+            </div>
+
+            <div className="mt-8">
+
+              <Table>
+
+                <thead>
+
+                  <tr className="border-b border-prima-sand">
+
+                    <th className="text-left py-4">
+                      Waktu
+                    </th>
+
+                    <th className="text-left py-4">
+                      Aktor
+                    </th>
+
+                    <th className="text-left py-4">
+                      Aksi
+                    </th>
+
+                    <th className="text-left py-4">
+                      Data
+                    </th>
+
+                  </tr>
+
+                </thead>
+
+                <tbody>
+
+                  <tr className="border-b border-prima-sand">
+
+                    <td className="py-5">
+                      14:25
+                    </td>
+
+                    <td className="py-5">
+                      Dr. Hendra
+                    </td>
+
+                    <td className="py-5">
+
+                      <Badge variant="info">
+                        UPDATE
+                      </Badge>
+
+                    </td>
+
+                    <td className="py-5">
+                      Rekam Medis
+                    </td>
+
+                  </tr>
+
+                  <tr>
+
+                    <td className="py-5">
+                      14:10
+                    </td>
+
+                    <td className="py-5">
+                      Siti Aminah
+                    </td>
+
+                    <td className="py-5">
+
+                      <Badge variant="success">
+                        LOGIN
+                      </Badge>
+
+                    </td>
+
+                    <td className="py-5">
+                      Dashboard Admin
+                    </td>
+
+                  </tr>
+
+                </tbody>
+
+              </Table>
+
+            </div>
+
+          </Card>
+
+        </div>
+
+      )}
+
+      {/* VALIDATION TAB */}
+      {activeTab === "validation" && (
+
+        <div className="space-y-8">
+
+          <Card className="bg-[#ECE8DF]">
+
+            <p className="text-prima-text leading-relaxed">
+
+              Jalankan validasi secara berkala
+              untuk memastikan tidak ada data
+              corrupt atau tidak konsisten.
+
+            </p>
+
+          </Card>
+
+          {/* VALIDATION CARDS */}
+          <div className="space-y-6">
+
+            <Card>
+
+              <div className="flex items-center justify-between">
+
+                <div>
+
+                  <h2
+                    className="
+                      text-2xl
+                      font-bold
+                      text-prima-text
+                    "
+                  >
+                    Integritas Relasi Data
+                  </h2>
+
+                  <p className="text-prima-muted mt-2">
+                    Semua relasi data valid.
+                  </p>
+
+                </div>
+
+                <Button variant="outline">
+                  Jalankan Validasi
+                </Button>
+
+              </div>
+
+            </Card>
+
+            <Card>
+
+              <div className="flex items-center justify-between">
+
+                <div>
+
+                  <h2
+                    className="
+                      text-2xl
+                      font-bold
+                      text-prima-text
+                    "
+                  >
+                    Validasi Data Pasien
+                  </h2>
+
+                  <p className="text-prima-muted mt-2">
+                    Ditemukan 4 data tidak lengkap.
+                  </p>
+
+                </div>
+
+                <Button variant="primary">
+                  Jalankan Validasi
+                </Button>
+
+              </div>
+
+              <div className="space-y-4 mt-8">
+
+                <div
+                  className="
+                    bg-[#FFF3F1]
+                    rounded-2xl
+                    p-5
+                    flex
+                    items-center
+                    justify-between
+                  "
+                >
+
+                  <p className="text-prima-text">
+                    #PS-1029:
+                    Alamat domisili tidak lengkap
+                  </p>
+
+                  <button className="text-prima-green">
+                    Perbaiki
+                  </button>
+
+                </div>
+
+                <div
+                  className="
+                    bg-[#FFF3F1]
+                    rounded-2xl
+                    p-5
+                    flex
+                    items-center
+                    justify-between
+                  "
+                >
+
+                  <p className="text-prima-text">
+                    #PS-1102:
+                    Format NIK tidak valid
+                  </p>
+
+                  <button className="text-prima-green">
+                    Perbaiki
+                  </button>
+
+                </div>
+
+              </div>
+
+            </Card>
+
+            <Card>
+
+              <div className="flex items-center justify-between">
+
+                <div>
+
+                  <h2
+                    className="
+                      text-2xl
+                      font-bold
+                      text-prima-text
+                    "
+                  >
+                    Deteksi Data Duplikat
+                  </h2>
+
+                  <p className="text-prima-muted mt-2">
+                    Ditemukan 2 potensi data ganda.
+                  </p>
+
+                </div>
+
+                <Button variant="outline">
+                  Deteksi Sekarang
+                </Button>
+
+              </div>
+
+            </Card>
+
+          </div>
+
+          {/* ACTIONS */}
+          <div className="flex gap-5">
+
+            <Button variant="primary">
+              Jalankan Semua Validasi
+            </Button>
+
+            <Button variant="outline">
+              Unduh Laporan
+            </Button>
+
+          </div>
+
+        </div>
+
+      )}
 
     </div>
   )

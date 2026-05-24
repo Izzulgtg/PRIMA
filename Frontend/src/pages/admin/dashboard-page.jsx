@@ -12,41 +12,68 @@ function DashboardPage() {
   const [isModalOpen, setIsModalOpen] = useState(false)
 
   return (
-    <div>
+    <div className="space-y-10">
 
-      <h1 className="text-3xl font-bold text-prima-text">
-        Dashboard Admin
-      </h1>
+      {/* HEADER */}
+      <div
+        className="
+          flex
+          items-start
+          justify-between
+          gap-10
+        "
+      >
 
-      <div className="mt-4">
-        <Badge variant="success">
-          System Active
-        </Badge>
-      </div>
+        <div>
 
-      {/* ACTION BUTTONS */}
-      <div className="flex gap-4 mt-6">
+          <p className="text-prima-teal font-medium">
+            PRIMA Configuration
+          </p>
 
-        <Button variant="primary">
-          Simpan
-        </Button>
+          <h1
+            className="
+              text-5xl
+              font-bold
+              text-prima-text
+              mt-4
+            "
+          >
+            Dashboard Admin
+          </h1>
 
-        <Button variant="secondary">
-          Edit
-        </Button>
+          <p
+            className="
+              text-prima-muted
+              mt-5
+              text-lg
+              leading-relaxed
+              max-w-2xl
+            "
+          >
+            Kelola konfigurasi sistem,
+            monitoring layanan,
+            keamanan platform,
+            dan pengaturan PRIMA.
+          </p>
 
-        <Button variant="danger">
-          Hapus
-        </Button>
+        </div>
 
-        <Button variant="outline">
-          Detail
-        </Button>
+        <div className="flex gap-4">
+
+          <Badge variant="success">
+            System Active
+          </Badge>
+
+          <Button variant="primary">
+            + Tambah Slot
+          </Button>
+
+        </div>
 
       </div>
 
       {/* SEARCH */}
-      <div className="mt-6 max-w-md">
+      <div className="max-w-xl">
 
         <Input
           placeholder="Cari data pasien..."
@@ -55,80 +82,145 @@ function DashboardPage() {
       </div>
 
       {/* STAT CARDS */}
-      <div className="grid grid-cols-3 gap-6 mt-8">
+      <div className="grid grid-cols-3 gap-8">
 
         <Card>
 
-          <h2 className="text-prima-muted text-sm">
-            Total Pasien
-          </h2>
+          <div className="flex items-center justify-between">
 
-          <p className="text-3xl font-bold text-prima-text mt-2">
-            120
-          </p>
+            <div>
+
+              <p className="text-prima-muted text-sm">
+                Total Pasien
+              </p>
+
+              <h2
+                className="
+                  text-5xl
+                  font-bold
+                  text-prima-text
+                  mt-4
+                "
+              >
+                120
+              </h2>
+
+              <p className="text-prima-green mt-4 text-sm">
+                +12% bulan ini
+              </p>
+
+            </div>
+
+            <div
+              className="
+                w-16
+                h-16
+                rounded-2xl
+                bg-[#DDE8D7]
+              "
+            />
+
+          </div>
 
         </Card>
 
         <Card>
 
-          <h2 className="text-prima-muted text-sm">
-            Konsultasi Hari Ini
-          </h2>
+          <div className="flex items-center justify-between">
 
-          <p className="text-3xl font-bold text-prima-text mt-2">
-            34
-          </p>
+            <div>
+
+              <p className="text-prima-muted text-sm">
+                Konsultasi Hari Ini
+              </p>
+
+              <h2
+                className="
+                  text-5xl
+                  font-bold
+                  text-prima-text
+                  mt-4
+                "
+              >
+                34
+              </h2>
+
+              <p className="text-prima-teal mt-4 text-sm">
+                +8% hari ini
+              </p>
+
+            </div>
+
+            <div
+              className="
+                w-16
+                h-16
+                rounded-2xl
+                bg-[#DCE9EE]
+              "
+            />
+
+          </div>
 
         </Card>
 
         <Card>
 
-          <h2 className="text-prima-muted text-sm">
-            Maintenance Aktif
-          </h2>
+          <div className="flex items-center justify-between">
 
-          <p className="text-3xl font-bold text-prima-text mt-2">
-            2
-          </p>
+            <div>
+
+              <p className="text-prima-muted text-sm">
+                Maintenance Aktif
+              </p>
+
+              <h2
+                className="
+                  text-5xl
+                  font-bold
+                  text-prima-text
+                  mt-4
+                "
+              >
+                2
+              </h2>
+
+              <p className="text-[#C4846A] mt-4 text-sm">
+                Perlu pengecekan
+              </p>
+
+            </div>
+
+            <div
+              className="
+                w-16
+                h-16
+                rounded-2xl
+                bg-[#F3DDD4]
+              "
+            />
+
+          </div>
 
         </Card>
 
       </div>
 
-      {/* MODAL BUTTON */}
-      <div className="mt-8">
-
-        <Button
-          variant="primary"
-          onClick={() => setIsModalOpen(true)}
-        >
-          Open Modal
-        </Button>
-
-      </div>
-
-      {/* MODAL */}
-      <Modal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        title="Tambah Data"
-      >
-
-        <p className="text-prima-muted">
-          Ini isi modal PRIMA.
-        </p>
-
-      </Modal>
-
-      {/* ADVANCED DASHBOARD */}
-      <div className="grid grid-cols-2 gap-6 mt-10">
+      {/* MAIN CONTENT */}
+      <div className="grid grid-cols-2 gap-8">
 
         {/* RECENT ACTIVITY */}
         <Card>
 
           <div className="flex items-center justify-between">
 
-            <h2 className="text-xl font-semibold text-prima-text">
+            <h2
+              className="
+                text-2xl
+                font-semibold
+                text-prima-text
+              "
+            >
               Recent Activity
             </h2>
 
@@ -138,7 +230,7 @@ function DashboardPage() {
 
           </div>
 
-          <div className="mt-6 space-y-5">
+          <div className="space-y-6 mt-8">
 
             <div
               className="
@@ -147,7 +239,7 @@ function DashboardPage() {
                 justify-between
                 border-b
                 border-prima-sand
-                pb-4
+                pb-5
               "
             >
 
@@ -176,7 +268,7 @@ function DashboardPage() {
                 justify-between
                 border-b
                 border-prima-sand
-                pb-4
+                pb-5
               "
             >
 
@@ -231,28 +323,30 @@ function DashboardPage() {
         {/* SYSTEM STATUS */}
         <Card>
 
-          <h2 className="text-xl font-semibold text-prima-text">
-            System Status
-          </h2>
+          <div className="flex items-center justify-between">
 
-          <div className="mt-8 space-y-6">
+            <h2
+              className="
+                text-2xl
+                font-semibold
+                text-prima-text
+              "
+            >
+              System Status
+            </h2>
+
+            <Badge variant="success">
+              Online
+            </Badge>
+
+          </div>
+
+          <div className="space-y-6 mt-8">
 
             <div className="flex items-center justify-between">
 
-              <p className="text-prima-text font-medium">
+              <p className="text-prima-text">
                 Server Status
-              </p>
-
-              <Badge variant="success">
-                Online
-              </Badge>
-
-            </div>
-
-            <div className="flex items-center justify-between">
-
-              <p className="text-prima-text font-medium">
-                Database
               </p>
 
               <Badge variant="success">
@@ -263,7 +357,19 @@ function DashboardPage() {
 
             <div className="flex items-center justify-between">
 
-              <p className="text-prima-text font-medium">
+              <p className="text-prima-text">
+                Database
+              </p>
+
+              <Badge variant="success">
+                Active
+              </Badge>
+
+            </div>
+
+            <div className="flex items-center justify-between">
+
+              <p className="text-prima-text">
                 API Service
               </p>
 
@@ -275,7 +381,7 @@ function DashboardPage() {
 
             <div className="flex items-center justify-between">
 
-              <p className="text-prima-text font-medium">
+              <p className="text-prima-text">
                 Backup Service
               </p>
 
@@ -285,123 +391,151 @@ function DashboardPage() {
 
             </div>
 
-            <div className="mt-10">
-
-  <Card>
-
-    <div className="flex items-center justify-between">
-
-      <h2 className="text-xl font-semibold text-prima-text">
-        Data Pengguna
-      </h2>
-
-      <Button variant="primary">
-        Tambah User
-      </Button>
-
-    </div>
-
-    <div className="mt-8">
-
-      <Table>
-
-        <thead>
-
-          <tr className="border-b border-prima-sand">
-
-            <th className="text-left py-4 text-prima-muted font-medium">
-              Nama
-            </th>
-
-            <th className="text-left py-4 text-prima-muted font-medium">
-              Role
-            </th>
-
-            <th className="text-left py-4 text-prima-muted font-medium">
-              Status
-            </th>
-
-          </tr>
-
-        </thead>
-
-        <tbody>
-
-          <tr className="border-b border-prima-sand">
-
-            <td className="py-5 text-prima-text">
-              izzul
-            </td>
-
-            <td className="py-5">
-              <Badge variant="info">
-                Admin
-              </Badge>
-            </td>
-
-            <td className="py-5">
-              <Badge variant="success">
-                Active
-              </Badge>
-            </td>
-
-          </tr>
-
-          <tr className="border-b border-prima-sand">
-
-            <td className="py-5 text-prima-text">
-              izzul (2)
-            </td>
-
-            <td className="py-5">
-              <Badge variant="warning">
-                Dokter
-              </Badge>
-            </td>
-
-            <td className="py-5">
-              <Badge variant="success">
-                Active
-              </Badge>
-            </td>
-
-          </tr>
-
-          <tr>
-
-            <td className="py-5 text-prima-text">
-              izzul (3)
-            </td>
-
-            <td className="py-5">
-              <Badge variant="secondary">
-                Pasien
-              </Badge>
-            </td>
-
-            <td className="py-5">
-              <Badge variant="danger">
-                Offline
-              </Badge>
-            </td>
-
-          </tr>
-
-        </tbody>
-
-      </Table>
-
-    </div>
-
-  </Card>
-
-</div>
-
           </div>
 
         </Card>
 
       </div>
+
+      {/* TABLE */}
+      <Card>
+
+        <div className="flex items-center justify-between">
+
+          <h2
+            className="
+              text-2xl
+              font-semibold
+              text-prima-text
+            "
+          >
+            Data Pengguna
+          </h2>
+
+          <Button variant="primary">
+            Tambah User
+          </Button>
+
+        </div>
+
+        <div className="mt-8">
+
+          <Table>
+
+            <thead>
+
+              <tr className="border-b border-prima-sand">
+
+                <th className="text-left py-4 text-prima-muted">
+                  Nama
+                </th>
+
+                <th className="text-left py-4 text-prima-muted">
+                  Role
+                </th>
+
+                <th className="text-left py-4 text-prima-muted">
+                  Status
+                </th>
+
+              </tr>
+
+            </thead>
+
+            <tbody>
+
+              <tr className="border-b border-prima-sand">
+
+                <td className="py-5 text-prima-text">
+                  izzul
+                </td>
+
+                <td className="py-5">
+
+                  <Badge variant="info">
+                    Admin
+                  </Badge>
+
+                </td>
+
+                <td className="py-5">
+
+                  <Badge variant="success">
+                    Active
+                  </Badge>
+
+                </td>
+
+              </tr>
+
+              <tr className="border-b border-prima-sand">
+
+                <td className="py-5 text-prima-text">
+                  dr. Prima
+                </td>
+
+                <td className="py-5">
+
+                  <Badge variant="warning">
+                    Dokter
+                  </Badge>
+
+                </td>
+
+                <td className="py-5">
+
+                  <Badge variant="success">
+                    Active
+                  </Badge>
+
+                </td>
+
+              </tr>
+
+              <tr>
+
+                <td className="py-5 text-prima-text">
+                  pasien01
+                </td>
+
+                <td className="py-5">
+
+                  <Badge variant="secondary">
+                    Pasien
+                  </Badge>
+
+                </td>
+
+                <td className="py-5">
+
+                  <Badge variant="danger">
+                    Offline
+                  </Badge>
+
+                </td>
+
+              </tr>
+
+            </tbody>
+
+          </Table>
+
+        </div>
+
+      </Card>
+
+      {/* MODAL */}
+      <Modal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        title="Tambah Data"
+      >
+
+        <p className="text-prima-muted">
+          Ini isi modal PRIMA.
+        </p>
+
+      </Modal>
 
     </div>
   )

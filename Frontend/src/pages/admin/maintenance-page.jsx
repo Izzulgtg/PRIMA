@@ -1,211 +1,465 @@
 import Card from "../../components/ui/card"
 import Badge from "../../components/ui/badge"
-import Table from "../../components/ui/table"
 import Button from "../../components/ui/button"
 
 function MaintenancePage() {
   return (
-    <div>
+    <div className="space-y-10">
 
-      <h1 className="text-3xl font-bold text-prima-text">
-        Maintenance System
-      </h1>
+      {/* HEADER */}
+      <div className="flex items-start justify-between">
 
-      <p className="text-prima-muted mt-2">
-        Monitoring dan pengelolaan maintenance sistem PRIMA.
-      </p>
+        <div>
 
-      <div className="grid grid-cols-3 gap-6 mt-10">
+          <p className="text-prima-teal font-medium">
+            PRIMA Maintenance
+          </p>
 
-  <Card>
+          <h1
+            className="
+              text-5xl
+              font-bold
+              text-prima-text
+              mt-4
+            "
+          >
+            Periodic Maintenance
+          </h1>
 
-    <div className="flex items-center justify-between">
+          <p
+            className="
+              text-prima-muted
+              mt-4
+              text-lg
+            "
+          >
+            System integrity check and routine
+            optimization tasks for PRIMA medical core.
+          </p>
 
-      <div>
+        </div>
 
-        <p className="text-prima-muted text-sm">
-          Active Maintenance
-        </p>
-
-        <h2 className="text-3xl font-bold text-prima-text mt-2">
-          2
-        </h2>
-
-      </div>
-
-      <Badge variant="warning">
-        Running
-      </Badge>
-
-    </div>
-
-  </Card>
-
-  <Card>
-
-    <div className="flex items-center justify-between">
-
-      <div>
-
-        <p className="text-prima-muted text-sm">
-          Scheduled
-        </p>
-
-        <h2 className="text-3xl font-bold text-prima-text mt-2">
-          5
-        </h2>
+        <Button variant="primary">
+          Tambah Slot Baru
+        </Button>
 
       </div>
 
-      <Badge variant="info">
-        Upcoming
-      </Badge>
+      {/* MAINTENANCE GRID */}
+      <div className="grid grid-cols-3 gap-8">
 
-    </div>
+        {/* DAILY */}
+        <Card className="border-t-4 border-[#4D7C57]">
 
-  </Card>
+          <div className="flex items-center justify-between">
 
-  <Card>
+            <h2
+              className="
+                text-2xl
+                font-bold
+                text-[#4D7C57]
+              "
+            >
+              DAILY
+            </h2>
 
-    <div className="flex items-center justify-between">
+            <Badge variant="success">
+              3 Tasks
+            </Badge>
 
-      <div>
+          </div>
 
-        <p className="text-prima-muted text-sm">
-          Completed
-        </p>
+          <div className="space-y-5 mt-8">
 
-        <h2 className="text-3xl font-bold text-prima-text mt-2">
-          18
-        </h2>
+            <div className="bg-prima-background rounded-2xl p-5">
+
+              <h3 className="font-semibold text-prima-text">
+                Server status check
+              </h3>
+
+              <p className="text-sm text-prima-muted mt-2">
+                Verify uptime and CPU load.
+              </p>
+
+              <Button
+                variant="primary"
+                className="mt-5 w-full"
+              >
+                Tandai Selesai
+              </Button>
+
+            </div>
+
+            <div className="bg-prima-background rounded-2xl p-5">
+
+              <h3 className="font-semibold text-prima-text">
+                Backup verification
+              </h3>
+
+              <p className="text-sm text-prima-muted mt-2">
+                Confirm overnight snapshots.
+              </p>
+
+              <Button
+                variant="primary"
+                className="mt-5 w-full"
+              >
+                Tandai Selesai
+              </Button>
+
+            </div>
+
+          </div>
+
+        </Card>
+
+        {/* WEEKLY */}
+        <Card className="border-t-4 border-[#4B8196]">
+
+          <div className="flex items-center justify-between">
+
+            <h2
+              className="
+                text-2xl
+                font-bold
+                text-[#4B8196]
+              "
+            >
+              WEEKLY
+            </h2>
+
+            <Badge variant="info">
+              2 Tasks
+            </Badge>
+
+          </div>
+
+          <div className="space-y-5 mt-8">
+
+            <div className="bg-prima-background rounded-2xl p-5">
+
+              <h3 className="font-semibold text-prima-text">
+                Log cleaning
+              </h3>
+
+              <p className="text-sm text-prima-muted mt-2">
+                Archive logs older than 7 days.
+              </p>
+
+              <Button
+                variant="outline"
+                className="mt-5 w-full"
+              >
+                Tandai Selesai
+              </Button>
+
+            </div>
+
+            <div className="bg-prima-background rounded-2xl p-5">
+
+              <h3 className="font-semibold text-prima-text">
+                DB optimization
+              </h3>
+
+              <p className="text-sm text-prima-muted mt-2">
+                Run VACUUM and reindex.
+              </p>
+
+              <Button
+                variant="outline"
+                className="mt-5 w-full"
+              >
+                Tandai Selesai
+              </Button>
+
+            </div>
+
+          </div>
+
+        </Card>
+
+        {/* MONTHLY */}
+        <Card className="border-t-4 border-[#C9A227]">
+
+          <div className="flex items-center justify-between">
+
+            <h2
+              className="
+                text-2xl
+                font-bold
+                text-[#C9A227]
+              "
+            >
+              MONTHLY
+            </h2>
+
+            <Badge variant="warning">
+              3 Tasks
+            </Badge>
+
+          </div>
+
+          <div className="space-y-5 mt-8">
+
+            <div className="bg-prima-background rounded-2xl p-5">
+
+              <h3 className="font-semibold text-prima-text">
+                Dependency updates
+              </h3>
+
+              <p className="text-sm text-prima-muted mt-2">
+                Audit and update packages.
+              </p>
+
+              <Button
+                variant="secondary"
+                className="mt-5 w-full"
+              >
+                Tandai Selesai
+              </Button>
+
+            </div>
+
+            <div className="bg-prima-background rounded-2xl p-5">
+
+              <h3 className="font-semibold text-prima-text">
+                Storage review
+              </h3>
+
+              <p className="text-sm text-prima-muted mt-2">
+                Purge obsolete temporary files.
+              </p>
+
+              <Button
+                variant="secondary"
+                className="mt-5 w-full"
+              >
+                Tandai Selesai
+              </Button>
+
+            </div>
+
+          </div>
+
+        </Card>
 
       </div>
 
-      <Badge variant="success">
-        Done
-      </Badge>
+      {/* BOTTOM SECTION */}
+      <div className="grid grid-cols-3 gap-8">
 
-    </div>
+        {/* PROGRESS */}
+        <div className="col-span-2">
 
-  </Card>
+          <Card>
 
-</div>
+            <div className="flex items-center justify-between">
 
-<div className="mt-10">
+              <div>
 
-  <Card>
+                <h2
+                  className="
+                    text-3xl
+                    font-bold
+                    text-prima-text
+                  "
+                >
+                  Maintenance Progress
+                </h2>
 
-    <div className="flex items-center justify-between">
+                <p className="text-prima-muted mt-2">
+                  Real-time completion status.
+                </p>
 
-      <h2 className="text-xl font-semibold text-prima-text">
-        Maintenance History
-      </h2>
+              </div>
 
-      <Button variant="primary">
-        Add Maintenance
-      </Button>
+              <div className="text-right">
 
-    </div>
+                <h2
+                  className="
+                    text-5xl
+                    font-bold
+                    text-prima-green
+                  "
+                >
+                  68%
+                </h2>
 
-    <div className="mt-8">
+                <p className="text-prima-muted mt-2">
+                  TOTAL HEALTH SCORE
+                </p>
 
-      <Table>
+              </div>
 
-        <thead>
+            </div>
 
-          <tr className="border-b border-prima-sand">
+            {/* PROGRESS BARS */}
+            <div className="grid grid-cols-3 gap-6 mt-10">
 
-            <th className="text-left py-4 text-prima-muted">
-              System
-            </th>
+              <div>
 
-            <th className="text-left py-4 text-prima-muted">
-              Date
-            </th>
+                <div className="flex justify-between">
 
-            <th className="text-left py-4 text-prima-muted">
-              Status
-            </th>
+                  <p className="font-medium">
+                    Daily Tasks
+                  </p>
 
-          </tr>
+                  <p>33%</p>
 
-        </thead>
+                </div>
 
-        <tbody>
+                <div
+                  className="
+                    w-full
+                    h-3
+                    rounded-full
+                    bg-[#E5DED2]
+                    mt-3
+                  "
+                >
 
-          <tr className="border-b border-prima-sand">
+                  <div
+                    className="
+                      h-full
+                      w-[33%]
+                      rounded-full
+                      bg-prima-green
+                    "
+                  />
 
-            <td className="py-5 text-prima-text">
-              Database Backup
-            </td>
+                </div>
 
-            <td className="py-5 text-prima-text">
-              20 Mei 2026
-            </td>
+              </div>
 
-            <td className="py-5">
+              <div>
+
+                <div className="flex justify-between">
+
+                  <p className="font-medium">
+                    Weekly Tasks
+                  </p>
+
+                  <p>0%</p>
+
+                </div>
+
+                <div
+                  className="
+                    w-full
+                    h-3
+                    rounded-full
+                    bg-[#E5DED2]
+                    mt-3
+                  "
+                >
+
+                  <div
+                    className="
+                      h-full
+                      w-[5%]
+                      rounded-full
+                      bg-[#4B8196]
+                    "
+                  />
+
+                </div>
+
+              </div>
+
+              <div>
+
+                <div className="flex justify-between">
+
+                  <p className="font-medium">
+                    Monthly Tasks
+                  </p>
+
+                  <p>0%</p>
+
+                </div>
+
+                <div
+                  className="
+                    w-full
+                    h-3
+                    rounded-full
+                    bg-[#E5DED2]
+                    mt-3
+                  "
+                >
+
+                  <div
+                    className="
+                      h-full
+                      w-[5%]
+                      rounded-full
+                      bg-[#C9A227]
+                    "
+                  />
+
+                </div>
+
+              </div>
+
+            </div>
+
+          </Card>
+
+        </div>
+
+        {/* SECURITY SCORE */}
+        <Card className="bg-[#4D7C57] text-white">
+
+          <h2 className="text-2xl font-bold">
+            Infrastructure Security Score
+          </h2>
+
+          <p className="mt-4 text-white/80">
+            Based on latest maintenance logs
+            and patch compliance.
+          </p>
+
+          <div className="mt-12">
+
+            <h1 className="text-7xl font-bold">
+              9.4
+            </h1>
+
+            <p className="mt-3 text-white/70">
+              /10
+            </p>
+
+          </div>
+
+          <div className="space-y-5 mt-12">
+
+            <div className="flex justify-between">
+
+              <p>SSL Status</p>
 
               <Badge variant="success">
-                Completed
+                ACTIVE
               </Badge>
 
-            </td>
+            </div>
 
-          </tr>
+            <div className="flex justify-between">
 
-          <tr className="border-b border-prima-sand">
-
-            <td className="py-5 text-prima-text">
-              API Optimization
-            </td>
-
-            <td className="py-5 text-prima-text">
-              22 Mei 2026
-            </td>
-
-            <td className="py-5">
-
-              <Badge variant="warning">
-                Running
-              </Badge>
-
-            </td>
-
-          </tr>
-
-          <tr>
-
-            <td className="py-5 text-prima-text">
-              Security Patch
-            </td>
-
-            <td className="py-5 text-prima-text">
-              25 Mei 2026
-            </td>
-
-            <td className="py-5">
+              <p>API Latency</p>
 
               <Badge variant="info">
-                Scheduled
+                42ms
               </Badge>
 
-            </td>
+            </div>
 
-          </tr>
+          </div>
 
-        </tbody>
+        </Card>
 
-      </Table>
-
-    </div>
-
-  </Card>
-
-</div>
+      </div>
 
     </div>
-
-    
   )
 }
 
