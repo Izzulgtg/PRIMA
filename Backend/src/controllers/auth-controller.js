@@ -104,8 +104,7 @@ exports.login = async (req, res) => {
 
   try {
     // Cari user berdasarkan email di database
-    const [users] = await db.query('SELECT * FROM users WHERE email = ?', [email]);
-    
+const [users] = await db.query('SELECT * FROM users WHERE email = ? AND deleted_at IS NULL', [email]);    
     // Jika user tidak ditemukan
     if (users.length === 0) {
       return res.status(401).json({ message: 'Email atau password salah!' });
@@ -171,5 +170,104 @@ exports.logout = async (req, res) => {
   } catch (error) {
     console.error('Error saat logout:', error);
     return res.status(500).json({ message: 'Terjadi kesalahan pada server saat logout.' });
+  }
+};
+
+// =========================================================================
+// 4. GET PROFIL SAYA (Mengambil data user + profil sesuai token yang login)
+// =========================================================================
+exports.getProfilSaya = async (req, res) => {
+  try {
+    // req.user.id didapatkan otomatis dari hasil verifikasi token JWT oleh middleware
+    const userId = req.user.id;
+
+    // Lakukan JOIN antara tabel `users` dan `profil_pasien` untuk menarik data lengkap
+    const query = `
+      SELECT u.id, u.nama_lengkap, u.email, u.role, u.nomor_hp, u.last_login_at,
+             p.nik, p.tanggal_lahir, p.jenis_kelamin
+      FROM users u
+      LEFT JOIN profil_pasien p ON u.id = p.user_id
+      WHERE u.id = ? AND u.deleted_at IS NULL
+    `;
+    
+    const [results] = await db.query(query, [userId]);
+
+    if (results.length === 0) {
+      return res.status(404).json({ message: 'Data pengguna tidak ditemukan atau sudah dihapus.' });
+    }
+
+    return res.status(200).json({
+      success: true,
+      data: results[0]
+    });
+
+  } catch (error) {
+    console.error('Error saat mengambil profil:', error);
+    return res.status(500).json({ message: 'Terjadi kesalahan pada server saat mengambil data profil.' });
+  }
+};
+
+// =========================================================================
+// 5. UPDATE PROFIL SAYA (Mengubah data nomor HP, tanggal lahir, jenis kelamin)
+// =========================================================================
+exports.updateProfilSaya = async (req, res) => {
+  const { nama_lengkap, nomor_hp, nik, tanggal_lahir, jenis_kelamin } = req.body;
+  const userId = req.user.id;
+
+  // Validasi opsional: Jika NIK diubah, pastikan harus 16 digit angka
+  if (nik && (nik.length !== 16 || isNaN(nik))) {
+    return res.status(400).json({ message: 'NIK harus berjumlah 16 digit angka!' });
+  }
+
+  try {
+    // 1. Update data di tabel `users` (Nama & Nomor HP)
+    await db.query(
+      'UPDATE users SET nama_lengkap = ?, nomor_hp = ? WHERE id = ?',
+      [nama_lengkap, nomor_hp, userId]
+    );
+
+    // 2. Update data tambahan di tabel `profil_pasien`
+    await db.query(
+      'UPDATE profil_pasien SET nik = ?, tanggal_lahir = ?, jenis_kelamin = ? WHERE user_id = ?',
+      [nik, tanggal_lahir, jenis_kelamin, userId]
+    );
+
+    return res.status(200).json({
+      success: true,
+      message: 'Profil Anda berhasil diperbarui dengan sukses!'
+    });
+
+  } catch (error) {
+    console.error('Error saat update profil:', error);
+    return res.status(500).json({ message: 'Terjadi kesalahan pada server saat memperbarui profil.' });
+  }
+};
+
+// =========================================================================
+// 6. SOFT DELETE USER (Hanya menaruh tanggal di deleted_at tanpa hapus fisik)
+// =========================================================================
+exports.softDeleteUser = async (req, res) => {
+  const { id } = req.params; // Mengambil ID user yang mau dihapus dari URL
+
+  try {
+    // Jalankan query UPDATE untuk mengisi kolom deleted_at
+    const [result] = await db.query(
+      'UPDATE users SET deleted_at = NOW(), is_active = 0 WHERE id = ? AND deleted_at IS NULL',
+      [id]
+    );
+
+    // Jika tidak ada baris yang berubah, berarti user sudah terhapus sebelumnya atau ID salah
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ message: 'User tidak ditemukan atau sudah dihapus sebelumnya.' });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: `User dengan ID ${id} berhasil dihapus (Soft Delete) dari sistem.`
+    });
+
+  } catch (error) {
+    console.error('Error saat soft delete user:', error);
+    return res.status(500).json({ message: 'Terjadi kesalahan pada server saat menghapus user.' });
   }
 };
