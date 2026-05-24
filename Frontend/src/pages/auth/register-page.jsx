@@ -3,7 +3,9 @@ import Input from "../../components/ui/input"
 import { useNavigate } from "react-router-dom"
 
 function RegisterPage() {
-const navigate = useNavigate()
+
+  const navigate = useNavigate()
+
   return (
     <div
       className="
@@ -16,107 +18,410 @@ const navigate = useNavigate()
       "
     >
 
-      <div
-        className="
-          bg-prima-card
-          w-full
-          max-w-md
-          rounded-3xl
-          p-8
-          shadow-sm
-          border
-          border-prima-sand
-        "
-      >
+      <div className="w-full max-w-2xl">
 
-        <div>
+        {/* LOGO */}
+        <div className="text-center mb-10">
 
           <h1 className="text-4xl font-bold text-prima-green">
             PRIMA
           </h1>
 
-          <h2 className="text-2xl font-semibold text-prima-text mt-6">
-            Create Account
-          </h2>
-
           <p className="text-prima-muted mt-2">
-            Daftar untuk menggunakan layanan PRIMA.
+            Health Services
           </p>
 
         </div>
 
-        <div className="mt-8 space-y-5">
+        {/* CARD */}
+        <div
+          className="
+            bg-white
+            rounded-[32px]
+            border
+            border-prima-sand
+            p-10
+            shadow-sm
+          "
+        >
 
-          <Input
-            type="text"
-            placeholder="Nama lengkap"
-          />
+          {/* HEADER */}
+          <div className="text-center">
 
-          <Input
-            type="email"
-            placeholder="Masukkan email"
-          />
+            <h2
+              className="
+                text-4xl
+                font-bold
+                text-prima-text
+              "
+            >
+              Buat Akun Baru
+            </h2>
 
-          <Input
-            type="password"
-            placeholder="Masukkan password"
-          />
+            <p
+              className="
+                text-prima-muted
+                mt-4
+                leading-relaxed
+              "
+            >
+              Daftar untuk mulai menggunakan
+              layanan kesehatan PRIMA
+            </p>
 
-          <select
-            className="
-              w-full
-              px-4
-              py-3
-              rounded-xl
-              border
-              border-prima-sand
-              bg-white
-              text-prima-text
+          </div>
 
-              focus:outline-none
-              focus:ring-2
-              focus:ring-prima-green
-            "
-          >
+          {/* FORM */}
+          <div className="mt-10 space-y-6">
 
-            <option>
-              Pilih Role
-            </option>
+            {/* NAMA */}
+            <div>
 
-            <option>
-              Pasien
-            </option>
+              <label
+                className="
+                  text-sm
+                  font-medium
+                  text-prima-text
+                "
+              >
+                Nama lengkap
+              </label>
 
-            <option>
-              Dokter
-            </option>
+              <div className="mt-2">
 
-          </select>
+                <Input
+                  type="text"
+                  placeholder="Masukkan nama sesuai KTP"
+                />
 
-          <Input
-            type="password"
-            placeholder="Konfirmasi password"
-          />
+              </div>
+
+            </div>
+
+            {/* NIK */}
+            <div>
+
+              <label
+                className="
+                  text-sm
+                  font-medium
+                  text-prima-text
+                "
+              >
+                NIK/SIP/NIP
+              </label>
+
+              <input
+                type="text"
+                placeholder="16 digit nomor induk kependudukan"
+                className="
+                  w-full
+                  mt-2
+                  px-4
+                  py-3
+                  rounded-2xl
+                  border
+                  border-red-300
+                  bg-[#F8F5EF]
+                  outline-none
+                "
+              />
+
+              <p className="text-red-400 text-xs mt-2">
+                Wajib diisi • Sesuai KTP Anda
+              </p>
+
+            </div>
+
+            {/* HP + EMAIL */}
+            <div className="grid grid-cols-2 gap-4">
+
+              <div>
+
+                <label
+                  className="
+                    text-sm
+                    font-medium
+                    text-prima-text
+                  "
+                >
+                  Nomor HP
+                </label>
+
+                <div className="flex gap-3 mt-2">
+
+                  <div
+                    className="
+                      px-4
+                      py-3
+                      rounded-2xl
+                      bg-[#F8F5EF]
+                      border
+                      border-prima-sand
+                      text-prima-text
+                    "
+                  >
+                    +62
+                  </div>
+
+                  <input
+                    type="text"
+                    placeholder="812345678"
+                    className="
+                      flex-1
+                      px-4
+                      py-3
+                      rounded-2xl
+                      bg-[#F8F5EF]
+                      border
+                      border-prima-sand
+                      outline-none
+                    "
+                  />
+
+                </div>
+
+              </div>
+
+              <div>
+
+                <label
+                  className="
+                    text-sm
+                    font-medium
+                    text-prima-text
+                  "
+                >
+                  Email
+                </label>
+
+                <div className="mt-2">
+
+                  <Input
+                    type="email"
+                    placeholder="contoh@mail.com"
+                  />
+
+                </div>
+
+              </div>
+
+            </div>
+
+            {/* TANGGAL + GENDER */}
+            <div className="grid grid-cols-2 gap-4">
+
+              <div>
+
+                <label
+                  className="
+                    text-sm
+                    font-medium
+                    text-prima-text
+                  "
+                >
+                  Tanggal lahir
+                </label>
+
+                <div className="mt-2">
+
+                  <input
+                    type="date"
+                    className="
+                      w-full
+                      px-4
+                      py-3
+                      rounded-2xl
+                      bg-[#F8F5EF]
+                      border
+                      border-prima-sand
+                      outline-none
+                    "
+                  />
+
+                </div>
+
+              </div>
+
+              <div>
+
+                <label
+                  className="
+                    text-sm
+                    font-medium
+                    text-prima-text
+                  "
+                >
+                  Jenis kelamin
+                </label>
+
+                <div className="flex gap-5 mt-5">
+
+                  <label className="flex items-center gap-2">
+                    <input type="radio" name="gender" />
+                    Laki-laki
+                  </label>
+
+                  <label className="flex items-center gap-2">
+                    <input type="radio" name="gender" />
+                    Perempuan
+                  </label>
+
+                </div>
+
+              </div>
+
+            </div>
+
+            {/* PASSWORD */}
+            <div>
+
+              <label
+                className="
+                  text-sm
+                  font-medium
+                  text-prima-text
+                "
+              >
+                Password
+              </label>
+
+              <div className="mt-2">
+
+                <Input
+                  type="password"
+                  placeholder="Masukkan password"
+                />
+
+              </div>
+
+              {/* PASSWORD STRENGTH */}
+              <div className="mt-4">
+
+                <div
+                  className="
+                    w-full
+                    h-2
+                    rounded-full
+                    bg-[#E9E1D6]
+                    overflow-hidden
+                  "
+                >
+
+                  <div
+                    className="
+                      w-[70%]
+                      h-full
+                      bg-[#C6A8FF]
+                    "
+                  />
+
+                </div>
+
+                <div className="flex justify-between mt-2">
+
+                  <p className="text-xs text-prima-muted">
+                    Cukup
+                  </p>
+
+                  <p className="text-xs text-prima-muted">
+                    70%
+                  </p>
+
+                </div>
+
+              </div>
+
+            </div>
+
+            {/* KONFIRMASI PASSWORD */}
+            <div>
+
+              <label
+                className="
+                  text-sm
+                  font-medium
+                  text-prima-text
+                "
+              >
+                Konfirmasi password
+              </label>
+
+              <div className="mt-2">
+
+                <Input
+                  type="password"
+                  placeholder="Konfirmasi password"
+                />
+
+              </div>
+
+            </div>
+
+            {/* CHECKBOX */}
+            <label className="flex items-start gap-3">
+
+              <input
+                type="checkbox"
+                className="mt-1"
+              />
+
+              <p
+                className="
+                  text-sm
+                  text-prima-muted
+                  leading-relaxed
+                "
+              >
+                Saya menyetujui Syarat &
+                Ketentuan serta Kebijakan
+                Privasi yang berlaku
+                di layanan kesehatan PRIMA.
+              </p>
+
+            </label>
+
+            {/* BUTTON */}
+            <div className="pt-2">
+
+              <Button variant="primary">
+                Daftar Sekarang
+              </Button>
+
+            </div>
+
+            {/* LOGIN */}
+            <div className="text-center pt-4">
+
+              <p className="text-prima-muted text-sm">
+                Sudah punya akun?
+              </p>
+
+              <div className="mt-4">
+
+                <Button
+                  variant="secondary"
+                  onClick={() => navigate("/login")}
+                >
+                  Masuk
+                </Button>
+
+              </div>
+
+            </div>
+
+          </div>
 
         </div>
 
-        <div className="mt-8">
+        {/* FOOTER */}
+        <div className="text-center mt-8">
 
-          <Button variant="primary">
-            Register
-          </Button>
+          <p className="text-prima-muted text-sm">
+            Data Anda dienkripsi secara aman dan rahasia
+          </p>
 
         </div>
-
-        <p className="text-prima-muted text-sm mt-6 text-center">
-
-          Sudah punya akun?
-
-          <span className="text-prima-teal cursor-pointer ml-1">
-            Login
-          </span>
-
-        </p>
 
       </div>
 
