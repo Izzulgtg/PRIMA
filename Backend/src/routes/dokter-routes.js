@@ -13,4 +13,11 @@ router.get('/obat', dokterController.getAllObat);
 router.put('/obat/:id', dokterController.updateObat);
 router.delete('/obat/:id', dokterController.softDeleteObat);
 
+// Rute Manajemen Rekam Medis (EHR)
+router.post('/rekam-medis', dokterController.createRekamMedis);
+
+// Rute Manajemen Antrean Poliklinik
+router.get('/antrean/:dokter_id', dokterController.getAntreanDokter);
+router.put('/antrean/:pendaftaran_id/status', dokterController.updateStatusAntrean);
+
 module.exports = router;

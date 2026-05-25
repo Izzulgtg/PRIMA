@@ -92,3 +92,157 @@ exports.softDeleteObat = async (req, res) => {
     return res.status(500).json({ message: 'Terjadi kesalahan pada server.' });
   }
 };
+
+// =========================================================================
+// 5. POST: DOKTER MENGINPUT REKAM MEDIS & RESEP OBAT (TRANSAKSI MULTI-TABEL)
+// =========================================================================
+exports.createRekamMedis = async (req, res) => {
+  const { 
+    pendaftaran_id, pasien_id, dokter_id, 
+    keluhan, diagnosis, tindakan, catatan_resep,
+    item_obat // Berupa Array of Object: [{ obat_id: 1, jumlah: 2, aturan_pakai: '3x1' }]
+  } = req.body;
+
+  // Validasi input minimal
+  if (!pendaftaran_id || !pasien_id || !dokter_id || !diagnosis) {
+    return res.status(400).json({ message: 'Pendaftaran ID, Pasien ID, Dokter ID, dan Diagnosis wajib diisi!' });
+  }
+
+  const connection = await db.getConnection();
+  try {
+    await connection.beginTransaction();
+
+    // 1. Insert ke tabel `rekam_medis`
+    const rmQuery = `
+      INSERT INTO rekam_medis (pendaftaran_id, pasien_id, dokter_id, keluhan, diagnosis, tindakan, created_at, updated_at)
+      VALUES (?, ?, ?, ?, ?, ?, NOW(), NOW())
+    `;
+    const [rmResult] = await connection.query(rmQuery, [pendaftaran_id, pasien_id, dokter_id, keluhan, diagnosis, tindakan]);
+    const rekamMedisId = rmResult.insertId;
+
+    // 2. Jika dokter memberikan resep (ada item_obat), proses tabel resep & resep_detail
+    if (item_obat && item_obat.length > 0) {
+      
+      // Insert ke tabel master `resep`
+      const resepQuery = `
+        INSERT INTO resep (rekam_medis_id, catatan, created_at, updated_at)
+        VALUES (?, ?, NOW(), NOW())
+      `;
+      const [resepResult] = await connection.query(resepQuery, [rekamMedisId, catatan_resep || null]);
+      const resepId = resepResult.insertId;
+
+      // Loop untuk insert ke `resep_detail` sekaligus memotong stok di tabel `obat`
+      for (const item of item_obat) {
+        // Cek apakah stok obat mencukupi
+        const [obatCheck] = await connection.query('SELECT stok, nama_obat FROM obat WHERE id = ?', [item.obat_id]);
+        if (obatCheck.length === 0) {
+          throw new Error(`Obat dengan ID ${item.obat_id} tidak ditemukan.`);
+        }
+        
+        const stokSekarang = obatCheck[0].stok;
+        if (stokSekarang < item.jumlah) {
+          throw new Error(`Stok obat ${obatCheck[0].nama_subat} tidak mencukupi! Sisa stok: ${stokSekarang}`);
+        }
+
+        // Insert ke `resep_detail` (sesuaikan nama kolom database kalian jika berbeda)
+        const detailQuery = `
+          INSERT INTO resep_detail (resep_id, obat_id, jumlah, aturan_pakai, created_at, updated_at)
+          VALUES (?, ?, ?, ?, NOW(), NOW())
+        `;
+        await connection.query(detailQuery, [resepId, item.obat_id, item.jumlah, item.aturan_pakai || null]);
+
+        // Potong stok obat di tabel `obat`
+        const updateStokQuery = `UPDATE obat SET stok = stok - ? WHERE id = ?`;
+        await connection.query(updateStokQuery, [item.jumlah, item.obat_id]);
+      }
+    }
+
+    // 3. Update status di tabel pendaftaran menjadi 'Selesai' agar antrean bergeser
+    await connection.query('UPDATE pendaftaran SET status = "Selesai" WHERE id = ?', [pendaftaran_id]);
+
+    await connection.commit();
+    return res.status(201).json({
+      success: true,
+      message: 'Rekam medis dan resep obat berhasil disimpan, stok obat otomatis terpotong!',
+      rekamMedisId: rekamMedisId
+    });
+
+  } catch (error) {
+    await connection.rollback();
+    console.error('Error saat simpan rekam medis:', error.message);
+    return res.status(500).json({ message: error.message || 'Terjadi kesalahan pada server saat menyimpan rekam medis.' });
+  } finally {
+    connection.release();
+  }
+};
+
+// =========================================================================
+// 6. GET: DOKTER MELIHAT DAFTAR ANTREAN PASIEN (Hari Ini & Sesuai Spesialisasi)
+// =========================================================================
+exports.getAntreanDokter = async (req, res) => {
+  const { dokter_id } = req.params; // ID user dokter yang sedang login
+
+  try {
+    // Ambil tanggal hari ini saja (YYYY-MM-DD)
+    const hariIni = new Date().toISOString().slice(0, 10);
+
+    // Query untuk mengambil pasien yang mendaftar ke dokter ini pada hari ini
+    // Diurutkan berdasarkan nomor antrean terkecil (paling depan)
+    const query = `
+      SELECT p.id AS pendaftaran_id, p.nomor_antrean, p.status, p.keluhan, p.created_at,
+             u.nama_lengkap AS nama_pasien, pp.jenis_kelamin, pp.tanggal_lahir
+      FROM pendaftaran p
+      JOIN users u ON p.pasien_id = u.id
+      JOIN profil_pasien pp ON u.id = pp.user_id
+      WHERE p.dokter_id = ? 
+        AND DATE(p.created_at) = ? 
+        AND p.status IN ('Mengantre', 'Diperiksa')
+      ORDER BY p.nomor_antrean ASC
+    `;
+
+    const [results] = await db.query(query, [dokter_id, hariIni]);
+    
+    return res.status(200).json({
+      success: true,
+      count: results.length,
+      data: results
+    });
+  } catch (error) {
+    console.error('Error saat mengambil antrean dokter:', error);
+    return res.status(500).json({ message: 'Terjadi kesalahan pada server saat mengambil data antrean.' });
+  }
+};
+
+// =========================================================================
+// 7. PUT: DOKTER MENGUBAH STATUS ANTREAN (Mengantre -> Diperiksa)
+// =========================================================================
+exports.updateStatusAntrean = async (req, res) => {
+  const { pendaftaran_id } = req.params;
+  const { status } = req.body; // Ekspektasi nilai: 'Diperiksa' atau 'Selesai'
+
+  if (!status) {
+    return res.status(400).json({ message: 'Status baru wajib dikirimkan!' });
+  }
+
+  try {
+    // Pastikan data pendaftaran tersebut ada
+    const [check] = await db.query('SELECT id FROM pendaftaran WHERE id = ?', [pendaftaran_id]);
+    if (check.length === 0) {
+      return res.status(404).json({ message: 'Data pendaftaran tidak ditemukan.' });
+    }
+
+    // Update status antrean
+    await db.query(
+      'UPDATE pendaftaran SET status = ?, updated_at = NOW() WHERE id = ?',
+      [status, pendaftaran_id]
+    );
+
+    return res.status(200).json({
+      success: true,
+      message: `Status antrean berhasil diperbarui menjadi '${status}'!`
+    });
+  } catch (error) {
+    console.error('Error saat update status antrean:', error);
+    return res.status(500).json({ message: 'Terjadi kesalahan pada server saat memperbarui status.' });
+  }
+};
