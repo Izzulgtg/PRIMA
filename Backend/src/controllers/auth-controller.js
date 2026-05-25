@@ -8,58 +8,41 @@ const jwt = require('jsonwebtoken');
 exports.registerPasien = async (req, res) => {
   // Ambil data yang dikirim oleh Frontend
   const { nama_lengkap, email, password, nomor_hp, nik, tanggal_lahir, jenis_kelamin } = req.body;
-
-  // --- VALIDASI INPUT ---
-  // Pengecekan input wajib dasar
   if (!nama_lengkap || !email || !password) {
     return res.status(400).json({ message: 'Nama, email, dan password wajib diisi!' });
   }
-
-  // Pengecekan format NIK (Harus 16 digit angka jika diisi)
   if (nik && (nik.length !== 16 || isNaN(nik))) {
     return res.status(400).json({ message: 'NIK harus berjumlah 16 digit angka!' });
   }
-
-  // Pengecekan format email standar
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if (!emailRegex.test(email)) {
     return res.status(400).json({ message: 'Format email tidak valid!' });
   }
 
-  // Pengecekan panjang password minimal 6 karakter
   if (password.length < 6) {
     return res.status(400).json({ message: 'Password minimal harus 6 karakter!' });
   }
-
-  // Dapatkan koneksi khusus dari pool untuk menjalankan Transaction
   const connection = await db.getConnection();
 
   try {
-    // Mulai Database Transaction
     await connection.beginTransaction();
-
-    // Cek apakah email sudah terdaftar di tabel users
     const [existingUser] = await connection.query('SELECT id FROM users WHERE email = ?', [email]);
     if (existingUser.length > 0) {
-      await connection.rollback(); // Batalkan transaksi
+      await connection.rollback();
       return res.status(400).json({ message: 'Email sudah terdaftar!' });
     }
 
-    // Enkripsi / Hashing password pasien demi keamanan
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
-    // Insert data utama ke tabel `users`
     const userQuery = `
       INSERT INTO users (nama_lengkap, email, password, role, nomor_hp, is_active) 
       VALUES (?, ?, ?, 'pasien', ?, 1)
     `;
     const [userResult] = await connection.query(userQuery, [nama_lengkap, email, hashedPassword, nomor_hp || null]);
-    
-    // Ambil ID user yang baru saja terbuat
+
     const newUserId = userResult.insertId;
 
-    // Insert data tambahan ke tabel `profil_pasien`
     const profilQuery = `
       INSERT INTO profil_pasien (user_id, nik, tanggal_lahir, jenis_kelamin) 
       VALUES (?, ?, ?, ?)
@@ -71,7 +54,6 @@ exports.registerPasien = async (req, res) => {
       jenis_kelamin || null
     ]);
 
-    // Jika kedua proses insert berhasil tanpa error, simpan permanen ke database
     await connection.commit();
 
     return res.status(201).json({
@@ -81,12 +63,10 @@ exports.registerPasien = async (req, res) => {
     });
 
   } catch (error) {
-    // Jika ada salah satu proses yang error, batalkan semua perubahan data (Rollback)
     await connection.rollback();
     console.error('Error saat register pasien:', error);
     return res.status(500).json({ message: 'Terjadi kesalahan pada server saat registrasi.' });
   } finally {
-    // Kembalikan koneksi ke pool
     connection.release();
   }
 };
@@ -112,32 +92,27 @@ const [users] = await db.query('SELECT * FROM users WHERE email = ? AND deleted_
 
     const user = users[0];
 
-    // Cek apakah akun pasien statusnya aktif (is_active = 1)
     if (user.is_active === 0) {
       return res.status(403).json({ message: 'Akun Anda dinonaktifkan. Silakan hubungi admin.' });
     }
 
-    // Cocokkan password yang diinput dengan password terenkripsi di DB
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
       return res.status(401).json({ message: 'Email atau password salah!' });
     }
 
-    // Buat JWT Token jika password cocok
     const token = jwt.sign(
       { 
         id: user.id, 
         role: user.role,
         nama: user.nama_lengkap 
       },
-      process.env.JWT_SECRET, // Mengambil kunci rahasia dari file .env kamu
+      process.env.JWT_SECRET,
       { expiresIn: '1d' }
     );
 
-    // Update kolom `last_login_at` di database sebagai catatan log
     await db.query('UPDATE users SET last_login_at = NOW() WHERE id = ?', [user.id]);
 
-    // Kirim token beserta data user esensial ke Frontend
     return res.status(200).json({
       success: true,
       message: 'Login berhasil!',
@@ -161,8 +136,6 @@ const [users] = await db.query('SELECT * FROM users WHERE email = ? AND deleted_
 // =========================================================================
 exports.logout = async (req, res) => {
   try {
-    // Pada arsitektur JWT, backend cukup mengirim respon sukses.
-    // Sisi Frontend yang wajib menghapus token dari localStorage nanti.
     return res.status(200).json({
       success: true,
       message: 'Logout berhasil! Token silakan dihapus dari client.'
@@ -178,10 +151,7 @@ exports.logout = async (req, res) => {
 // =========================================================================
 exports.getProfilSaya = async (req, res) => {
   try {
-    // req.user.id didapatkan otomatis dari hasil verifikasi token JWT oleh middleware
     const userId = req.user.id;
-
-    // Lakukan JOIN antara tabel `users` dan `profil_pasien` untuk menarik data lengkap
     const query = `
       SELECT u.id, u.nama_lengkap, u.email, u.role, u.nomor_hp, u.last_login_at,
              p.nik, p.tanggal_lahir, p.jenis_kelamin
@@ -208,25 +178,21 @@ exports.getProfilSaya = async (req, res) => {
 };
 
 // =========================================================================
-// 5. UPDATE PROFIL SAYA (Mengubah data nomor HP, tanggal lahir, jenis kelamin)
+// 5. UPDATE PROFIL SAYA 
 // =========================================================================
 exports.updateProfilSaya = async (req, res) => {
   const { nama_lengkap, nomor_hp, nik, tanggal_lahir, jenis_kelamin } = req.body;
   const userId = req.user.id;
 
-  // Validasi opsional: Jika NIK diubah, pastikan harus 16 digit angka
   if (nik && (nik.length !== 16 || isNaN(nik))) {
     return res.status(400).json({ message: 'NIK harus berjumlah 16 digit angka!' });
   }
 
   try {
-    // 1. Update data di tabel `users` (Nama & Nomor HP)
     await db.query(
       'UPDATE users SET nama_lengkap = ?, nomor_hp = ? WHERE id = ?',
       [nama_lengkap, nomor_hp, userId]
     );
-
-    // 2. Update data tambahan di tabel `profil_pasien`
     await db.query(
       'UPDATE profil_pasien SET nik = ?, tanggal_lahir = ?, jenis_kelamin = ? WHERE user_id = ?',
       [nik, tanggal_lahir, jenis_kelamin, userId]
@@ -244,19 +210,18 @@ exports.updateProfilSaya = async (req, res) => {
 };
 
 // =========================================================================
-// 6. SOFT DELETE USER (Hanya menaruh tanggal di deleted_at tanpa hapus fisik)
+// 6. SOFT DELETE USER
 // =========================================================================
 exports.softDeleteUser = async (req, res) => {
-  const { id } = req.params; // Mengambil ID user yang mau dihapus dari URL
+  const { id } = req.params;
 
   try {
-    // Jalankan query UPDATE untuk mengisi kolom deleted_at
     const [result] = await db.query(
       'UPDATE users SET deleted_at = NOW(), is_active = 0 WHERE id = ? AND deleted_at IS NULL',
       [id]
     );
 
-    // Jika tidak ada baris yang berubah, berarti user sudah terhapus sebelumnya atau ID salah
+
     if (result.affectedRows === 0) {
       return res.status(404).json({ message: 'User tidak ditemukan atau sudah dihapus sebelumnya.' });
     }

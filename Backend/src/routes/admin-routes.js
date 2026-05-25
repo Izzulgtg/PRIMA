@@ -4,7 +4,6 @@ const adminController = require('../controllers/admin-controller');
 const verifyToken = require('../middlewares/auth-middleware');
 const requireRole = require('../middlewares/role-middleware');
 
-// Seluruh rute di bawah ini wajib LOGIN dan wajib ber-role ADMIN
 router.use(verifyToken, requireRole('admin'));
 
 // Route CRUD Dokter
