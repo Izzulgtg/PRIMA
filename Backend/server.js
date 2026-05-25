@@ -2,6 +2,8 @@ const express = require('express');
 const cors = require('cors');
 const dotenv = require('dotenv');
 const authRoutes = require('./src/routes/auth-routes'); // Import route auth
+const adminRoutes = require('./src/routes/admin-routes'); // Import route admin
+const dokterRoutes = require('./src/routes/dokter-routes');
 
 dotenv.config();
 
@@ -27,3 +29,8 @@ app.get('/', (req, res) => {
 app.listen(PORT, () => {
   console.log(`Server backend PRIMA berjalan lancar di port ${PORT}`);
 });
+
+// Pasang base URL untuk rute admin
+app.use('/api/admin', adminRoutes);
+
+app.use('/api/dokter', dokterRoutes);
