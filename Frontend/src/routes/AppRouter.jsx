@@ -101,8 +101,8 @@ function AppRouter() {
           />
 
           <Route
-            path="consultation"
-            element={<PatientConsultationPage />}
+              path = "consultation"
+              element = {<PatientConsultationPage />}
           />
 
           <Route
