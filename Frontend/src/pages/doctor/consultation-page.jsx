@@ -41,6 +41,15 @@ function ConsultationPage() {
     ]);
 
     const [newMessage, setNewMessage] = useState("");
+    const [showPrescriptionOverlay, setShowPrescriptionOverlay] = useState(false);
+    const [lastPrescription, setLastPrescription] = useState(null);
+
+    const [prescriptionData, setPrescriptionData] = useState({
+        medicineName: "",
+        dosage: "",
+        instruction: "",
+        note: "",
+    });
 
     function handleSendMessage(event) {
         event.preventDefault();
@@ -57,6 +66,44 @@ function ConsultationPage() {
 
         setMessages([...messages, message]);
         setNewMessage("");
+    }
+
+    function handlePrescriptionChange(event) {
+        const { name, value } = event.target;
+
+        setPrescriptionData({
+            ...prescriptionData,
+            [name]: value,
+        });
+    }
+
+    function handleSavePrescription(event) {
+        event.preventDefault();
+
+        const prescription = {
+            id: Date.now(),
+            patientName: selectedConsultation.patientName,
+            ...prescriptionData,
+        };
+
+        setLastPrescription(prescription);
+
+        const prescriptionMessage = {
+            id: Date.now() + 1,
+            sender: "doctor",
+            text: `Resep dibuat: ${prescriptionData.medicineName}, ${prescriptionData.dosage}. ${prescriptionData.instruction}`,
+        };
+
+        setMessages([...messages, prescriptionMessage]);
+
+        setPrescriptionData({
+            medicineName: "",
+            dosage: "",
+            instruction: "",
+            note: "",
+        });
+
+        setShowPrescriptionOverlay(false);
     }
 
     return (
@@ -108,13 +155,26 @@ function ConsultationPage() {
                 </aside>
 
                 <div className="rounded-2xl bg-white p-5 shadow-sm lg:col-span-2">
-                    <h2 className="text-lg font-semibold text-prima-black">
-                        Ruang Chat Konsultasi
-                    </h2>
+                    <div className="flex items-start justify-between gap-4">
+                        <div>
+                            <h2 className="text-lg font-semibold text-prima-black">
+                                Ruang Chat Konsultasi
+                            </h2>
 
-                    <p className="mt-1 text-sm text-prima-gray">
-                        Pilih pasien dari antrian untuk memulai sesi konsultasi teks.
-                    </p>
+                            <p className="mt-1 text-sm text-prima-gray">
+                                Pilih pasien dari antrian untuk memulai sesi konsultasi teks.
+                            </p>
+                        </div>
+
+                        <button
+                            type="button"
+                            disabled={!selectedConsultation}
+                            onClick={() => setShowPrescriptionOverlay(true)}
+                            className="rounded-xl bg-prima-green px-4 py-2 text-sm font-medium text-white disabled:cursor-not-allowed disabled:opacity-50"
+                        >
+                            Buat Resep
+                        </button>
+                    </div>
 
                     {!selectedConsultation && (
                         <div className="mt-5 rounded-2xl bg-prima-sand p-4">
@@ -139,6 +199,26 @@ function ConsultationPage() {
                             <p className="mt-1 text-sm text-prima-black">
                                 {selectedConsultation.topic}
                             </p>
+
+                            {lastPrescription && (
+                                <div className="mt-4 rounded-2xl bg-white p-4">
+                                    <p className="text-sm font-semibold text-prima-black">
+                                        Resep Terakhir
+                                    </p>
+
+                                    <p className="mt-2 text-sm text-prima-gray">
+                                        Obat: {lastPrescription.medicineName}
+                                    </p>
+
+                                    <p className="mt-1 text-sm text-prima-gray">
+                                        Dosis: {lastPrescription.dosage}
+                                    </p>
+
+                                    <p className="mt-1 text-sm text-prima-gray">
+                                        Aturan pakai: {lastPrescription.instruction}
+                                    </p>
+                                </div>
+                            )}
 
                             <div className="mt-5 space-y-3">
                                 {messages.map((message) => (
@@ -181,6 +261,114 @@ function ConsultationPage() {
                     )}
                 </div>
             </div>
+
+            {showPrescriptionOverlay && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 px-4">
+                    <div className="w-full max-w-xl rounded-2xl bg-white p-6 shadow-lg">
+                        <div className="flex items-start justify-between gap-4">
+                            <div>
+                                <h2 className="text-xl font-semibold text-prima-black">
+                                    Buat Resep Konsultasi
+                                </h2>
+
+                                <p className="mt-1 text-sm text-prima-gray">
+                                    Resep untuk pasien {selectedConsultation?.patientName}.
+                                </p>
+                            </div>
+
+                            <button
+                                type="button"
+                                onClick={() => setShowPrescriptionOverlay(false)}
+                                className="rounded-xl border border-prima-sand px-3 py-2 text-sm text-prima-gray"
+                            >
+                                Tutup
+                            </button>
+                        </div>
+
+                        <form onSubmit={handleSavePrescription} className="mt-5 space-y-4">
+                            <div>
+                                <label className="text-sm font-medium text-prima-black">
+                                    Nama Obat
+                                </label>
+
+                                <input
+                                    type="text"
+                                    name="medicineName"
+                                    value={prescriptionData.medicineName}
+                                    onChange={handlePrescriptionChange}
+                                    required
+                                    className="mt-2 w-full rounded-xl border border-prima-sand px-4 py-3 text-sm text-prima-black outline-none focus:border-prima-green"
+                                    placeholder="Contoh: Paracetamol 500mg"
+                                />
+                            </div>
+
+                            <div>
+                                <label className="text-sm font-medium text-prima-black">
+                                    Dosis
+                                </label>
+
+                                <input
+                                    type="text"
+                                    name="dosage"
+                                    value={prescriptionData.dosage}
+                                    onChange={handlePrescriptionChange}
+                                    required
+                                    className="mt-2 w-full rounded-xl border border-prima-sand px-4 py-3 text-sm text-prima-black outline-none focus:border-prima-green"
+                                    placeholder="Contoh: 3x sehari"
+                                />
+                            </div>
+
+                            <div>
+                                <label className="text-sm font-medium text-prima-black">
+                                    Aturan Pakai
+                                </label>
+
+                                <textarea
+                                    name="instruction"
+                                    value={prescriptionData.instruction}
+                                    onChange={handlePrescriptionChange}
+                                    required
+                                    rows={3}
+                                    className="mt-2 w-full rounded-xl border border-prima-sand px-4 py-3 text-sm text-prima-black outline-none focus:border-prima-green"
+                                    placeholder="Contoh: Diminum setelah makan selama 3 hari."
+                                />
+                            </div>
+
+                            <div>
+                                <label className="text-sm font-medium text-prima-black">
+                                    Catatan Tambahan
+                                </label>
+
+                                <textarea
+                                    name="note"
+                                    value={prescriptionData.note}
+                                    onChange={handlePrescriptionChange}
+                                    rows={3}
+                                    className="mt-2 w-full rounded-xl border border-prima-sand px-4 py-3 text-sm text-prima-black outline-none focus:border-prima-green"
+                                    placeholder="Contoh: Kontrol ulang jika gejala memburuk."
+                                />
+                            </div>
+
+                            <div className="flex justify-end gap-3">
+                                <button
+                                    type="button"
+                                    onClick={() => setShowPrescriptionOverlay(false)}
+                                    className="rounded-xl border border-prima-gray px-5 py-3 text-sm font-medium text-prima-gray"
+                                >
+                                    Batal
+                                </button>
+
+                                <button
+                                    type="submit"
+                                    className="rounded-xl bg-prima-green px-5 py-3 text-sm font-medium text-white"
+                                >
+                                    Simpan Resep
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
         </section>
     );
 }

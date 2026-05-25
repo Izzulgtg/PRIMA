@@ -32,6 +32,7 @@ import ConsultationPage from "../pages/doctor/consultation-page";
 import SchedulePage from "../pages/doctor/schedule-page";
 import MedicinePage from "../pages/doctor/medicine-page";
 import MedicalRecordsPage from "../pages/doctor/medical-records-page";
+import MonitoringPage from "../pages/doctor/monitoring-page";
 
 function AppRouter() {
   return (
@@ -165,6 +166,11 @@ function AppRouter() {
           <Route 
             path="medical-records" 
             element={<MedicalRecordsPage />} 
+          />
+
+          <Route 
+            path="monitoring" 
+            element={<MonitoringPage />} 
           />
 
         </Route>
