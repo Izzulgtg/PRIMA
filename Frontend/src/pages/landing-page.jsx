@@ -1,661 +1,528 @@
 import Button from "../components/ui/button"
 import landingHero from "../assets/images/landing-hero.webp"
 import { useNavigate } from "react-router-dom"
-
 function LandingPage() {
 const navigate = useNavigate()
+
   return (
-    <div className="bg-prima-background min-h-screen">
+  <div className="bg-prima-background min-h-screen">
 
-      {/* NAVBAR */}
-      <nav
-        className="
-          flex
-          items-center
-          justify-between
-          px-10
-          py-6
-        "
-      >
-
-        <h1 className="text-3xl font-bold text-prima-green">
-          PRIMA
-        </h1>
-
-        <div className="flex items-center gap-4">
-
-              <Button
-        variant="outline"
-        onClick={() => navigate("/login")}
-      >
-        Login
-      </Button>
-
-                <Button
-        variant="primary"
-        onClick={() => navigate("/register")}
-      >
-        Register
-      </Button>
-
-        </div>
-
-      </nav>
-
-      {/* HERO SECTION */}
-      <section
-        className="
-          px-10
-          py-16
-          flex
-          items-center
-          justify-between
-          gap-20
-        "
-      >
-
-        {/* LEFT CONTENT */}
-        <div className="max-w-xl">
-
-          <div
-            className="
-              inline-flex
-              items-center
-              px-4
-              py-2
-              rounded-full
-              bg-[#DDE8D7]
-              text-prima-green
-              text-sm
-              font-medium
-            "
-          >
-            Ayo Kelola Kesehatan Anda
-          </div>
-
-          <h1
-            className="
-              text-6xl
-              font-bold
-              text-prima-text
-              leading-tight
-              mt-8
-            "
-          >
-            Layanan Kesehatan
-            Masyarakat yang
-            <span className="text-prima-green italic">
-              {" "}Mudah & Terpercaya
-            </span>
-          </h1>
-
-          <p
-            className="
-              text-prima-muted
-              text-lg
-              leading-relaxed
-              mt-8
-            "
-          >
-            Akses layanan medis profesional
-            langsung dari genggaman Anda.
-            Mulai dari pendaftaran dokter
-            hingga konsultasi real-time.
-          </p>
-
-          <div className="flex gap-4 mt-10">
-
-           <Button
-  variant="primary"
-  onClick={() => navigate("/register")}
+   <nav
+  className="
+    flex
+    items-center
+    justify-between
+    px-10
+    py-6
+  "
 >
-  Daftar Berobat Sekarang
-</Button>
 
-          <Button
+  <h1 className="text-3xl font-bold text-prima-green">
+    PRIMA
+  </h1>
+
+  <div className="flex items-center gap-4">
+<Button
   variant="outline"
   onClick={() => navigate("/login")}
 >
-  Lihat Layanan
+  Login
 </Button>
-          </div>
 
-        </div>
-
-        {/* RIGHT CONTENT */}
-          <div
-          className="
-            relative
-            w-[520px]
-            h-[620px]
-            rounded-[40px]
-            bg-prima-sand
-            shadow-xl
-            overflow-hidden
-          "
-        >
-
-        {/* HERO IMAGE */}
-          <img
-            src={landingHero}
-            alt="PRIMA Hero"
-            className="
-              w-full
-              h-full
-              object-cover
-            "
-          />
-          {/* FLOATING CARD */}
-          <div
-            className="
-              absolute
-              bottom-6
-              left-6
-              right-6
-              bg-white
-              rounded-3xl
-              p-5
-              shadow-lg
-              flex
-              items-center
-              gap-4
-            "
-          >
-
-            <div
-              className="
-                w-12
-                h-12
-                rounded-full
-                bg-prima-green
-              "
-            />
-
-            <div>
-
-              <h3 className="font-semibold text-prima-text">
-                Konsultasi Berkualitas
-              </h3>
-
-              <p className="text-sm text-prima-muted mt-1">
-                Praktis, mudah, dan real-time.
-              </p>
-
-            </div>
-
-          </div>
-
-        </div>
-
-      </section>
-
-      {/* FEATURE SECTION */}
-      <section className="px-10 py-28">
-
-        <div className="text-center">
-
-          <p
-            className="
-              text-prima-teal
-              font-medium
-            "
-          >
-            Layanan Unggulan Kami
-          </p>
-
-          <h2
-            className="
-              text-5xl
-              font-bold
-              text-prima-text
-              mt-5
-            "
-          >
-            Solusi Digital Kesehatan
-            yang Modern & Aman
-          </h2>
-
-          <p
-            className="
-              text-prima-muted
-              mt-6
-              max-w-2xl
-              mx-auto
-              leading-relaxed
-            "
-          >
-            PRIMA membantu pengelolaan layanan kesehatan
-            dengan sistem modern yang cepat,
-            aman, dan mudah digunakan.
-          </p>
-
-        </div>
-
-        <div
-          className="
-            grid
-            grid-cols-3
-            gap-8
-            mt-20
-          "
-        >
-
-          {/* CARD 1 */}
-          <div
-            className="
-              bg-white
-              rounded-[32px]
-              p-8
-              border
-              border-prima-sand
-              hover:shadow-lg
-              transition-all
-            "
-          >
-
-            <div
-              className="
-                w-16
-                h-16
-                rounded-2xl
-                bg-[#E8F0FF]
-                mb-8
-              "
-            />
-
-            <h3 className="text-2xl font-semibold text-prima-text">
-              Jadwal Dokter Real-Time
-            </h3>
-
-            <p
-              className="
-                text-prima-muted
-                mt-5
-                leading-relaxed
-              "
-            >
-              Pantau jadwal dokter secara langsung
-              untuk proses reservasi yang lebih cepat.
-            </p>
-
-          </div>
-
-          {/* CARD 2 */}
-          <div
-            className="
-              bg-white
-              rounded-[32px]
-              p-8
-              border
-              border-prima-sand
-              hover:shadow-lg
-              transition-all
-            "
-          >
-
-            <div
-              className="
-                w-16
-                h-16
-                rounded-2xl
-                bg-[#F3E8FF]
-                mb-8
-              "
-            />
-
-            <h3 className="text-2xl font-semibold text-prima-text">
-              Konsultasi Mudah
-            </h3>
-
-            <p
-              className="
-                text-prima-muted
-                mt-5
-                leading-relaxed
-              "
-            >
-              Konsultasi online dengan sistem chat
-              yang cepat dan efisien.
-            </p>
-
-          </div>
-
-          {/* CARD 3 */}
-          <div
-            className="
-              bg-white
-              rounded-[32px]
-              p-8
-              border
-              border-prima-sand
-              hover:shadow-lg
-              transition-all
-            "
-          >
-
-            <div
-              className="
-                w-16
-                h-16
-                rounded-2xl
-                bg-[#FCE7F3]
-                mb-8
-              "
-            />
-
-            <h3 className="text-2xl font-semibold text-prima-text">
-              Data Aman
-            </h3>
-
-            <p
-              className="
-                text-prima-muted
-                mt-5
-                leading-relaxed
-              "
-            >
-              Seluruh data pasien dan rekam medis
-              tersimpan aman dan terenkripsi.
-            </p>
-
-          </div>
-
-        </div>
-
-      </section>
-
-   <section className="px-10 py-28">
-
-  <div
-    className="
-      bg-prima-sand
-      rounded-[40px]
-      p-16
-      flex
-      items-center
-      justify-between
-      gap-20
-      relative
-      overflow-hidden
-    "
-  >
-
-    {/* LEFT CONTENT */}
-    <div className="max-w-xl z-10">
-
-      <p className="text-prima-teal font-medium">
-        Ekosistem PRIMA
-      </p>
-
-      <h2
-        className="
-          text-5xl
-          font-bold
-          text-prima-text
-          leading-tight
-          mt-6
-        "
-      >
-        Bergabung dengan
-        Ekosistem Kesehatan
-        Masa Depan
-      </h2>
-
-      <p
-        className="
-          text-prima-muted
-          leading-relaxed
-          mt-6
-          text-lg
-        "
-      >
-        PRIMA membantu rumah sakit,
-        dokter, dan pasien dalam satu
-        sistem kesehatan digital
-        yang modern dan terintegrasi.
-      </p>
-
-      {/* STATS */}
-      <div className="flex gap-16 mt-12">
-
-        <div>
-
-          <h3 className="text-4xl font-bold text-prima-green">
-            98%
-          </h3>
-
-          <p className="text-prima-muted mt-2">
-            Kepuasan Pasien
-          </p>
-
-        </div>
-
-        <div>
-
-          <h3 className="text-4xl font-bold text-prima-teal">
-            24/7
-          </h3>
-
-          <p className="text-prima-muted mt-2">
-            Dukungan Medis
-          </p>
-
-        </div>
-
-      </div>
-
-    </div>
-
-    {/* RIGHT SIDE */}
-    <div className="relative z-10">
-
-      <div
-        className="
-          bg-white
-          rounded-[32px]
-          p-8
-          w-[360px]
-          shadow-lg
-        "
-      >
-
-        <div className="space-y-6">
-
-          <div className="flex items-start gap-4">
-
-            <div
-              className="
-                w-12
-                h-12
-                rounded-full
-                bg-[#FFDCCF]
-              "
-            />
-
-            <div>
-
-              <h3 className="font-semibold text-prima-text">
-                Integrasi BPJS
-              </h3>
-
-              <p className="text-prima-muted text-sm mt-1">
-                Sistem terhubung dengan layanan nasional.
-              </p>
-
-            </div>
-
-          </div>
-
-          <div className="flex items-start gap-4">
-
-            <div
-              className="
-                w-12
-                h-12
-                rounded-full
-                bg-[#DDE8D7]
-              "
-            />
-
-            <div>
-
-              <h3 className="font-semibold text-prima-text">
-                Monitoring Real-Time
-              </h3>
-
-              <p className="text-prima-muted text-sm mt-1">
-                Monitoring data pasien dan sistem.
-              </p>
-
-            </div>
-
-          </div>
-
-        </div>
-
-      </div>
-
-    </div>
-
-    {/* DECORATION */}
-    <div
-      className="
-        absolute
-        right-[-120px]
-        top-[-120px]
-        w-[320px]
-        h-[320px]
-        rounded-full
-        border-[40px]
-        border-[#D8CCBC]
-        opacity-40
-      "
-    />
+<Button
+  variant="primary"
+  onClick={() => navigate("/register")}
+>
+  Register
+</Button>
 
   </div>
 
-</section>
+</nav>
 
-      <footer
+<section
   className="
     px-10
-    pt-24
-    pb-10
-    mt-24
-    border-t
-    border-prima-sand
-    bg-[#F1ECE4]
+    py-24
+    flex
+    items-center
+    justify-between
+    gap-12
   "
 >
+
+  <div className="max-w-2xl">
+
+    <p className="text-prima-teal font-medium">
+      Program Rekam Medis & Interaksi Medis Terpadu
+    </p>
+
+    <h1
+      className="
+        text-6xl
+        font-bold
+        text-prima-text
+        leading-tight
+        mt-6
+      "
+    >
+      Sistem Praktik Dokter Modern
+      untuk Pelayanan yang Lebih Cepat
+    </h1>
+
+    <p
+      className="
+        text-prima-muted
+        text-lg
+        mt-6
+        leading-relaxed
+      "
+    >
+      PRIMA membantu pasien, dokter, dan admin
+      mengelola layanan kesehatan secara
+      terintegrasi, aman, dan efisien.
+    </p>
+
+    <div className="flex gap-4 mt-10">
+
+      <Button variant="primary">
+        Mulai Sekarang
+      </Button>
+
+      <Button variant="outline">
+        Pelajari Sistem
+      </Button>
+
+    </div>
+
+  </div>
+
+<div
+  className="
+    relative
+    w-[520px]
+    h-[620px]
+    rounded-[40px]
+    overflow-hidden
+    shadow-2xl
+  "
+>
+
+  {/* HERO IMAGE */}
+  <img
+    src={landingHero}
+    alt="PRIMA Hero"
+    className="
+      w-full
+      h-full
+      object-cover
+    "
+  />
+
+  {/* OVERLAY */}
+  <div
+    className="
+      absolute
+      inset-0
+      bg-black/10
+    "
+  />
+
+  {/* FLOATING CARD */}
+  <div
+    className="
+      absolute
+      bottom-6
+      left-6
+      right-6
+      bg-white
+      rounded-3xl
+      p-6
+      shadow-xl
+    "
+  >
+
+    <p className="text-prima-green font-semibold">
+      Konsultasi Berikutnya
+    </p>
+
+    <p className="text-prima-muted mt-2">
+      Senin, 14:00 WIB 
+    </p>
+
+  </div>
+
+</div>
+
+</section>
+
+<section className="px-10 py-24">
+
+  <div className="text-center">
+
+
+    <h2
+      className="
+        text-4xl
+        font-bold
+        text-prima-text
+        mt-4
+      "
+    >
+      Solusi Digital untuk
+      Pelayanan Kesehatan Modern
+    </h2>
+
+  </div>
 
   <div
     className="
       grid
       grid-cols-4
-      gap-12
+      gap-6
+      mt-16
     "
   >
 
-    {/* BRAND */}
-    <div>
+    <div
+      className="
+        bg-prima-card
+        rounded-3xl
+        p-8
+        border
+        border-prima-sand
+      "
+    >
 
-      <h2 className="text-4xl font-bold text-prima-green">
-        PRIMA
-      </h2>
-
-      <p
+      <div
         className="
-          text-prima-muted
-          leading-relaxed
-          mt-6
+          w-14
+          h-14
+          rounded-2xl
+          bg-prima-sand
+          mb-6
         "
-      >
-        Platform layanan kesehatan modern
-        untuk membantu pasien, dokter,
-        dan admin dalam satu sistem
-        terintegrasi.
+      />
+
+      <h3 className="text-xl font-semibold text-prima-text">
+        Rekam Medis Digital
+      </h3>
+
+      <p className="text-prima-muted mt-4 leading-relaxed">
+        Penyimpanan data pasien secara aman,
+        cepat, dan terintegrasi.
       </p>
 
     </div>
 
-    {/* MENU */}
-    <div>
+    <div
+      className="
+        bg-prima-card
+        rounded-3xl
+        p-8
+        border
+        border-prima-sand
+      "
+    >
 
-      <h3 className="text-lg font-semibold text-prima-text">
-        Navigasi
+      <div
+        className="
+          w-14
+          h-14
+          rounded-2xl
+          bg-prima-sand
+          mb-6
+        "
+      />
+
+      <h3 className="text-xl font-semibold text-prima-text">
+        Konsultasi Online
       </h3>
 
-      <div className="space-y-4 mt-6">
-
-        <p className="text-prima-muted cursor-pointer">
-          Home
-        </p>
-
-        <p className="text-prima-muted cursor-pointer">
-          Layanan
-        </p>
-
-        <p className="text-prima-muted cursor-pointer">
-          Konsultasi
-        </p>
-
-        <p className="text-prima-muted cursor-pointer">
-          Dashboard
-        </p>
-
-      </div>
+      <p className="text-prima-muted mt-4 leading-relaxed">
+        Konsultasi pasien dan dokter
+        melalui chat terjadwal.
+      </p>
 
     </div>
 
-    {/* SYSTEM */}
-    <div>
+    <div
+      className="
+        bg-prima-card
+        rounded-3xl
+        p-8
+        border
+        border-prima-sand
+      "
+    >
 
-      <h3 className="text-lg font-semibold text-prima-text">
-        Sistem
+      <div
+        className="
+          w-14
+          h-14
+          rounded-2xl
+          bg-prima-sand
+          mb-6
+        "
+      />
+
+      <h3 className="text-xl font-semibold text-prima-text">
+        Dashboard Dokter
       </h3>
 
-      <div className="space-y-4 mt-6">
-
-        <p className="text-prima-muted cursor-pointer">
-          Login
-        </p>
-
-        <p className="text-prima-muted cursor-pointer">
-          Register
-        </p>
-
-        <p className="text-prima-muted cursor-pointer">
-          Maintenance
-        </p>
-
-        <p className="text-prima-muted cursor-pointer">
-          Support
-        </p>
-
-      </div>
+      <p className="text-prima-muted mt-4 leading-relaxed">
+        Kelola pasien, jadwal,
+        dan rekam medis dengan mudah.
+      </p>
 
     </div>
 
-    {/* CONTACT */}
-    <div>
+    <div
+      className="
+        bg-prima-card
+        rounded-3xl
+        p-8
+        border
+        border-prima-sand
+      "
+    >
 
-      <h3 className="text-lg font-semibold text-prima-text">
-        Kontak
+      <div
+        className="
+          w-14
+          h-14
+          rounded-2xl
+          bg-prima-sand
+          mb-6
+        "
+      />
+
+      <h3 className="text-xl font-semibold text-prima-text">
+        Monitoring Admin
       </h3>
 
-      <div className="space-y-4 mt-6">
+      <p className="text-prima-muted mt-4 leading-relaxed">
+        Monitoring sistem,
+        maintenance, dan data layanan.
+      </p>
 
-        <p className="text-prima-muted">
-          primahealth@gmail.com
-        </p>
+    </div>
 
-        <p className="text-prima-muted">
-          +62 812 3456 7890
-        </p>
+  </div>
 
-        <p className="text-prima-muted">
-          Sidoarjo, Indonesia
-        </p>
+</section>
+
+    <section className="px-10 py-24">
+
+  <div className="text-center">
+
+
+    <h2
+      className="
+        text-4xl
+        font-bold
+        text-prima-text
+        mt-4
+      "
+    >
+      Dirancang untuk Semua
+      Kebutuhan Pelayanan Medis
+    </h2>
+
+  </div>
+
+  <div
+    className="
+      grid
+      grid-cols-3
+      gap-8
+      mt-16
+    "
+  >
+
+    {/* PASIEN */}
+    <div
+      className="
+        bg-prima-card
+        rounded-3xl
+        p-10
+        border
+        border-prima-sand
+      "
+    >
+
+      <div
+        className="
+          w-16
+          h-16
+          rounded-2xl
+          bg-prima-sand
+          mb-8
+        "
+      />
+
+      <h3 className="text-2xl font-semibold text-prima-text">
+        Pasien
+      </h3>
+
+      <p className="text-prima-muted mt-4 leading-relaxed">
+        Pendaftaran online, konsultasi digital,
+        riwayat pengobatan, dan akses
+        informasi kesehatan pribadi.
+      </p>
+
+    </div>
+
+    {/* DOKTER */}
+    <div
+      className="
+        bg-prima-card
+        rounded-3xl
+        p-10
+        border
+        border-prima-sand
+      "
+    >
+
+      <div
+        className="
+          w-16
+          h-16
+          rounded-2xl
+          bg-prima-sand
+          mb-8
+        "
+      />
+
+      <h3 className="text-2xl font-semibold text-prima-text">
+        Dokter
+      </h3>
+
+      <p className="text-prima-muted mt-4 leading-relaxed">
+        Kelola pasien, pemeriksaan,
+        konsultasi daring, jadwal praktik,
+        dan rekam medis digital.
+      </p>
+
+    </div>
+
+    {/* ADMIN */}
+    <div
+      className="
+        bg-prima-card
+        rounded-3xl
+        p-10
+        border
+        border-prima-sand
+      "
+    >
+
+      <div
+        className="
+          w-16
+          h-16
+          rounded-2xl
+          bg-prima-sand
+          mb-8
+        "
+      />
+
+      <h3 className="text-2xl font-semibold text-prima-text">
+        Admin
+      </h3>
+
+      <p className="text-prima-muted mt-4 leading-relaxed">
+        Monitoring sistem, maintenance,
+        validasi data, dan pengelolaan
+        layanan kesehatan PRIMA.
+      </p>
+
+    </div>
+
+  </div>
+
+</section>
+<footer
+  className="
+    px-10
+    py-16
+    border-t
+    border-prima-sand
+    mt-24
+  "
+>
+
+  <div
+    className="
+      flex
+      items-start
+      justify-between
+      gap-12
+    "
+  >
+
+    {/* LEFT */}
+    <div className="max-w-md">
+
+      <h2 className="text-3xl font-bold text-prima-green">
+        PRIMA
+      </h2>
+
+      <p className="text-prima-muted mt-6 leading-relaxed">
+        Program Rekam Medis & Interaksi Medis
+        Terpadu untuk pelayanan kesehatan
+        yang lebih modern, aman, dan efisien.
+      </p>
+
+    </div>
+
+    {/* RIGHT */}
+    <div className="flex gap-20">
+
+      <div>
+
+        <h3 className="text-prima-text font-semibold">
+          Information
+        </h3>
+
+        <div className="mt-5 space-y-3">
+
+          <p className="text-prima-muted cursor-pointer">
+            Kontak Kami
+          </p>
+
+          <p className="text-prima-muted cursor-pointer">
+            Syarat Dan Ketenntuan
+          </p>
+
+          <p className="text-prima-muted cursor-pointer">
+            Kebijakan Privasi          </p>
+
+        </div>
+
+      </div>
+
+      <div>
+
+        <h3 className="text-prima-text font-semibold">
+          System
+        </h3>
+
+        <div className="mt-5 space-y-3">
+
+          <p className="text-prima-muted cursor-pointer">
+            Login
+          </p>
+
+          <p className="text-prima-muted cursor-pointer">
+            Register
+          </p>
+
+          <p className="text-prima-muted cursor-pointer">
+            Dashboard
+          </p>
+
+        </div>
 
       </div>
 
@@ -663,45 +530,26 @@ const navigate = useNavigate()
 
   </div>
 
-  {/* BOTTOM */}
   <div
     className="
-      flex
-      items-center
-      justify-between
       border-t
       border-prima-sand
-      mt-16
+      mt-12
       pt-8
+      text-center
     "
   >
 
     <p className="text-prima-muted text-sm">
-      © 2026 PRIMA Healthcare. All rights reserved.
+      © 2026 PRIMA. All rights reserved.
     </p>
-
-    <div className="flex gap-6">
-
-      <p className="text-prima-muted text-sm cursor-pointer">
-        Privacy Policy
-      </p>
-
-      <p className="text-prima-muted text-sm cursor-pointer">
-        Terms
-      </p>
-
-      <p className="text-prima-muted text-sm cursor-pointer">
-        Disclaimer
-      </p>
-
-    </div>
 
   </div>
 
 </footer>
 
-    </div>
-  )
+  </div>
+)
 }
 
 export default LandingPage
