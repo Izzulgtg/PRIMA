@@ -4,6 +4,7 @@ const dotenv = require('dotenv');
 const authRoutes = require('./src/routes/auth-routes'); // Import route auth
 const adminRoutes = require('./src/routes/admin-routes'); // Import route admin
 const dokterRoutes = require('./src/routes/dokter-routes');
+const pasienRoutes = require('./src/routes/pasien-routes');
 
 dotenv.config();
 
@@ -34,3 +35,5 @@ app.listen(PORT, () => {
 app.use('/api/admin', adminRoutes);
 
 app.use('/api/dokter', dokterRoutes);
+
+app.use('/api/pasien', pasienRoutes);
