@@ -4,53 +4,72 @@ const ConsultationStatusCard = ({
   doctor,
   time,
   actionText,
+  status,
   background,
   buttonColor,
   icon,
 }) => {
+
   return (
     <div
-      className={`${background} rounded-3xl p-5 text-white shadow-sm`}
+      className={`${background} rounded-[28px] p-6 border border-[#F1ECE4] shadow-sm`}
     >
-      <div className="flex items-start justify-between">
 
+      {/* TOP */}
+      <div className="flex items-start justify-between gap-4">
+
+        {/* TEXT */}
         <div>
-          <p className="text-sm font-medium uppercase opacity-80">
+
+          <p className="text-sm font-medium text-prima-secondary uppercase tracking-wide">
             {title}
           </p>
 
-          <h3 className="mt-2 text-lg font-semibold">
+          <h3 className="mt-2 text-xl font-bold text-prima-text">
             {subtitle}
           </h3>
 
-          <p className="mt-1 text-sm opacity-80">
+          <p className="mt-2 text-sm text-prima-secondary leading-relaxed">
             {doctor}
           </p>
+
         </div>
 
-        <div className="rounded-xl bg-white/20 p-3">
+        {/* ICON */}
+        <div className="rounded-2xl bg-prima-sand p-3 text-prima-green">
+
           {icon}
+
         </div>
 
       </div>
 
-      <div className="mt-8 flex items-center justify-between">
+      {/* MIDDLE */}
+      <div className="mt-8 flex items-end justify-between">
 
-        <p className="text-2xl font-semibold">
-          {time}
-        </p>
+        <div>
 
-        <span className="text-sm opacity-80">
-          Menunggu antrean
-        </span>
+          <p className="text-3xl font-bold text-prima-text">
+            {time}
+          </p>
+
+          <p className="mt-1 text-sm text-prima-secondary">
+            {status}
+          </p>
+
+        </div>
 
       </div>
 
+      {/* BUTTON */}
       <button
-        className={`${buttonColor} mt-5 w-full rounded-2xl py-3 text-sm font-medium transition hover:opacity-90`}
+        className={`${buttonColor} mt-6 w-full rounded-2xl py-3 text-sm font-semibold transition-all duration-300 hover:scale-[1.02]`}
       >
+
         {actionText}
+
       </button>
+
     </div>
   )
 }

@@ -10,10 +10,10 @@ import PatientLayout from "../layouts/patient-layout"
 import PatientDashboardPage from "../pages/patient/dashboard/Dashboard-Page"
 import PatientAppointmentPage from "../pages/patient/appointment/appointment-page"
 import PatientConsultationPage from "../pages/patient/consultation/consultation-page"
-import PatientMedicalHistoryPage from "../pages/patient/medical-history/medical-history-page"
-import PatientMedicineHistoryPage from "../pages/patient/medicine-history/medicine-history-page"
+import PatientHealthRecordsPage  from "../pages/patient/health-records/health-records-page"
 import PatientProfilePage from "../pages/patient/profile/profile-page"
 import PatientSecurityPage from "../pages/patient/security/security-page"
+import ConsultationRoomPage from "../pages/patient/consultation-room/consultation-room-page"
 
 import DashboardPage from "../pages/admin/dashboard-page"
 import MaintenancePage from "../pages/admin/maintenance-page"
@@ -106,13 +106,13 @@ function AppRouter() {
           />
 
           <Route
-              path="medical-history"
-              element={<PatientMedicalHistoryPage />}
+              path = "consultation-room"
+              element = {<ConsultationRoomPage/>}
           />
 
           <Route
-              path="medicine-history"
-              element={<PatientMedicineHistoryPage />}
+              path="health-records"
+              element={<PatientHealthRecordsPage/>}
           />
 
           <Route

@@ -1,113 +1,72 @@
+import { useNavigate } from "react-router-dom"
+
 import {
-  ArrowLeft,
-  MessageSquare,
   Clock3,
-  CalendarPlus,
-} from 'lucide-react'
+  CalendarDays,
+  Stethoscope,
+} from "lucide-react"
 
-import ConsultationStatusCard from '@/components/patient/consultation/consultation-status-card'
-import ChatBubble from '@/components/patient/consultation/chat-bubble'
-import ChatInput from '@/components/patient/consultation/chat-input'
-import TypingIndicator from '@/components/patient/consultation/typing-indicator'
+import ConsultationStatusCard from "@/components/patient/consultation/consultation-status-card"
 
-const ConsultationPage = () => {
+function ConsultationPage() {
+
+  const navigate = useNavigate()
+
   return (
-    <div className="min-h-screen bg-prima-background p-6">
+    <div className="space-y-6">
 
-      {/* HEADER */}
-      <div className="mb-8 flex items-center gap-3">
+      {/* HERO */}
+      <section className="bg-prima-green rounded-[32px] p-8 text-white">
 
-        <button className="rounded-full bg-white p-3 shadow-sm">
-          <ArrowLeft className="h-5 w-5 text-prima-text" />
-        </button>
+        <div className="flex flex-col lg:flex-row items-start justify-between gap-10">
 
-        <h1 className="text-2xl font-semibold text-prima-text">
-          Konsultasi Daring
-        </h1>
+          {/* LEFT */}
+          <div className="max-w-2xl">
 
-      </div>
+            <p className="text-sm opacity-80">
+              Online Consultation
+            </p>
 
-      {/* STATUS SECTION */}
-      <div className="grid grid-cols-1 gap-5 lg:grid-cols-3">
+            <h1 className="text-4xl font-bold mt-3 leading-tight">
+              Konsultasi Online Bersama Dokter
+            </h1>
 
-        <ConsultationStatusCard
-          title="Dalam 15 Menit"
-          subtitle="Sesi Konsultasi"
-          doctor="Dr. Sarah Johnson, Sp.PD"
-          time="14:55"
-          actionText="Menunggu Antrean"
-          background="bg-[#356D83]"
-          buttonColor="bg-white text-[#356D83]"
-          icon={<MessageSquare className="h-5 w-5" />}
-        />
+            <p className="mt-5 text-lg opacity-90 leading-relaxed">
+              Pantau jadwal konsultasi, masuk ruang tunggu,
+              dan lakukan konsultasi online secara aman melalui PRIMA.
+            </p>
 
-        <ConsultationStatusCard
-          title="Segera Dimulai"
-          subtitle="Masuk Ruang Tunggu"
-          doctor="Dokter sudah bersiap"
-          time="04:59"
-          actionText="Masuk Ruang Chat"
-          background="bg-[#F3D6B3]"
-          buttonColor="bg-orange-500 text-white"
-          icon={<Clock3 className="h-5 w-5 text-orange-700" />}
-        />
+            <button
+              onClick={() => navigate("/patient/consultation-room")}
+              className="mt-8 bg-white text-prima-green px-6 py-3 rounded-2xl font-semibold hover:scale-105 hover:shadow-xl transition-all duration-300"
+            >
+              Join Consultation
+            </button>
 
-        <ConsultationStatusCard
-          title="Waktunya Dimulai"
-          subtitle="Mulai Sekarang"
-          doctor="Sesi Anda telah dimulai"
-          time="00:00"
-          actionText="Masuk Ruang Chat Sekarang"
-          background="bg-prima-green"
-          buttonColor="bg-white text-prima-green"
-          icon={<CalendarPlus className="h-5 w-5" />}
-        />
+          </div>
 
-      </div>
+          {/* RIGHT */}
+          <div className="bg-white/10 backdrop-blur-sm rounded-3xl p-6 w-[320px] border border-white/10">
 
-      {/* CHAT SECTION */}
-      <div className="mt-8 overflow-hidden rounded-[32px] bg-prima-sand shadow-sm">
+            <p className="text-sm opacity-80">
+              Doctor Status
+            </p>
 
-        {/* TOP CHAT */}
-        <div className="border-b border-white bg-[#F7F5EF] p-5">
+            <h3 className="text-3xl font-bold mt-3">
+              Online
+            </h3>
 
-          <div className="flex items-center justify-between">
+            <p className="mt-3 opacity-80 leading-relaxed">
+              Dokter tersedia untuk konsultasi hari ini.
+            </p>
 
-            <div className="flex items-center gap-4">
+            <div className="mt-6 flex items-center gap-2">
 
-              <img
-                src="https://randomuser.me/api/portraits/women/44.jpg"
-                alt="Doctor"
-                className="h-14 w-14 rounded-full object-cover"
-              />
+              <div className="w-3 h-3 rounded-full bg-green-300 animate-pulse"></div>
 
-              <div>
-
-                <h3 className="text-lg font-semibold text-prima-text">
-                  Dr. Dila, Sp.PD
-                </h3>
-
-                <p className="text-sm text-green-600">
-                  ● Online • Sedang Aktif
-                </p>
-
-              </div>
-
-            </div>
-
-            <div className="text-right">
-
-              <p className="text-sm text-prima-secondary">
-                WAKTU SISA
-              </p>
-
-              <p className="text-lg font-semibold text-red-500">
-                29:45
-              </p>
-
-              <button className="mt-2 rounded-xl border border-red-400 px-4 py-2 text-sm text-red-500">
-                Akhiri Sesi
-              </button>
+              <span className="text-sm">
+                Active Session
+              </span>
 
             </div>
 
@@ -115,56 +74,164 @@ const ConsultationPage = () => {
 
         </div>
 
-        {/* CHAT BODY */}
-        <div className="space-y-6 bg-[#ECE7DD] p-6">
+      </section>
 
-          <div className="flex justify-center">
-            <span className="rounded-full bg-[#D9D3C8] px-4 py-2 text-sm text-prima-secondary">
-              Sesi Konsultasi Dimulai Pukul 10:00 AM
-            </span>
+      {/* STATUS CARD */}
+      <section className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+        <ConsultationStatusCard
+          title="Upcoming Session"
+          subtitle="Jadwal Konsultasi"
+          doctor="Dr. Sarah Johnson"
+          time="14:55 WIB"
+          actionText="Waiting Session"
+          status="Waiting Session"
+          background="bg-prima-card"
+          buttonColor="bg-prima-green text-white"
+          icon={
+            <CalendarDays className="h-5 w-5" />
+          }
+        />
+
+        <ConsultationStatusCard
+          title="Countdown"
+          subtitle="Sesi Dimulai"
+          doctor="Konsultasi dimulai dalam"
+          time="00:14:32"
+          actionText="Prepare Session"
+          status="Prepare Session"
+          background="bg-prima-card"
+          buttonColor="bg-prima-teal text-white"
+          icon={
+            <Clock3 className="h-5 w-5" />
+          }
+        />
+
+        <ConsultationStatusCard
+          title="Doctor Online"
+          subtitle="Ready Consultation"
+          doctor="Dokter sedang aktif"
+          time="Online"
+          actionText="Ready"
+          status="Ready"
+          background="bg-prima-card"
+          buttonColor="bg-prima-green text-white"
+          icon={
+            <Stethoscope className="h-5 w-5" />
+          }
+        />
+
+      </section>
+
+      {/* RECENT CONSULTATION */}
+
+      <section className="bg-prima-card rounded-[32px] p-8 border border-[#F1ECE4] shadow-sm">
+
+        {/* HEADER */}
+        <div className="flex items-center justify-between">
+
+          <div>
+
+            <p className="text-sm text-prima-secondary">
+              Consultation History
+            </p>
+
+            <h2 className="text-3xl font-bold text-prima-text mt-2">
+              Recent Consultation
+            </h2>
+
           </div>
 
-          <ChatBubble
-            sender="doctor"
-            message="Selamat pagi Ibu Amelia. Saya dr. Sarah yang akan membantu Anda hari ini. Apa saja keluhan yang Ibu rasakan?"
-            time="10:01 AM"
-          />
+          {/* BUTTON */}
+          <button className="text-prima-teal font-medium hover:underline">
 
-          <ChatBubble
-            sender="patient"
-            message="Selamat pagi Dokter. Saya merasa pusing dan mual sejak tadi malam, Dok. Rasanya seperti berputar-putar."
-            time="10:02 AM"
-          />
+            View All
 
-          <ChatBubble
-            sender="doctor"
-            message="Baik, apakah ada gejala lain seperti demam atau nyeri perut? Dan apakah Ibu sudah meminum obat sebelumnya?"
-            time="10:03 AM"
-          />
-
-          <TypingIndicator />
+          </button>
 
         </div>
 
-        {/* INPUT */}
-        <ChatInput />
+        {/* LIST */}
+        <div className="mt-8 space-y-4">
 
-      </div>
+          {/* ITEM 1 */}
+          <div className="bg-prima-background rounded-2xl p-5 flex items-center justify-between">
 
-      {/* FOOTER */}
-      <footer className="mt-10 flex flex-col gap-4 text-sm text-prima-secondary md:flex-row md:items-center md:justify-between">
+            {/* LEFT */}
+            <div>
 
-        <p>
-          © 2024 Gentle Care Medical. All rights reserved.
-        </p>
+              <h3 className="font-semibold text-prima-text">
+                Dr. Sarah Johnson
+              </h3>
 
-        <div className="flex gap-5">
-          <button>Privacy Policy</button>
-          <button>Terms of Service</button>
-          <button>Contact Support</button>
+              <p className="text-sm text-prima-secondary mt-1">
+                General Consultation • 20 Mei 2026
+              </p>
+
+            </div>
+
+            {/* STATUS */}
+            <div className="bg-prima-sand text-prima-green px-4 py-2 rounded-full text-sm font-medium">
+
+              Completed
+
+            </div>
+
+          </div>
+
+          {/* ITEM 2 */}
+          <div className="bg-prima-background rounded-2xl p-5 flex items-center justify-between">
+
+            {/* LEFT */}
+            <div>
+
+              <h3 className="font-semibold text-prima-text">
+                Dr. Andi Saputra
+              </h3>
+
+              <p className="text-sm text-prima-secondary mt-1">
+                Follow-up Consultation • 12 Mei 2026
+              </p>
+
+            </div>
+
+            {/* STATUS */}
+            <div className="bg-prima-sand text-prima-teal px-4 py-2 rounded-full text-sm font-medium">
+
+              Reviewed
+
+            </div>
+
+          </div>
+
+          {/* ITEM 3 */}
+          <div className="bg-prima-background rounded-2xl p-5 flex items-center justify-between">
+
+            {/* LEFT */}
+            <div>
+
+              <h3 className="font-semibold text-prima-text">
+                Dr. Michael Adrian
+              </h3>
+
+              <p className="text-sm text-prima-secondary mt-1">
+                Medical Checkup • 05 Mei 2026
+              </p>
+
+            </div>
+
+            {/* STATUS */}
+            <div className="bg-prima-sand text-[#C4846A] px-4 py-2 rounded-full text-sm font-medium">
+
+              Prescription Sent
+
+            </div>
+
+          </div>
+
         </div>
 
-      </footer>
+      </section>
 
     </div>
   )
