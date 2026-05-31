@@ -7,7 +7,7 @@ import {
 import AdminLayout from "../layouts/admin-layout"
 import PatientLayout from "../layouts/patient-layout"
 
-import PatientDashboardPage from "../pages/patient/dashboard/Dashboard-Page"
+import PatientDashboardPage from "../pages/patient/dashboard/dashboard-page"
 import PatientAppointmentPage from "../pages/patient/appointment/appointment-page"
 import PatientConsultationPage from "../pages/patient/consultation/consultation-page"
 import PatientHealthRecordsPage  from "../pages/patient/health-records/health-records-page"
