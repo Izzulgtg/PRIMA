@@ -1,10 +1,76 @@
 import Button from "../../components/ui/button"
 import Input from "../../components/ui/input"
 import { useNavigate } from "react-router-dom"
+import { useState } from "react"
 
 function RegisterPage() {
 
   const navigate = useNavigate()
+  const [name, setName] = useState("")
+  const [email, setEmail] = useState("")
+  const [password, setPassword] = useState("")
+  const [confirmPassword, setConfirmPassword] = useState("")
+  const [error, setError] = useState("")
+
+  const handleRegister = () => {
+
+  setError("")
+
+  if (
+    !name ||
+    !email ||
+    !password ||
+    !confirmPassword
+  ) {
+
+    setError("Semua field wajib diisi")
+
+    return
+  }
+
+  if (password !== confirmPassword) {
+
+    setError("Konfirmasi password tidak sama")
+
+    return
+  }
+
+  /* AMBIL USER LAMA */
+  const existingUsers =
+    JSON.parse(localStorage.getItem("users")) || []
+
+  /* CEK EMAIL */
+  const emailExists = existingUsers.find(
+    (user) => user.email === email
+  )
+
+  if (emailExists) {
+
+    setError("Email sudah terdaftar")
+
+    return
+  }
+
+  /* USER BARU */
+ const newUser = {
+  name: name.trim(),
+  email: email.trim(),
+  password: password.trim(),
+  role: "pasien",
+}
+
+  /* SIMPAN */
+  existingUsers.push(newUser)
+
+  localStorage.setItem(
+    "users",
+    JSON.stringify(existingUsers)
+  )
+
+  alert("Registrasi berhasil")
+
+  navigate("/login")
+}
 
   return (
     <div
@@ -89,10 +155,12 @@ function RegisterPage() {
 
               <div className="mt-2">
 
-                <Input
-                  type="text"
-                  placeholder="Masukkan nama sesuai KTP"
-                />
+            <Input
+              type="text"
+              placeholder="Masukkan nama sesuai KTP"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+            />
 
               </div>
 
@@ -197,10 +265,12 @@ function RegisterPage() {
 
                 <div className="mt-2">
 
-                  <Input
-                    type="email"
-                    placeholder="contoh@mail.com"
-                  />
+                <Input
+                  type="email"
+                  placeholder="contoh@mail.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                />
 
                 </div>
 
@@ -288,10 +358,12 @@ function RegisterPage() {
 
               <div className="mt-2">
 
-                <Input
-                  type="password"
-                  placeholder="Masukkan password"
-                />
+              <Input
+                type="password"
+                placeholder="Masukkan password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
 
               </div>
 
@@ -349,10 +421,12 @@ function RegisterPage() {
 
               <div className="mt-2">
 
-                <Input
-                  type="password"
-                  placeholder="Konfirmasi password"
-                />
+              <Input
+                type="password"
+                placeholder="Konfirmasi password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+              />
 
               </div>
 
@@ -383,12 +457,22 @@ function RegisterPage() {
 
             {/* BUTTON */}
             <div className="pt-2">
-
-              <Button variant="primary">
+              <Button
+                variant="primary"
+                onClick={handleRegister}
+              >
                 Daftar Sekarang
               </Button>
 
             </div>
+
+              {
+                error && (
+                  <p className="text-red-500 text-sm mt-4">
+                    {error}
+                  </p>
+                )
+              }
 
             {/* LOGIN */}
             <div className="text-center pt-4">

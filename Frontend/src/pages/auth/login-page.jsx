@@ -2,9 +2,98 @@ import Button from "../../components/ui/button"
 import Input from "../../components/ui/input"
 import loginBanner from "../../assets/images/login-banner.webp"
 import { useNavigate } from "react-router-dom"
+import { useState } from "react"
+
 
 function LoginPage() {
 const navigate = useNavigate()
+const [email, setEmail] = useState("")
+const [password, setPassword] = useState("")
+const [error, setError] = useState("")
+
+const handleLogin = () => {
+
+  setError("")
+
+  if (!email || !password) {
+
+    setError("Email dan password wajib diisi")
+
+    return
+  }
+
+  /* USER DUMMY */
+  const defaultUsers = [
+    {
+      email: "zaki@prima.id",
+      password: "password",
+      role: "admin",
+      redirect: "/admin/dashboard",
+    },
+
+    {
+      email: "dila.andini@prima.id",
+      password: "password",
+      role: "dokter",
+      redirect: "/doctor/dashboard",
+    },
+
+    {
+      email: "izzul@gmail.com",
+      password: "password",
+      role: "pasien",
+      redirect: "/patient/dashboard",
+    },
+
+    {
+      email: "mersela@gmail.com",
+      password: "password",
+      role: "pasien",
+      redirect: "/patient/dashboard",
+    },
+
+    {
+      email: "verdi@gmail.com",
+      password: "password",
+      role: "pasien",
+      redirect: "/patient/dashboard",
+    },
+  ]
+
+  /* USER REGISTER */
+  const registeredUsers =
+    JSON.parse(localStorage.getItem("users")) || []
+
+  /* GABUNGKAN */
+  const users = [
+    ...defaultUsers,
+
+    ...registeredUsers.map((user) => ({
+      ...user,
+      redirect: "/patient/dashboard",
+    })),
+  ]
+
+  /* CARI USER */
+  const user = users.find(
+    (u) =>
+      u.email.trim() === email.trim() &&
+      u.password.trim() === password.trim()
+  )
+
+  if (!user) {
+
+    setError("Email atau password salah")
+
+    return
+  }
+
+  /* SIMPAN ROLE */
+  localStorage.setItem("role", user.role)
+
+  /* REDIRECT */
+  navigate(user.redirect)
+}
 
   return (
   <div className="bg-prima-background min-h-screen p-6">
@@ -40,12 +129,12 @@ const navigate = useNavigate()
           PRIMA
         </h1>
 
-        <Button
-  variant="primary"
-  onClick={() => navigate("/admin/dashboard")}
->
-  Masuk
-</Button>
+      <Button
+        variant="primary"
+        onClick={() => navigate("/register")}
+      >
+        Register
+      </Button>
 
       </div>
 
@@ -181,29 +270,40 @@ const navigate = useNavigate()
 
               <div className="space-y-6">
 
-                <Input
-                  type="email"
-                  placeholder="nama@email.com"
-                />
+            <Input
+              type="email"
+              placeholder="nama@email.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
 
-                <Input
-                  type="password"
-                  placeholder="password"
-                />
+            <Input
+              type="password"
+              placeholder="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
 
               </div>
 
-              <div className="mt-8">
+            <div className="mt-8">
 
                 <Button
-  variant="primary"
-  onClick={() => navigate("/admin/dashboard")}
-> 
-  Masuk
-</Button>
+                  variant="primary"
+                  onClick={handleLogin}
+                >
+                  Masuk
+                </Button>
 
+            </div>
 
-              </div>
+            {
+              error && (
+                <p className="text-red-500 text-sm mt-4">
+                  {error}
+                </p>
+              )
+            }
 
               <p
                 className="

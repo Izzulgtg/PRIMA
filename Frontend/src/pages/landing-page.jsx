@@ -52,10 +52,7 @@ const navigate = useNavigate()
 >
 
   <div className="max-w-2xl">
-
-    <p className="text-prima-teal font-medium">
-      Program Rekam Medis & Interaksi Medis Terpadu
-    </p>
+    
 
     <h1
       className="
@@ -312,136 +309,7 @@ const navigate = useNavigate()
 
 </section>
 
-    <section className="px-10 py-24">
-
-  <div className="text-center">
-
-
-    <h2
-      className="
-        text-4xl
-        font-bold
-        text-prima-text
-        mt-4
-      "
-    >
-      Dirancang untuk Semua
-      Kebutuhan Pelayanan Medis
-    </h2>
-
-  </div>
-
-  <div
-    className="
-      grid
-      grid-cols-3
-      gap-8
-      mt-16
-    "
-  >
-
-    {/* PASIEN */}
-    <div
-      className="
-        bg-prima-card
-        rounded-3xl
-        p-10
-        border
-        border-prima-sand
-      "
-    >
-
-      <div
-        className="
-          w-16
-          h-16
-          rounded-2xl
-          bg-prima-sand
-          mb-8
-        "
-      />
-
-      <h3 className="text-2xl font-semibold text-prima-text">
-        Pasien
-      </h3>
-
-      <p className="text-prima-muted mt-4 leading-relaxed">
-        Pendaftaran online, konsultasi digital,
-        riwayat pengobatan, dan akses
-        informasi kesehatan pribadi.
-      </p>
-
-    </div>
-
-    {/* DOKTER */}
-    <div
-      className="
-        bg-prima-card
-        rounded-3xl
-        p-10
-        border
-        border-prima-sand
-      "
-    >
-
-      <div
-        className="
-          w-16
-          h-16
-          rounded-2xl
-          bg-prima-sand
-          mb-8
-        "
-      />
-
-      <h3 className="text-2xl font-semibold text-prima-text">
-        Dokter
-      </h3>
-
-      <p className="text-prima-muted mt-4 leading-relaxed">
-        Kelola pasien, pemeriksaan,
-        konsultasi daring, jadwal praktik,
-        dan rekam medis digital.
-      </p>
-
-    </div>
-
-    {/* ADMIN */}
-    <div
-      className="
-        bg-prima-card
-        rounded-3xl
-        p-10
-        border
-        border-prima-sand
-      "
-    >
-
-      <div
-        className="
-          w-16
-          h-16
-          rounded-2xl
-          bg-prima-sand
-          mb-8
-        "
-      />
-
-      <h3 className="text-2xl font-semibold text-prima-text">
-        Admin
-      </h3>
-
-      <p className="text-prima-muted mt-4 leading-relaxed">
-        Monitoring sistem, maintenance,
-        validasi data, dan pengelolaan
-        layanan kesehatan PRIMA.
-      </p>
-
-    </div>
-
-  </div>
-
-</section>
+   
 <footer
   className="
     px-10

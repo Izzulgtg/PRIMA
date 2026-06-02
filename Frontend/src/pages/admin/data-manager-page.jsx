@@ -458,7 +458,7 @@ function DataManagerPage() {
                     </td>
 
                     <td className="py-5">
-                      Dr. Hendra
+                      Izzul
                     </td>
 
                     <td className="py-5">
@@ -482,7 +482,7 @@ function DataManagerPage() {
                     </td>
 
                     <td className="py-5">
-                      Siti Aminah
+                      Izzul 
                     </td>
 
                     <td className="py-5">
