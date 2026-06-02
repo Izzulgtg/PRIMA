@@ -2,6 +2,7 @@ import Button from "../../components/ui/button"
 import Input from "../../components/ui/input"
 import { useNavigate } from "react-router-dom"
 import { useState } from "react"
+import api from "../../services/api"
 
 function RegisterPage() {
 
@@ -12,7 +13,7 @@ function RegisterPage() {
   const [confirmPassword, setConfirmPassword] = useState("")
   const [error, setError] = useState("")
 
-  const handleRegister = () => {
+const handleRegister = async () => {
 
   setError("")
 
@@ -35,41 +36,28 @@ function RegisterPage() {
     return
   }
 
-  /* AMBIL USER LAMA */
-  const existingUsers =
-    JSON.parse(localStorage.getItem("users")) || []
+  try {
 
-  /* CEK EMAIL */
-  const emailExists = existingUsers.find(
-    (user) => user.email === email
-  )
+    await api.post(
+      "/register-pasien",
+      {
+        nama_lengkap: name,
+        email,
+        password,
+      }
+    )
 
-  if (emailExists) {
+    alert("Registrasi berhasil")
 
-    setError("Email sudah terdaftar")
+    navigate("/login")
 
-    return
+  } catch (err) {
+
+    setError(
+      err.response?.data?.message ||
+      "Registrasi gagal"
+    )
   }
-
-  /* USER BARU */
- const newUser = {
-  name: name.trim(),
-  email: email.trim(),
-  password: password.trim(),
-  role: "pasien",
-}
-
-  /* SIMPAN */
-  existingUsers.push(newUser)
-
-  localStorage.setItem(
-    "users",
-    JSON.stringify(existingUsers)
-  )
-
-  alert("Registrasi berhasil")
-
-  navigate("/login")
 }
 
   return (

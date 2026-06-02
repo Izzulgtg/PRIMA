@@ -3,6 +3,7 @@ import Input from "../../components/ui/input"
 import loginBanner from "../../assets/images/login-banner.webp"
 import { useNavigate } from "react-router-dom"
 import { useState } from "react"
+import api from "../../services/api"
 
 
 function LoginPage() {
@@ -11,7 +12,7 @@ const [email, setEmail] = useState("")
 const [password, setPassword] = useState("")
 const [error, setError] = useState("")
 
-const handleLogin = () => {
+const handleLogin = async () => {
 
   setError("")
 
@@ -22,79 +23,57 @@ const handleLogin = () => {
     return
   }
 
-  /* USER DUMMY */
-  const defaultUsers = [
-    {
-      email: "zaki@prima.id",
-      password: "password",
-      role: "admin",
-      redirect: "/admin/dashboard",
-    },
+  try {
 
-    {
-      email: "dila.andini@prima.id",
-      password: "password",
-      role: "dokter",
-      redirect: "/doctor/dashboard",
-    },
+    const response = await api.post(
+      "/login",
+      {
+        email,
+        password,
+      }
+    )
 
-    {
-      email: "izzul@gmail.com",
-      password: "password",
-      role: "pasien",
-      redirect: "/patient/dashboard",
-    },
+    const user = response.data.user
+    const token = response.data.token
 
-    {
-      email: "mersela@gmail.com",
-      password: "password",
-      role: "pasien",
-      redirect: "/patient/dashboard",
-    },
+    localStorage.setItem("token", token)
 
-    {
-      email: "verdi@gmail.com",
-      password: "password",
-      role: "pasien",
-      redirect: "/patient/dashboard",
-    },
-  ]
+    localStorage.setItem(
+      "user",
+      JSON.stringify(user)
+    )
 
-  /* USER REGISTER */
-  const registeredUsers =
-    JSON.parse(localStorage.getItem("users")) || []
+    localStorage.setItem(
+      "role",
+      user.role
+    )
 
-  /* GABUNGKAN */
-  const users = [
-    ...defaultUsers,
+    if (user.role === "admin") {
 
-    ...registeredUsers.map((user) => ({
-      ...user,
-      redirect: "/patient/dashboard",
-    })),
-  ]
+      navigate("/admin/dashboard")
 
-  /* CARI USER */
-  const user = users.find(
-    (u) =>
-      u.email.trim() === email.trim() &&
-      u.password.trim() === password.trim()
-  )
+    }
 
-  if (!user) {
+    else if (user.role === "dokter") {
 
-    setError("Email atau password salah")
+      navigate("/doctor/dashboard")
 
-    return
+    }
+
+    else {
+
+      navigate("/patient/dashboard")
+
+    }
+
+  } catch (err) {
+
+    setError(
+      err.response?.data?.message ||
+      "Login gagal"
+    )
   }
-
-  /* SIMPAN ROLE */
-  localStorage.setItem("role", user.role)
-
-  /* REDIRECT */
-  navigate(user.redirect)
 }
-
   return (
   <div className="bg-prima-background min-h-screen p-6">
 
