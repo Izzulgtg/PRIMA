@@ -284,27 +284,19 @@ const handleLogin = async () => {
               )
             }
 
-              <p
-                className="
-                  text-center
-                  text-prima-muted
-                  text-sm
-                  mt-8
-                  leading-relaxed
-                "
-              >
-                “Akses dashboard akan disesuaikan
-                otomatis berdasarkan akun Anda”
-              </p>
-
             </div>
 
             {/* SECURITY TEXT */}
             <div className="mt-8">
 
-              <p className="text-prima-muted">
+            <div className="mt-8 flex items-center justify-center gap-2">
+
+
+              <p className="text-prima-muted text-sm opacity-80">
                 Sistem Keamanan Terenkripsi PRIMA
               </p>
+
+            </div>
 
             </div>
 

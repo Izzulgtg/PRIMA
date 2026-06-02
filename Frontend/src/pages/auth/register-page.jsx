@@ -183,7 +183,7 @@ const handleRegister = async () => {
                 "
               />
 
-              <p className="text-red-400 text-xs mt-2">
+              <p className="text--400 text-xs mt-2">
                 Wajib diisi • Sesuai KTP Anda
               </p>
 
@@ -352,43 +352,6 @@ const handleRegister = async () => {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
               />
-
-              </div>
-
-              {/* PASSWORD STRENGTH */}
-              <div className="mt-4">
-
-                <div
-                  className="
-                    w-full
-                    h-2
-                    rounded-full
-                    bg-[#E9E1D6]
-                    overflow-hidden
-                  "
-                >
-
-                  <div
-                    className="
-                      w-[70%]
-                      h-full
-                      bg-[#C6A8FF]
-                    "
-                  />
-
-                </div>
-
-                <div className="flex justify-between mt-2">
-
-                  <p className="text-xs text-prima-muted">
-                    Cukup
-                  </p>
-
-                  <p className="text-xs text-prima-muted">
-                    70%
-                  </p>
-
-                </div>
 
               </div>
 

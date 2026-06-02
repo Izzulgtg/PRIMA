@@ -80,14 +80,12 @@ const navigate = useNavigate()
       terintegrasi, aman, dan efisien.
     </p>
 
-    <div className="flex gap-4 mt-10">
-
-      <Button variant="primary">
-        Mulai Sekarang
-      </Button>
-
-      <Button variant="outline">
-        Pelajari Sistem
+      <div className="flex gap-4 mt-10">
+      <Button
+      variant="primary"
+      onClick={() => navigate("/login")}
+      >
+      Masuk
       </Button>
 
     </div>
@@ -139,13 +137,6 @@ const navigate = useNavigate()
     "
   >
 
-    <p className="text-prima-green font-semibold">
-      Konsultasi Berikutnya
-    </p>
-
-    <p className="text-prima-muted mt-2">
-      Senin, 14:00 WIB 
-    </p>
 
   </div>
 
@@ -371,26 +362,6 @@ const navigate = useNavigate()
       </div>
 
       <div>
-
-        <h3 className="text-prima-text font-semibold">
-          System
-        </h3>
-
-        <div className="mt-5 space-y-3">
-
-          <p className="text-prima-muted cursor-pointer">
-            Login
-          </p>
-
-          <p className="text-prima-muted cursor-pointer">
-            Register
-          </p>
-
-          <p className="text-prima-muted cursor-pointer">
-            Dashboard
-          </p>
-
-        </div>
 
       </div>
 
