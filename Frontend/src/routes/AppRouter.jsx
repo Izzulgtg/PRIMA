@@ -12,8 +12,11 @@ import PatientAppointmentPage from "../pages/patient/appointment/appointment-pag
 import PatientConsultationPage from "../pages/patient/consultation/consultation-page"
 import PatientHealthRecordsPage  from "../pages/patient/health-records/health-records-page"
 import PatientProfilePage from "../pages/patient/profile/profile-page"
+import EditProfilePage from "../pages/patient/profile/edit-profile-page"
 import PatientSecurityPage from "../pages/patient/security/security-page"
+import PatientSettingPage from "../pages/patient/settings/account-settings-page"
 import ConsultationRoomPage from "../pages/patient/consultation-room/consultation-room-page"
+import WaitingRoomPage from "../pages/patient/consultation-room/waiting-room-page"
 
 import DashboardPage from "../pages/admin/dashboard-page"
 import MaintenancePage from "../pages/admin/maintenance-page"
@@ -111,6 +114,11 @@ function AppRouter() {
           />
 
           <Route
+              path = "waiting-room"
+              element = {<WaitingRoomPage/>}
+          />
+
+          <Route
               path="health-records"
               element={<PatientHealthRecordsPage/>}
           />
@@ -121,8 +129,18 @@ function AppRouter() {
           />
 
           <Route
+              path="profile/edit"
+              element={<EditProfilePage  />}
+          />
+
+          <Route
               path="security"
               element={<PatientSecurityPage />}
+          />
+
+          <Route
+              path="setting"
+              element={<PatientSettingPage />}
           />
         
         </Route>

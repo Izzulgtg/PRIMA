@@ -78,14 +78,6 @@ function PatientLayout() {
                         Profile
                     </NavLink>
 
-                    <NavLink
-                        to="/patient/security"
-                        className={navClass}
-                    >
-                        <ShieldCheck size={20} />
-                        Security
-                    </NavLink>
-
                 </nav>
 
                 {/* Sidebar Footer */}
@@ -137,7 +129,7 @@ function PatientLayout() {
 
                             {/* Avatar */}
                             <div className="w-10 h-10 rounded-full bg-prima-green flex items-center justify-center text-white font-semibold">
-                                VS
+                                P
                             </div>
 
                             {/* User Info */}

@@ -1,22 +1,118 @@
 import {
-  ArrowLeft,
-} from "lucide-react"
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 
-import { useNavigate } from "react-router-dom"
+import { ArrowLeft } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
-import ChatBubble from "@/components/patient/consultation/chat-bubble"
-import ChatInput from "@/components/patient/consultation/chat-input"
-import TypingIndicator from "@/components/patient/consultation/typing-indicator"
+import ChatBubble from "@/components/patient/consultation/chat-bubble";
+import ChatInput from "@/components/patient/consultation/chat-input";
+import TypingIndicator from "@/components/patient/consultation/typing-indicator";
+
+import { dummyMessages } from "@/data/dummy-chat-messages";
+import { dummyConsultationSession } from "@/data/dummy-consultation-session";
 
 function ConsultationRoomPage() {
+  const navigate = useNavigate();
 
-  const navigate = useNavigate()
+  const [messages, setMessages] =
+    useState(dummyMessages);
+
+  const [sending, setSending] =
+    useState(false);
+
+  const [remainingSeconds, setRemainingSeconds] =
+    useState(
+      dummyConsultationSession.duration
+    );
+
+  const chatEndRef = useRef(null);
+
+  useEffect(() => {
+    chatEndRef.current?.scrollIntoView({
+      behavior: "smooth",
+    });
+  }, [messages]);
+
+  useEffect(() => {
+    if (remainingSeconds <= 0) return;
+
+    const timer = setInterval(() => {
+      setRemainingSeconds((prev) =>
+        prev > 0 ? prev - 1 : 0
+      );
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [remainingSeconds]);
+
+  const sendMessage = async (
+    text
+  ) => {
+    if (!text?.trim()) return;
+
+    setSending(true);
+
+    const newMessage = {
+      id: Date.now(),
+      sender: "patient",
+      message: text,
+      time: new Date().toLocaleTimeString(
+        "id-ID",
+        {
+          hour: "2-digit",
+          minute: "2-digit",
+        }
+      ),
+    };
+
+    setMessages((prev) => [
+      ...prev,
+      newMessage,
+    ]);
+
+    setTimeout(() => {
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: Date.now() + 1,
+          sender: "doctor",
+          message:
+            "Baik, informasi Anda sudah saya terima. Mohon jelaskan lebih detail mengenai keluhan yang dirasakan.",
+          time: new Date().toLocaleTimeString(
+            "id-ID",
+            {
+              hour: "2-digit",
+              minute: "2-digit",
+            }
+          ),
+        },
+      ]);
+
+      setSending(false);
+    }, 1500);
+  };
+
+  const minutes = Math.floor(
+    remainingSeconds / 60
+  );
+
+  const seconds =
+    remainingSeconds % 60;
+
+  const formattedTime = `${String(
+    minutes
+  ).padStart(2, "0")}:${String(
+    seconds
+  ).padStart(2, "0")}`;
 
   return (
-    <div className="h-[calc(100vh-140px)] flex flex-col gap-6">
+    <div className="flex h-[calc(100vh-140px)] flex-col gap-6">
 
       {/* HEADER */}
-      <section className="bg-prima-card rounded-[32px] p-6 border border-[#F1ECE4] shadow-sm">
+      <section className="rounded-[32px] border border-[#F1ECE4] bg-prima-card p-6 shadow-sm">
 
         <div className="flex items-center justify-between">
 
@@ -24,30 +120,48 @@ function ConsultationRoomPage() {
           <div className="flex items-center gap-4">
 
             <button
-              onClick={() => navigate("/patient/consultation")}
-              className="w-12 h-12 rounded-2xl bg-prima-background flex items-center justify-center hover:bg-prima-sand transition-all duration-300"
+              onClick={() =>
+                navigate(
+                  "/patient/waiting-room"
+                )
+              }
+              className="
+                flex
+                h-12
+                w-12
+                items-center
+                justify-center
+                rounded-2xl
+                bg-prima-background
+                transition
+                hover:bg-prima-sand
+              "
             >
-
               <ArrowLeft size={20} />
-
             </button>
 
-            <div className="w-14 h-14 rounded-full bg-prima-green flex items-center justify-center text-white font-bold">
-              DR
+            <div className="flex h-14 w-14 items-center justify-center rounded-full bg-prima-green font-bold text-white">
+              {
+                dummyConsultationSession.doctorCode
+              }
             </div>
 
             <div>
 
               <h2 className="text-2xl font-bold text-prima-text">
-                Dr. Sarah Johnson
+                {
+                  dummyConsultationSession.doctorName
+                }
               </h2>
 
-              <div className="flex items-center gap-2 mt-1">
+              <div className="mt-1 flex items-center gap-2">
 
-                <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
+                <div className="h-2 w-2 rounded-full bg-green-500 animate-pulse" />
 
                 <p className="text-sm text-prima-secondary">
-                  Online Consultation Active
+                  {
+                    dummyConsultationSession.specialization
+                  }
                 </p>
 
               </div>
@@ -63,9 +177,31 @@ function ConsultationRoomPage() {
               Session Time
             </p>
 
-            <h3 className="text-2xl font-bold text-red-500 mt-1">
-              29:45
+            <h3 className="mt-1 text-2xl font-bold text-red-500">
+              {formattedTime}
             </h3>
+
+            <button
+              onClick={() =>
+                navigate(
+                  "/patient/consultation"
+                )
+              }
+              className="
+                mt-3
+                rounded-xl
+                bg-red-500
+                px-4
+                py-2
+                text-sm
+                font-medium
+                text-white
+                transition
+                hover:bg-red-600
+              "
+            >
+              Akhiri Konsultasi
+            </button>
 
           </div>
 
@@ -74,48 +210,51 @@ function ConsultationRoomPage() {
       </section>
 
       {/* CHAT AREA */}
-      <section className="flex-1 bg-prima-card rounded-[32px] border border-[#F1ECE4] shadow-sm flex flex-col overflow-hidden">
+      <section className="flex flex-1 flex-col overflow-hidden rounded-[32px] border border-[#F1ECE4] bg-prima-card shadow-sm">
 
         {/* CHAT BODY */}
-        <div className="flex-1 overflow-y-auto p-6 bg-prima-background space-y-6">
+        <div className="flex-1 overflow-y-auto bg-prima-background p-6 space-y-6">
 
           <div className="flex justify-center">
 
-            <span className="bg-prima-sand text-prima-secondary px-4 py-2 rounded-full text-sm">
-              Consultation Started at 10:00 AM
+            <span className="rounded-full bg-prima-sand px-4 py-2 text-sm text-prima-secondary">
+              Consultation Started
             </span>
 
           </div>
 
-          <ChatBubble
-            sender="doctor"
-            message="Selamat pagi. Apa keluhan yang sedang Anda rasakan hari ini?"
-            time="10:01 AM"
+          {messages.map(
+            (message) => (
+              <ChatBubble
+                key={message.id}
+                sender={message.sender}
+                message={message.message}
+                time={message.time}
+              />
+            )
+          )}
+
+          <TypingIndicator
+            doctorName={
+              dummyConsultationSession.doctorName
+            }
+            visible={sending}
           />
 
-          <ChatBubble
-            sender="patient"
-            message="Saya mengalami sakit kepala dan tubuh terasa lemas dok."
-            time="10:02 AM"
-          />
-
-          <ChatBubble
-            sender="doctor"
-            message="Apakah ada demam atau gangguan tidur sebelumnya?"
-            time="10:03 AM"
-          />
-
-          <TypingIndicator />
+          <div ref={chatEndRef} />
 
         </div>
 
         {/* INPUT */}
-        <ChatInput />
+        <ChatInput
+          onSend={sendMessage}
+          sending={sending}
+        />
 
       </section>
 
     </div>
-  )
+  );
 }
 
-export default ConsultationRoomPage
+export default ConsultationRoomPage;

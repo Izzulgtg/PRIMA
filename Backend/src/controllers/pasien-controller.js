@@ -57,25 +57,85 @@ exports.getRiwayatMedisPasien = async (req, res) => {
 
   try {
     const query = `
-      SELECT rm.id AS rekam_medis_id, rm.keluhan, rm.diagnosis, rm.tindakan, rm.created_at AS tanggal_periksa,
-             ud.nama_lengkap AS nama_dokter, pd.spesialisasi,
-             r.id AS resep_id, r.catatan AS catatan_resep
+      SELECT
+        rm.id AS rekam_medis_id,
+        rm.keluhan,
+        rm.diagnosis,
+        rm.tindakan,
+        rm.created_at AS tanggal_periksa,
+        ud.nama_lengkap AS nama_dokter,
+        pd.spesialisasi,
+        r.id AS resep_id,
+        r.catatan AS catatan_resep,
+        r.status AS status_resep,
+
+        GROUP_CONCAT(
+          CONCAT(
+            o.nama,
+            ' (',
+            rd.dosis,
+            ', ',
+            rd.aturan_pakai,
+            ')'
+          )
+          SEPARATOR '|'
+        ) AS daftar_obat
+
       FROM rekam_medis rm
-      JOIN users ud ON rm.dokter_id = ud.id
-      JOIN profil_dokter pd ON ud.id = pd.user_id
-      LEFT JOIN resep r ON rm.id = r.rekam_medis_id
+
+      JOIN users ud
+        ON rm.dokter_id = ud.id
+
+      JOIN profil_dokter pd
+        ON ud.id = pd.user_id
+
+      LEFT JOIN resep r
+        ON rm.id = r.rekam_medis_id
+
+      LEFT JOIN resep_detail rd
+        ON r.id = rd.resep_id
+
+      LEFT JOIN obat o
+        ON rd.obat_id = o.id
+
       WHERE rm.pasien_id = ?
+
+      GROUP BY
+        rm.id,
+        rm.keluhan,
+        rm.diagnosis,
+        rm.tindakan,
+        rm.created_at,
+        ud.nama_lengkap,
+        pd.spesialisasi,
+        r.id,
+        r.catatan,
+        r.status
+
       ORDER BY rm.created_at DESC
     `;
-    
-    const [results] = await db.query(query, [pasien_id]);
+
+    const [results] = await db.query(
+      query,
+      [pasien_id]
+    );
+
     return res.status(200).json({
       success: true,
       count: results.length,
-      data: results
+      data: results,
     });
+
   } catch (error) {
-    console.error('Error saat mengambil riwayat medis pasien:', error);
-    return res.status(500).json({ message: 'Terjadi kesalahan pada server saat mengambil data riwayat.' });
+    console.error(
+      "Error saat mengambil riwayat medis pasien:",
+      error
+    );
+
+    return res.status(500).json({
+      success: false,
+      message:
+        "Terjadi kesalahan pada server saat mengambil data riwayat.",
+    });
   }
 };

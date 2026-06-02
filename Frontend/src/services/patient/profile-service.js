@@ -2,6 +2,7 @@ import api from "../api"
 
 export const getProfile = async () => {
   const response = await api.get("/auth/profile")
+  console.log("PROFILE RESPONSE:", response.data);
   return response.data.data
 }
 
@@ -16,5 +17,5 @@ export const updateProfile = async (profileData) => {
 
 export const getCurrentUser = async () => {
   const response = await api.get("/auth/me")
-  return response.data.user_sekarang
+  return response.data.data
 }

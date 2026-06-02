@@ -1,3 +1,4 @@
+import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { updateProfile } from "@/services/patient/profile-service";
 
@@ -159,11 +160,22 @@ const HealthInfoForm = ({ profile, setProfile }) => {
           </label>
 
           <select
-            disabled
-            className="w-full rounded-lg border border-gray-200 bg-gray-100 p-3 text-gray-400"
+            className="w-full rounded-lg border border-gray-200 p-3 focus:border-prima-green focus:outline-none"
           >
             <option>
-              Belum tersedia
+              Belum dipilih
+            </option>
+            <option value="A">
+              A
+            </option>
+            <option value="B">
+              B
+            </option>
+            <option value="AB">
+              AB
+            </option>
+            <option value="O">
+              O
             </option>
           </select>
         </div>
@@ -177,7 +189,7 @@ const HealthInfoForm = ({ profile, setProfile }) => {
           <textarea
             rows="3"
             disabled
-            placeholder="Belum tersedia pada backend"
+            placeholder="Tidak Ada Alergi"
             className="w-full rounded-lg border border-gray-200 bg-gray-100 p-3 text-gray-400"
           />
         </div>

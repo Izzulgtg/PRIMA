@@ -1,6 +1,19 @@
-function UpcomingAppointmentCard() {
+function UpcomingAppointmentCard({
+  appointment,
+}) {
+  if (!appointment) {
+    return (
+      <section className="bg-prima-card rounded-3xl p-6 shadow-sm border border-prima-sand">
+        <h2 className="text-xl font-semibold text-prima-text">
+          Belum ada jadwal konsultasi
+        </h2>
+      </section>
+    );
+  }
+
   return (
-    <section className="bg-prima-card rounded-3xl p-6 shadow-sm border border-prima-sand space-y-6">
+    <section className="bg-prima-card rounded-3xl p-6 shadow-sm border border-prima-sand">
+
       <div className="flex items-center justify-between">
         <div>
           <p className="text-prima-secondary text-sm">
@@ -17,14 +30,15 @@ function UpcomingAppointmentCard() {
         </span>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
+
         <div className="bg-prima-background rounded-2xl p-4">
           <p className="text-prima-secondary text-sm">
             Dokter
           </p>
 
           <h3 className="font-semibold text-prima-text mt-1">
-            Dr. Andi Saputra
+            {appointment.doctor}
           </h3>
         </div>
 
@@ -34,7 +48,7 @@ function UpcomingAppointmentCard() {
           </p>
 
           <h3 className="font-semibold text-prima-text mt-1">
-            20 Mei 2026
+            {appointment.date}
           </h3>
         </div>
 
@@ -44,14 +58,12 @@ function UpcomingAppointmentCard() {
           </p>
 
           <h3 className="font-semibold text-prima-text mt-1">
-            13:00 WIB
+            {appointment.time}
           </h3>
         </div>
+
       </div>
 
-      <button className="bg-prima-green text-white px-6 py-3 rounded-2xl font-semibold hover:opacity-90 transition-all duration-300">
-        Join Consultation
-      </button>
     </section>
   );
 }

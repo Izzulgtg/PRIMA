@@ -1,16 +1,58 @@
-function QuickActionCard({ title, description }) {
-  return (
-    <button className="bg-prima-background rounded-2xl p-5 text-left hover:-translate-y-1 hover:shadow-md transition-all duration-300 border border-transparent hover:border-prima-green/20">
-      <div className="space-y-2">
-        <h3 className="font-semibold text-prima-text text-lg">
-          {title}
-        </h3>
+import { ChevronRight } from "lucide-react";
+import { Link } from "react-router-dom";
 
-        <p className="text-prima-secondary text-sm leading-relaxed">
-          {description}
-        </p>
+function QuickActionCard({
+  title,
+  description,
+  icon: Icon,
+  path,
+}) {
+  return (
+    <Link
+      to={path}
+      className="
+        group
+        bg-prima-background
+        border border-[#F1ECE4]
+        rounded-[24px]
+        p-5
+        transition-all
+        duration-300
+        hover:shadow-md
+        hover:-translate-y-1
+      "
+    >
+      <div className="flex items-start justify-between">
+
+        <div>
+
+          <div className="w-12 h-12 rounded-2xl bg-prima-sand flex items-center justify-center text-prima-green">
+
+            <Icon size={22} />
+
+          </div>
+
+          <h3 className="mt-4 font-semibold text-prima-text">
+            {title}
+          </h3>
+
+          <p className="mt-1 text-sm text-prima-secondary">
+            {description}
+          </p>
+
+        </div>
+
+        <ChevronRight
+          size={18}
+          className="
+            text-prima-secondary
+            transition-transform
+            group-hover:translate-x-1
+          "
+        />
+
       </div>
-    </button>
+    </Link>
   );
 }
 

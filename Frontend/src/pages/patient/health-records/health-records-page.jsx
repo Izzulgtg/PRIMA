@@ -1,36 +1,54 @@
+import { useEffect, useState } from "react";
 import {
   Activity,
   Pill,
   HeartPulse,
-} from "lucide-react"
+} from "lucide-react";
 
-import MedicalRecordCard from "@/components/patient/health-records/medical-record-card"
+import MedicalRecordCard from "@/components/patient/health-records/medical-record-card";
+import MedicationHistoryCard from "@/components/patient/health-records/medication-history-card";
+
+import { formatDate } from "@/utils/patient/format-date";
+
+import { dummyHealthRecords } from "@/data/dummy-health-records";
 
 function HealthRecordsPage() {
+  const [records, setRecords] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const records = [
-    {
-      date: "24 Mei 2026",
-      doctor: "Dr. Sarah Johnson",
-      diagnosis: "Vertigo ringan dan gangguan lambung",
-      complaint: "Pusing, mual, dan tubuh terasa lemas.",
-      status: "Completed",
-    },
-    {
-      date: "12 Mei 2026",
-      doctor: "Dr. Andi Saputra",
-      diagnosis: "Flu dan demam ringan",
-      complaint: "Demam dan sakit tenggorokan selama 3 hari.",
-      status: "Reviewed",
-    },
-    {
-      date: "05 Mei 2026",
-      doctor: "Dr. Michael Adrian",
-      diagnosis: "Hipertensi ringan",
-      complaint: "Tekanan darah meningkat dan sakit kepala.",
-      status: "Prescription",
-    },
-  ]
+  useEffect(() => {
+    setRecords(dummyHealthRecords);
+    setLoading(false);
+  }, []);
+
+  const sortedRecords = [...records].sort(
+    (a, b) =>
+      new Date(b.tanggal_periksa) -
+      new Date(a.tanggal_periksa)
+  );
+
+  const latestVisit =
+    sortedRecords.length > 0
+      ? formatDate(
+          sortedRecords[0].tanggal_periksa
+        )
+      : "-";
+
+  const medicationHistory =
+    sortedRecords.flatMap((record) =>
+      record.daftar_obat
+        ? record.daftar_obat
+            .split("|")
+            .map((medicine) => ({
+              medicine: medicine.trim(),
+              doctor: record.nama_dokter,
+              date: record.tanggal_periksa,
+              status:
+                record.status_resep ||
+                "Selesai",
+            }))
+        : []
+    );
 
   return (
     <div className="space-y-6">
@@ -40,7 +58,6 @@ function HealthRecordsPage() {
 
         <div className="flex flex-col lg:flex-row items-start justify-between gap-10">
 
-          {/* LEFT */}
           <div className="max-w-2xl">
 
             <p className="text-sm opacity-80">
@@ -53,12 +70,12 @@ function HealthRecordsPage() {
 
             <p className="mt-5 text-lg opacity-90 leading-relaxed">
               Pantau riwayat konsultasi, diagnosis,
-              dan resep obat Anda secara aman melalui PRIMA.
+              dan resep obat Anda secara aman melalui
+              PRIMA.
             </p>
 
           </div>
 
-          {/* RIGHT */}
           <div className="bg-white/10 backdrop-blur-sm rounded-3xl p-6 w-[320px] border border-white/10">
 
             <p className="text-sm opacity-80">
@@ -70,12 +87,13 @@ function HealthRecordsPage() {
             </h3>
 
             <p className="mt-3 opacity-80 leading-relaxed">
-              Kondisi kesehatan terakhir dalam status baik.
+              Kondisi kesehatan terakhir dalam status
+              baik.
             </p>
 
             <div className="mt-6 flex items-center gap-2">
 
-              <div className="w-3 h-3 rounded-full bg-green-300 animate-pulse"></div>
+              <div className="w-3 h-3 rounded-full bg-green-300 animate-pulse" />
 
               <span className="text-sm">
                 Medical Record Active
@@ -89,16 +107,14 @@ function HealthRecordsPage() {
 
       </section>
 
-      {/* SUMMARY CARD */}
+      {/* SUMMARY */}
       <section className="grid grid-cols-1 md:grid-cols-3 gap-6">
 
-        {/* CARD 1 */}
+        {/* TOTAL CONSULTATION */}
         <div className="bg-prima-card rounded-[28px] p-6 border border-[#F1ECE4] shadow-sm">
 
           <div className="w-12 h-12 rounded-2xl bg-prima-sand flex items-center justify-center text-prima-green">
-
             <HeartPulse size={22} />
-
           </div>
 
           <p className="text-sm text-prima-secondary mt-5">
@@ -106,97 +122,191 @@ function HealthRecordsPage() {
           </p>
 
           <h2 className="text-4xl font-bold text-prima-text mt-2">
-            12
+            {records.length}
           </h2>
 
         </div>
 
-        {/* CARD 2 */}
+        {/* TOTAL PRESCRIPTION */}
         <div className="bg-prima-card rounded-[28px] p-6 border border-[#F1ECE4] shadow-sm">
 
           <div className="w-12 h-12 rounded-2xl bg-prima-sand flex items-center justify-center text-prima-green">
-
             <Pill size={22} />
-
           </div>
 
           <p className="text-sm text-prima-secondary mt-5">
-            Active Prescription
+            Total Prescription
           </p>
 
           <h2 className="text-4xl font-bold text-prima-text mt-2">
-            4
+            {
+              records.filter(
+                (record) => record.catatan_resep
+              ).length
+            }
           </h2>
 
         </div>
 
-        {/* CARD 3 */}
+        {/* LAST VISIT */}
         <div className="bg-prima-card rounded-[28px] p-6 border border-[#F1ECE4] shadow-sm">
 
           <div className="w-12 h-12 rounded-2xl bg-prima-sand flex items-center justify-center text-prima-green">
-
             <Activity size={22} />
-
           </div>
 
           <p className="text-sm text-prima-secondary mt-5">
-            Health Monitoring
+            Last Visit
           </p>
 
-          <h2 className="text-4xl font-bold text-prima-text mt-2">
-            Stable
+          <h2 className="text-2xl font-bold text-prima-text mt-2">
+            {latestVisit}
           </h2>
 
         </div>
 
       </section>
 
-      {/* MEDICAL HISTORY */}
-      <section className="bg-prima-card rounded-[32px] p-8 border border-[#F1ECE4] shadow-sm">
+      {/* MEDICAL TIMELINE + MEDICATION HISTORY */}
+<section className="bg-prima-card rounded-[32px] p-8 border border-[#F1ECE4] shadow-sm">
 
-        {/* HEADER */}
-        <div className="flex items-center justify-between">
+  <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
 
-          <div>
+    {/* LEFT SIDE */}
+    <div className="xl:col-span-2">
 
-            <p className="text-sm text-prima-secondary">
-              Medical Timeline
+      <div className="flex items-center justify-between">
+
+        <div>
+
+          <p className="text-sm text-prima-secondary">
+            Medical Timeline
+          </p>
+
+          <h2 className="text-3xl font-bold text-prima-text mt-2">
+            Consultation History
+          </h2>
+
+        </div>
+
+        <button className="text-prima-teal font-medium hover:underline">
+          View All
+        </button>
+
+      </div>
+
+      {/* LOADING */}
+      {loading && (
+        <div className="py-10 text-center">
+
+          <p className="text-prima-secondary">
+            Memuat riwayat medis...
+          </p>
+
+        </div>
+      )}
+
+      {/* EMPTY */}
+      {!loading &&
+        records.length === 0 && (
+          <div className="py-10 text-center">
+
+            <p className="text-prima-secondary">
+              Belum ada riwayat pemeriksaan.
             </p>
 
-            <h2 className="text-3xl font-bold text-prima-text mt-2">
-              Consultation History
-            </h2>
+          </div>
+        )}
+
+      {/* RECORDS */}
+      {!loading &&
+        records.length > 0 && (
+          <div className="mt-8 space-y-5">
+
+            {sortedRecords.map((record) => (
+              <MedicalRecordCard
+                key={record.rekam_medis_id}
+                date={formatDate(
+                  record.tanggal_periksa
+                )}
+                doctor={record.nama_dokter}
+                specialization={
+                  record.spesialisasi || "-"
+                }
+                diagnosis={
+                  record.diagnosis
+                }
+                complaint={
+                  record.keluhan
+                }
+                prescription={
+                  record.catatan_resep
+                }
+                medicines={
+                  record.daftar_obat
+                    ? record.daftar_obat.split(
+                        "|"
+                      )
+                    : []
+                }
+                status={
+                  record.catatan_resep
+                    ? record.status_resep
+                    : "Selesai"
+                }
+              />
+            ))}
+
+          </div>
+        )}
+
+    </div>
+
+    {/* RIGHT SIDE */}
+      <div>
+        <div className="rounded-[28px] bg-prima-background border border-[#F1ECE4] p-6">
+
+          <p className="text-sm text-prima-secondary">
+            Medication History
+          </p>
+
+          <h2 className="mt-2 text-2xl font-bold text-prima-text">
+            Daftar Obat
+          </h2>
+
+          <div className="mt-6 space-y-4">
+
+            {medicationHistory.length === 0 ? (
+              <div className="py-8 text-center">
+                <p className="text-prima-secondary">
+                  Belum ada riwayat obat.
+                </p>
+              </div>
+            ) : (
+              medicationHistory.map(
+                (item, index) => (
+                  <MedicationHistoryCard
+                    key={`${item.medicine}-${index}`}
+                    medicine={item.medicine}
+                    doctor={item.doctor}
+                    date={item.date}
+                    status={item.status}
+                  />
+                )
+              )
+            )}
 
           </div>
 
-          <button className="text-prima-teal font-medium hover:underline">
-
-            View All
-
-          </button>
-
         </div>
+      </div>
 
-        {/* RECORD LIST */}
-        <div className="mt-8 space-y-5">
+  </div>
 
-          {records.map((record, index) => (
-            <MedicalRecordCard
-              key={index}
-              date={record.date}
-              doctor={record.doctor}
-              diagnosis={record.diagnosis}
-              complaint={record.complaint}
-              status={record.status}
-            />
-          ))}
-
-        </div>
-
-      </section>
+</section>
 
     </div>
-  )
+  );
 }
 
-export default HealthRecordsPage
+export default HealthRecordsPage;

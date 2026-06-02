@@ -1,4 +1,9 @@
-const TypingIndicator = () => {
+const TypingIndicator = ({
+  doctorName = "Dr. Sarah Johnson",
+  visible = true,
+}) => {
+  if (!visible) return null;
+
   return (
     <div className="flex items-center gap-3">
 
@@ -6,18 +11,18 @@ const TypingIndicator = () => {
 
         <div className="h-2 w-2 animate-bounce rounded-full bg-prima-secondary" />
 
-        <div className="h-2 w-2 animate-bounce rounded-full bg-prima-secondary delay-100" />
+        <div className="h-2 w-2 animate-bounce rounded-full bg-prima-secondary [animation-delay:150ms]" />
 
-        <div className="h-2 w-2 animate-bounce rounded-full bg-prima-secondary delay-200" />
+        <div className="h-2 w-2 animate-bounce rounded-full bg-prima-secondary [animation-delay:300ms]" />
 
       </div>
 
       <p className="text-sm text-prima-secondary">
-        Dr. Sarah sedang mengetik...
+        {doctorName} sedang mengetik...
       </p>
 
     </div>
-  )
-}
+  );
+};
 
-export default TypingIndicator
+export default TypingIndicator;

@@ -1,8 +1,11 @@
 function MedicalRecordCard({
   date,
   doctor,
+  specialization,
   diagnosis,
   complaint,
+  prescription,
+  medicines,
   status,
 }) {
 
@@ -26,10 +29,15 @@ function MedicalRecordCard({
         </div>
 
         {/* STATUS */}
-        <div className="bg-prima-sand text-prima-green px-4 py-2 rounded-full text-sm font-medium">
-
+        <div
+          className={`px-4 py-2 rounded-full text-sm font-medium
+            ${
+              prescription
+                ? "bg-orange-100 text-prima-warning"
+                : "bg-prima-sand text-prima-green"
+            }`}
+        >
           {status}
-
         </div>
 
       </div>
@@ -47,6 +55,10 @@ function MedicalRecordCard({
           <h4 className="text-lg font-semibold text-prima-text mt-1">
             {doctor}
           </h4>
+
+          <p className="inline-flex mt-2 px-3 py-1 rounded-full bg-prima-sand text-prima-green text-xs font-medium">
+            {specialization}
+          </p>
 
         </div>
 
@@ -75,6 +87,53 @@ function MedicalRecordCard({
           </p>
 
         </div>
+
+        {/* PRESCRIPTION */}
+        {
+          prescription?.trim() && (
+            <div>
+
+              <p className="text-sm text-prima-secondary">
+                Prescription Notes
+              </p>
+
+              <div className="mt-2 bg-prima-sand rounded-2xl p-4">
+
+                <p className="text-prima-text leading-relaxed">
+                  {prescription}
+                </p>
+
+              </div>
+
+            </div>
+          )
+        }
+
+        {/* MEDICINES */}
+        {
+          medicines?.length > 0 && (
+            <div>
+
+              <p className="text-sm text-prima-secondary">
+                Medicines
+              </p>
+
+              <div className="mt-2 space-y-2">
+
+                {medicines.map((medicine, index) => (
+                  <div
+                    key={index}
+                    className="bg-prima-sand rounded-xl p-3 text-sm text-prima-text"
+                  >
+                    {medicine}
+                  </div>
+                ))}
+
+              </div>
+
+            </div>
+          )
+        }
 
       </div>
 
