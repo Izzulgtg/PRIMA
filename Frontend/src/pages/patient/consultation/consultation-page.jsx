@@ -11,6 +11,13 @@ import ConsultationStatusCard from "@/components/patient/consultation/consultati
 function ConsultationPage() {
 
   const navigate = useNavigate()
+  const handleJoinConsultation =
+    () => {
+      navigate("/patient/consultation-room");
+  };
+  const handleWaitingRoom  =
+    () => {navigate("/patient/waiting-room");
+  };
 
   return (
     <div className="space-y-6">
@@ -37,10 +44,10 @@ function ConsultationPage() {
             </p>
 
             <button
-              onClick={() => navigate("/patient/consultation-room")}
+              onClick={handleWaitingRoom }
               className="mt-8 bg-white text-prima-green px-6 py-3 rounded-2xl font-semibold hover:scale-105 hover:shadow-xl transition-all duration-300"
             >
-              Join Consultation
+              Masuk Ruang Tunggu
             </button>
 
           </div>
@@ -91,6 +98,7 @@ function ConsultationPage() {
           icon={
             <CalendarDays className="h-5 w-5" />
           }
+          onJoin={handleWaitingRoom }
         />
 
         <ConsultationStatusCard
@@ -105,6 +113,7 @@ function ConsultationPage() {
           icon={
             <Clock3 className="h-5 w-5" />
           }
+          onJoin={handleWaitingRoom }
         />
 
         <ConsultationStatusCard
@@ -119,6 +128,7 @@ function ConsultationPage() {
           icon={
             <Stethoscope className="h-5 w-5" />
           }
+          onJoin={handleJoinConsultation}
         />
 
       </section>

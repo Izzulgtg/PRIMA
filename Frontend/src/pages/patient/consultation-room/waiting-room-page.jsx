@@ -1,3 +1,4 @@
+import { ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 import WaitingRoomCard from "@/components/patient/consultation/waiting-room-card";
@@ -13,16 +14,33 @@ function WaitingRoomPage() {
 
   const handleJoinConsultation =
     () => {
-      navigate(
-        "/patient/consultation-room"
-      );
+      navigate("/patient/consultation-room");
     };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
+
+      <div className="flex items-center justify-between">
+        <button
+          onClick={() =>
+            navigate("/patient/consultation")
+          }
+          className="
+            inline-flex items-center gap-2
+            text-prima-secondary
+            hover:text-prima-green
+            transition-colors
+            font-medium
+          "
+        >
+          <ArrowLeft size={18} />
+          Kembali
+        </button>
+      </div>
 
       {/* HERO */}
       <section className="bg-prima-green rounded-[32px] p-8 text-white">
+
 
         <p className="text-sm opacity-80">
           Waiting Room

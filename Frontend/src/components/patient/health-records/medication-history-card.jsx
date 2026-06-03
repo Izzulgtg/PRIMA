@@ -1,40 +1,41 @@
 import { Pill } from "lucide-react";
 import { formatDate } from "@/utils/patient/format-date";
 
+const STATUS_STYLES = {
+  aktif:
+    "bg-prima-green/10 text-prima-green",
+
+  selesai:
+    "bg-prima-teal/10 text-prima-teal",
+};
+
 function MedicationHistoryCard({
   medicine,
   doctor,
   date,
-  status,
+  status = "Selesai",
 }) {
-  const getStatusClass = (status) => {
-    switch (status?.toLowerCase()) {
-      case "aktif":
-        return "bg-prima-green/10 text-prima-green";
-
-      case "selesai":
-        return "bg-prima-teal/10 text-prima-teal";
-
-      default:
-        return "bg-prima-sand text-prima-secondary";
-    }
-  };
+  const statusClass =
+    STATUS_STYLES[
+      status?.toLowerCase()
+    ] ||
+    "bg-prima-sand text-prima-secondary";
 
   return (
-    <div className="rounded-2xl border border-[#F1ECE4] bg-white p-4">
+    <div className="rounded-2xl border border-[#F1ECE4] bg-white p-4 transition hover:shadow-sm">
 
       <div className="flex items-start justify-between gap-3">
 
-        <div>
+        <div className="min-w-0">
 
           <div className="flex items-center gap-2">
 
             <Pill
               size={16}
-              className="text-prima-green"
+              className="text-prima-green shrink-0"
             />
 
-            <h4 className="font-semibold text-prima-text">
+            <h4 className="font-semibold text-prima-text truncate">
               {medicine}
             </h4>
 
@@ -51,9 +52,7 @@ function MedicationHistoryCard({
         </div>
 
         <span
-          className={`rounded-full px-3 py-1 text-xs font-medium ${getStatusClass(
-            status
-          )}`}
+          className={`rounded-full px-3 py-1 text-xs font-medium whitespace-nowrap ${statusClass}`}
         >
           {status}
         </span>

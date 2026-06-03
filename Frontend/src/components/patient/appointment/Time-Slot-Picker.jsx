@@ -13,6 +13,7 @@ function TimeSlotPicker({
           key={slot.time}
           time={slot.time}
           status={slot.status}
+          disabled={slot.status === "Busy"}
           selected={
             selectedSlot === slot.time
           }

@@ -1,42 +1,40 @@
-function PrescriptionStatusBadge({
-  status = "Selesai",
+function MedicalHistoryFilter({
+  value,
+  onChange,
 }) {
-  const getStatusStyle = () => {
-    switch (
-      status?.toLowerCase()
-    ) {
-      case "selesai":
-      case "completed":
-        return "bg-prima-sand text-prima-green";
-
-      case "reviewed":
-      case "ditinjau":
-        return "bg-blue-100 text-prima-teal";
-
-      case "pending":
-      case "menunggu":
-        return "bg-yellow-100 text-yellow-700";
-
-      case "prescription sent":
-      case "resep dikirim":
-        return "bg-orange-100 text-prima-warning";
-
-      case "cancelled":
-      case "dibatalkan":
-        return "bg-red-100 text-red-600";
-
-      default:
-        return "bg-prima-sand text-prima-green";
-    }
-  };
-
   return (
-    <span
-      className={`inline-flex items-center rounded-full px-4 py-2 text-sm font-medium ${getStatusStyle()}`}
+    <select
+      value={value}
+      onChange={(e) =>
+        onChange(e.target.value)
+      }
+      className="
+        rounded-xl
+        border border-[#E7E1D8]
+        bg-white
+        px-4 py-2
+        text-sm
+        text-prima-text
+        focus:outline-none
+      "
     >
-      {status}
-    </span>
+      <option value="">
+        Semua Status
+      </option>
+
+      <option value="selesai">
+        Selesai
+      </option>
+
+      <option value="menunggu">
+        Menunggu
+      </option>
+
+      <option value="dibatalkan">
+        Dibatalkan
+      </option>
+    </select>
   );
 }
 
-export default PrescriptionStatusBadge;
+export default MedicalHistoryFilter;

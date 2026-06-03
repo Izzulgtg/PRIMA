@@ -8,15 +8,12 @@ function AppointmentStepper({
   ];
 
   return (
-    <div className="flex items-center justify-between">
+    <div className="flex items-center">
 
       {steps.map((step, index) => {
-        const stepNumber =
-          index + 1;
-
+        const stepNumber = index + 1;
         const active =
-          currentStep >=
-          stepNumber;
+          currentStep >= stepNumber;
 
         return (
           <div
@@ -28,13 +25,8 @@ function AppointmentStepper({
 
               <div
                 className={`
-                  flex
-                  h-10
-                  w-10
-                  items-center
-                  justify-center
-                  rounded-full
-                  font-semibold
+                  flex h-10 w-10 items-center justify-center
+                  rounded-full font-semibold
                   ${
                     active
                       ? "bg-prima-green text-white"
@@ -56,6 +48,20 @@ function AppointmentStepper({
               </span>
 
             </div>
+
+            {index !== steps.length - 1 && (
+              <div
+                className={`
+                  mx-4 h-[2px] flex-1
+                  ${
+                    currentStep >
+                    stepNumber
+                      ? "bg-prima-green"
+                      : "bg-[#E5E7EB]"
+                  }
+                `}
+              />
+            )}
 
           </div>
         );

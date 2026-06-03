@@ -1,3 +1,6 @@
+import PrescriptionStatusBadge from "./prescription-status-badge";
+import MedicineList from "./medicine-list";
+
 function MedicalRecordCard({
   date,
   doctor,
@@ -8,14 +11,11 @@ function MedicalRecordCard({
   medicines,
   status,
 }) {
-
   return (
     <div className="bg-prima-card rounded-[28px] p-6 border border-[#F1ECE4] shadow-sm">
 
-      {/* TOP */}
       <div className="flex items-start justify-between gap-4">
 
-        {/* LEFT */}
         <div>
 
           <p className="text-sm text-prima-secondary">
@@ -28,24 +28,14 @@ function MedicalRecordCard({
 
         </div>
 
-        {/* STATUS */}
-        <div
-          className={`px-4 py-2 rounded-full text-sm font-medium
-            ${
-              prescription
-                ? "bg-orange-100 text-prima-warning"
-                : "bg-prima-sand text-prima-green"
-            }`}
-        >
-          {status}
-        </div>
+        <PrescriptionStatusBadge
+          status={status}
+        />
 
       </div>
 
-      {/* CONTENT */}
       <div className="mt-6 space-y-5">
 
-        {/* DOCTOR */}
         <div>
 
           <p className="text-sm text-prima-secondary">
@@ -56,89 +46,62 @@ function MedicalRecordCard({
             {doctor}
           </h4>
 
-          <p className="inline-flex mt-2 px-3 py-1 rounded-full bg-prima-sand text-prima-green text-xs font-medium">
+          <span className="inline-flex mt-2 rounded-full bg-prima-sand px-3 py-1 text-xs font-medium text-prima-green">
             {specialization}
-          </p>
+          </span>
 
         </div>
 
-        {/* DIAGNOSIS */}
         <div>
 
           <p className="text-sm text-prima-secondary">
             Diagnosis
           </p>
 
-          <p className="text-prima-text mt-1 leading-relaxed">
+          <p className="mt-1 text-prima-text">
             {diagnosis}
           </p>
 
         </div>
 
-        {/* COMPLAINT */}
         <div>
 
           <p className="text-sm text-prima-secondary">
             Complaint
           </p>
 
-          <p className="text-prima-text mt-1 leading-relaxed">
+          <p className="mt-1 text-prima-text">
             {complaint}
           </p>
 
         </div>
 
-        {/* PRESCRIPTION */}
-        {
-          prescription?.trim() && (
-            <div>
+        {prescription?.trim() && (
+          <div>
 
-              <p className="text-sm text-prima-secondary">
-                Prescription Notes
+            <p className="text-sm text-prima-secondary">
+              Prescription Notes
+            </p>
+
+            <div className="mt-2 rounded-2xl bg-prima-sand p-4">
+
+              <p className="text-prima-text">
+                {prescription}
               </p>
 
-              <div className="mt-2 bg-prima-sand rounded-2xl p-4">
-
-                <p className="text-prima-text leading-relaxed">
-                  {prescription}
-                </p>
-
-              </div>
-
             </div>
-          )
-        }
 
-        {/* MEDICINES */}
-        {
-          medicines?.length > 0 && (
-            <div>
+          </div>
+        )}
 
-              <p className="text-sm text-prima-secondary">
-                Medicines
-              </p>
-
-              <div className="mt-2 space-y-2">
-
-                {medicines.map((medicine, index) => (
-                  <div
-                    key={index}
-                    className="bg-prima-sand rounded-xl p-3 text-sm text-prima-text"
-                  >
-                    {medicine}
-                  </div>
-                ))}
-
-              </div>
-
-            </div>
-          )
-        }
+        <MedicineList
+          medicines={medicines}
+        />
 
       </div>
 
     </div>
-  )
+  );
 }
 
-export default MedicalRecordCard
+export default MedicalRecordCard;

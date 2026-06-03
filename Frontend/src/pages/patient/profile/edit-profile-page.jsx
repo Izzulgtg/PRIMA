@@ -56,17 +56,12 @@ const EditProfilePage = () => {
 
       <button
         onClick={() =>
-          navigate(
-            "/patient/profile"
-          )
+          navigate("/patient/profile")
         }
         className="flex items-center gap-3 px-4 py-2 rounded-2xl bg-prima-background hover:bg-prima-sand transition-all duration-200 text-prima-text"
       >
-
         <ArrowLeft size={18} />
-
         Kembali
-
       </button>
 
       <div>
