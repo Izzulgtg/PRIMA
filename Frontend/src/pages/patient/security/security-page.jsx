@@ -1,10 +1,13 @@
 import PasswordChangeForm from "@/components/patient/security/password-change-form";
 import PrivacySettingsCard from "@/components/patient/security/privacy-settings-card";
 import LoginHistoryCard from "@/components/patient/security/login-history-card";
+import { ArrowLeft } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 import { dummyLoginHistory } from "@/data/dummy-login-history";
 
 const SecurityPage = () => {
+  const navigate = useNavigate();
   const lastLogin =
     dummyLoginHistory.length > 0
       ? new Date(
@@ -14,6 +17,16 @@ const SecurityPage = () => {
 
   return (
     <div className="space-y-6">
+
+      {/* HERO */}
+
+        <div className="flex items-center gap-4">
+          <button 
+          onClick={() =>navigate("/patient/profile")}
+          className="flex items-center gap-3 px-4 py-2 rounded-2xl bg-prima-background hover:bg-prima-sand transition-all duration-200 text-prima-text">
+            <ArrowLeft size={18} />kembali
+          </button>
+        </div>
 
       {/* HERO */}
       <section className="bg-prima-green rounded-[32px] p-8 text-white">

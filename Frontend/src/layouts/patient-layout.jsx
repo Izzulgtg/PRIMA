@@ -13,6 +13,17 @@ import {
 
 function PatientLayout() {
 
+    const user = JSON.parse(localStorage.getItem("user"));
+    const initial = user?.nama_lengkap?.charAt(0)?.toUpperCase() || "P";
+
+    const handleLogout = () => {
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
+
+        // optional: reset state kalau nanti pakai context
+        window.location.href = "/login";
+        };
+
     const navClass = ({ isActive }) =>
         `flex items-center gap-3 px-4 py-3 rounded-2xl transition-all duration-300 ${
             isActive
@@ -83,7 +94,9 @@ function PatientLayout() {
                 {/* Sidebar Footer */}
                 <div className="mt-auto p-4 border-t border-[#E5E7EB]">
 
-                    <button className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-prima-text hover:bg-prima-sand transition-all duration-300">
+                    <button 
+                    onClick={handleLogout}
+                    className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-prima-text hover:bg-prima-sand transition-all duration-300">
 
                         <LogOut size={20} />
 
@@ -129,7 +142,7 @@ function PatientLayout() {
 
                             {/* Avatar */}
                             <div className="w-10 h-10 rounded-full bg-prima-green flex items-center justify-center text-white font-semibold">
-                                P
+                                {initial}
                             </div>
 
                             {/* User Info */}
