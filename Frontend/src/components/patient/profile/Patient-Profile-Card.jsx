@@ -10,8 +10,9 @@ const PatientProfileCard = ({ profile }) => {
   const navigate = useNavigate();
 
   const initialName =
-    profile?.nama_lengkap?.charAt(0)?.toUpperCase() ||
-    "U";
+    profile?.nama_lengkap
+      ?.charAt(0)
+      ?.toUpperCase() || "U";
 
   return (
     <div className="rounded-[28px] bg-prima-card p-8 border border-[#F1ECE4] shadow-sm">
@@ -34,7 +35,7 @@ const PatientProfileCard = ({ profile }) => {
 
       </div>
 
-      {/* Info */}
+      {/* Informasi Akun */}
       <div className="mt-8 space-y-4">
 
         <div className="flex items-center gap-3">
@@ -80,78 +81,89 @@ const PatientProfileCard = ({ profile }) => {
         </div>
 
       </div>
+
+      {/* Informasi Pasien */}
       <div className="mt-8 border-t border-[#F1ECE4] pt-6">
 
         <h3 className="font-semibold text-prima-text">
-          Informasi Kesehatan
+          Informasi Pasien
         </h3>
 
         <div className="mt-4 grid grid-cols-2 gap-4">
 
           <div>
-            <p className="text-xs text-prima-secondary">
-              Golongan Darah
-            </p>
 
-            <p className="font-medium">
-              {profile?.golongan_darah}
-            </p>
-          </div>
-
-          <div>
             <p className="text-xs text-prima-secondary">
               Jenis Kelamin
             </p>
 
-            <p className="font-medium">
-              {profile?.jenis_kelamin}
+            <p className="font-medium text-prima-text">
+              {profile?.jenis_kelamin ||
+                "-"}
             </p>
+
           </div>
 
           <div>
+
             <p className="text-xs text-prima-secondary">
-              Tinggi Badan
+              Tanggal Lahir
             </p>
 
-            <p className="font-medium">
-              {profile?.tinggi_badan} cm
+            <p className="font-medium text-prima-text">
+              {profile?.tanggal_lahir
+                ? new Date(
+                    profile.tanggal_lahir
+                  ).toLocaleDateString(
+                    "id-ID",
+                    {
+                      day: "2-digit",
+                      month: "long",
+                      year: "numeric",
+                    }
+                  )
+                : "-"}
             </p>
+
           </div>
 
           <div>
+
             <p className="text-xs text-prima-secondary">
-              Berat Badan
+              Role
             </p>
 
-            <p className="font-medium">
-              {profile?.berat_badan} kg
+            <p className="font-medium capitalize text-prima-text">
+              {profile?.role || "-"}
             </p>
+
+          </div>
+
+          <div>
+
+            <p className="text-xs text-prima-secondary">
+              ID Pasien
+            </p>
+
+            <p className="font-medium text-prima-text">
+              #{profile?.id || "-"}
+            </p>
+
           </div>
 
         </div>
 
       </div>
-      <div className="mt-6 rounded-2xl bg-prima-sand p-4">
 
-        <p className="text-xs text-prima-secondary">
-          Riwayat Alergi
-        </p>
-
-        <p className="mt-2 text-prima-text">
-          {profile?.alergi || "Tidak Ada"}
-        </p>
-
-      </div>
-
-      {/* Login terakhir */}
+      {/* Login Terakhir */}
       {profile?.last_login_at && (
-        <div className="mt-8 rounded-2xl bg-prima-sand p-4">
+        <div className="mt-6 rounded-2xl bg-prima-sand p-4">
 
           <p className="text-xs text-prima-secondary">
             Login Terakhir
           </p>
 
-          <p className="mt-1 text-sm text-prima-text">
+          <p className="mt-2 text-sm text-prima-text">
             {new Date(
               profile.last_login_at
             ).toLocaleString("id-ID")}
@@ -160,7 +172,7 @@ const PatientProfileCard = ({ profile }) => {
         </div>
       )}
 
-      {/* Button Edit */}
+      {/* Tombol Edit */}
       <button
         onClick={() =>
           navigate(

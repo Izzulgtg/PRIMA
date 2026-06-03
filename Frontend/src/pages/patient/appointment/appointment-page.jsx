@@ -5,6 +5,7 @@ import AppointmentDatePicker from "@/components/patient/appointment/appointment-
 import TimeSlotPicker from "@/components/patient/appointment/time-slot-picker";
 import AppointmentForm from "@/components/patient/appointment/appointment-form";
 import AppointmentSummaryCard from "@/components/patient/appointment/appointment-summary-card";
+import {createAppointment} from "@/services/patient/appointment-service";
 
 function PatientAppointmentPage() {
   const [step, setStep] =
@@ -43,12 +44,18 @@ function PatientAppointmentPage() {
     },
   ];
 
-  const handleSubmit = (data) => {
-    console.log(data);
-
-    alert(
-      "Pendaftaran berhasil!"
-    );
+  const handleSubmit = async (formData) => {
+    try {const user =
+      JSON.parse(localStorage.getItem("user"));
+      const payload = {
+        pasien_id: user.id,
+        dokter_id: 1,
+        tanggal_periksa: selectedDate,
+        keluhan: formData.keluhan
+      };
+      const result = await createAppointment(payload);
+      alert(`Pendaftaran berhasil. Nomor antrean: ${result.data.nomor_antrean}`);
+    } catch (error) {console.error(error);}
   };
 
   return (

@@ -21,7 +21,7 @@ function PatientLayout() {
         localStorage.removeItem("user");
 
         // optional: reset state kalau nanti pakai context
-        window.location.href = "/login";
+        window.location.href = "/";
         };
 
     const navClass = ({ isActive }) =>

@@ -16,6 +16,6 @@ export const updateProfile = async (profileData) => {
 }
 
 export const getCurrentUser = async () => {
-  const response = await api.get("/auth/me")
+  const response = await api.get("/auth/profile")
   return response.data.data
 }

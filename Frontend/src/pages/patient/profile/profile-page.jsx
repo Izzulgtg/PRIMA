@@ -6,7 +6,7 @@ import {
 import PatientProfileCard from "@/components/patient/profile/patient-profile-card";
 import AccountSettingsCard from "@/components/patient/security/account-settings-card";
 
-import { dummyPatientProfile } from "@/data/dummy-patient-profile";
+import {getProfile} from "@/services/patient/profile-service";
 
 const PatientProfilePage = () => {
   const [profile, setProfile] =
@@ -16,8 +16,23 @@ const PatientProfilePage = () => {
     useState(true);
 
   useEffect(() => {
-    setProfile(dummyPatientProfile);
-    setLoading(false);
+    const fetchProfile = async () => {
+      try {
+        const data =
+          await getProfile();
+
+        setProfile(data);
+      } catch (error) {
+        console.error(
+          "Gagal mengambil profile:",
+          error
+        );
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProfile();
   }, []);
 
   if (loading) {
@@ -33,7 +48,6 @@ const PatientProfilePage = () => {
   return (
     <div className="space-y-6">
 
-      {/* HERO */}
       <section className="bg-prima-green rounded-[32px] p-8 text-white">
 
         <p className="text-sm opacity-80">
@@ -45,17 +59,16 @@ const PatientProfilePage = () => {
         </h1>
 
         <p className="mt-4 max-w-2xl text-lg opacity-90 leading-relaxed">
-          Kelola informasi pribadi, identitas pasien,
-          serta preferensi akun Anda dalam sistem
-          PRIMA Healthcare.
+          Kelola informasi pribadi,
+          identitas pasien,
+          serta preferensi akun Anda
+          dalam sistem PRIMA Healthcare.
         </p>
 
       </section>
 
-      {/* CONTENT */}
       <section className="grid gap-6 xl:grid-cols-3">
 
-        {/* PROFILE */}
         <div className="xl:col-span-2">
 
           <div className="mb-4">
@@ -76,7 +89,6 @@ const PatientProfilePage = () => {
 
         </div>
 
-        {/* ACCOUNT SETTINGS */}
         <div>
 
           <div className="mb-4">
@@ -86,7 +98,8 @@ const PatientProfilePage = () => {
             </h2>
 
             <p className="mt-2 text-prima-secondary">
-              Kelola notifikasi, bahasa,
+              Kelola notifikasi,
+              bahasa,
               dan preferensi akun.
             </p>
 

@@ -1,9 +1,9 @@
 import api from "../api";
 
-export const createAppointment = async (appointmentData) => {
+export const createAppointment = async (payload) => {
   const response = await api.post(
     "/pasien/daftar",
-    appointmentData
+    payload
   );
 
   return response.data;
