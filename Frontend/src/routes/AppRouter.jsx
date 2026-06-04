@@ -6,6 +6,7 @@ import {
 
 import AdminLayout from "../layouts/admin-layout"
 import PatientLayout from "../layouts/patient-layout"
+import DoctorLayout from "../layouts/doctor-layout";
 
 import PatientDashboardPage from "../pages/patient/dashboard/dashboard-page"
 import PatientAppointmentPage from "../pages/patient/appointment/appointment-page"
@@ -28,14 +29,12 @@ import LoginPage from "../pages/auth/login-page"
 
 import LandingPage from "../pages/landing-page"
 
-import DoctorDashboardPage from "../pages/doctor/doctor-dashboard-page";
-import DoctorLayout from "../layouts/doctor-layout";
-import ExaminationPage from "../pages/doctor/examination-page";
-import ConsultationPage from "../pages/doctor/consultation-page";
-import SchedulePage from "../pages/doctor/schedule-page";
-import MedicinePage from "../pages/doctor/medicine-page";
-import MedicalRecordsPage from "../pages/doctor/medical-records-page";
-import MonitoringPage from "../pages/doctor/monitoring-page";
+import DoctorDashboard from "../pages/doctor/DoctorDashboard";
+import QueuePage from "../pages/doctor/QueuePage";
+import SchedulePage from "../pages/doctor/SchedulePage";
+import ConsultationPage from "../pages/doctor/ConsultationPage";
+
+
 
 function AppRouter() {
   return (
@@ -146,52 +145,15 @@ function AppRouter() {
         </Route>
 
         {/* DOCTOR */}
-        <Route
-          path="/doctor"
-          element={<DoctorLayout />}
-        >
-          <Route
-            path="dashboard"
-            element={<DoctorDashboardPage />}
-          />
-
-          <Route
-            path="examination"
-            element={<ExaminationPage />}
-          />
-
-          <Route
-            path="examination/:patientId"
-            element={<ExaminationPage />}
-          />
-
-          <Route
-            path="consultation"
-            element={<ConsultationPage />}
-          />
-
-          <Route 
-            path="schedule" 
-            element={<SchedulePage />} 
-          />
-
-          <Route 
-            path="medicine" 
-            element={<MedicinePage />} 
-          />
-
-
-          <Route 
-            path="medical-records" 
-            element={<MedicalRecordsPage />} 
-          />
-
-          <Route 
-            path="monitoring" 
-            element={<MonitoringPage />} 
-          />
-
+        <Route path="/doctor" element={<DoctorLayout />}>
+          <Route path="dashboard" element={<DoctorDashboard />} />
+          <Route path="queue" element={<QueuePage />} />
+          <Route path="schedule" element={<SchedulePage />} />
+          <Route path="/doctor/consultation" element={<ConsultationPage />} />
         </Route>
+
+
+        
 
       </Routes>
 

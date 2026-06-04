@@ -1,376 +1,98 @@
 import { useState } from "react";
 
-function ConsultationPage() {
-    const consultationQueue = [
-        {
-            id: 1,
-            patientName: "Nadia Putri",
-            schedule: "10:00",
-            topic: "Konsultasi demam dan pusing",
-            status: "Menunggu",
-        },
-        {
-            id: 2,
-            patientName: "Agus Saputra",
-            schedule: "10:30",
-            topic: "Konsultasi batuk dan nyeri tenggorokan",
-            status: "Terjadwal",
-        },
-        {
-            id: 3,
-            patientName: "Maya Lestari",
-            schedule: "11:00",
-            topic: "Konsultasi nyeri lambung",
-            status: "Terjadwal",
-        },
-    ];
+export default function ConsultationPage() {
+  const [activeChat, setActiveChat] = useState(null);
+  const [messages, setMessages] = useState([]);
 
-    const [selectedConsultation, setSelectedConsultation] = useState(null);
+  const stats = { terjadwal: 6, selesai: 2, menunggu: 4 };
 
-    const [messages, setMessages] = useState([
-        {
-            id: 1,
-            sender: "patient",
-            text: "Selamat pagi Dok, saya ingin konsultasi.",
-        },
-        {
-            id: 2,
-            sender: "doctor",
-            text: "Selamat pagi, silakan ceritakan keluhan yang dirasakan.",
-        },
+  const todayQueue = [
+    { id: 1, name: "Bp. Ahmad Hidayat", time: "14:00", age: 28, gender: "Laki-laki", duration: "30 Menit", status: "Mulai" },
+    { id: 2, name: "Sdr. Siti Aminah", time: "14:45", age: 22, gender: "Perempuan", duration: "30 Menit", status: "Menunggu" },
+    { id: 3, name: "Bp. Bambang Agus", time: "15:30", age: 54, gender: "Laki-laki", duration: "30 Menit", status: "Menunggu" },
+    { id: 4, name: "Ibu Maria Ulfa", time: "11:00", age: 62, gender: "Perempuan", duration: "", status: "Selesai" },
+  ];
+
+  const startChat = (patient) => {
+    setActiveChat(patient);
+    setMessages([
+      { id: 1, sender: "patient", text: "Selamat siang dokter, nyeri di perut saya..." },
+      { id: 2, sender: "doctor", text: "Selamat siang Bu Siti, bisa jelaskan lebih detail?" },
     ]);
+  };
 
-    const [newMessage, setNewMessage] = useState("");
-    const [showPrescriptionOverlay, setShowPrescriptionOverlay] = useState(false);
-    const [lastPrescription, setLastPrescription] = useState(null);
+  const sendMessage = (e) => {
+    e.preventDefault();
+    const input = e.target.elements.message.value;
+    if (!input) return;
+    setMessages([...messages, { id: Date.now(), sender: "doctor", text: input }]);
+    e.target.reset();
+  };
 
-    const [prescriptionData, setPrescriptionData] = useState({
-        medicineName: "",
-        dosage: "",
-        instruction: "",
-        note: "",
-    });
+  return (
+    <main className="p-6 flex flex-col gap-6">
+      {/* Stats */}
+      <div className="flex gap-4">
+        <div className="flex-1 bg-white rounded-xl shadow p-4 text-center">
+          <p className="text-sm text-gray-500">Terjadwal</p>
+          <p className="font-semibold text-lg">{stats.terjadwal}</p>
+        </div>
+        <div className="flex-1 bg-white rounded-xl shadow p-4 text-center">
+          <p className="text-sm text-gray-500">Selesai</p>
+          <p className="font-semibold text-lg">{stats.selesai}</p>
+        </div>
+        <div className="flex-1 bg-white rounded-xl shadow p-4 text-center">
+          <p className="text-sm text-gray-500">Menunggu</p>
+          <p className="font-semibold text-lg">{stats.menunggu}</p>
+        </div>
+      </div>
 
-    function handleSendMessage(event) {
-        event.preventDefault();
+      {/* Active Chat Banner */}
+      {activeChat && (
+        <div className="bg-[#004C70] text-white rounded-xl p-4 flex items-center justify-between">
+          <div>
+            <p className="text-xs font-semibold">BERLANGSUNG • 12:45 Tersedia</p>
+            <p className="font-bold text-lg">{activeChat.name}</p>
+            <p className="text-sm">Konsultasi Diabetes • Sesi 2</p>
+          </div>
+          <button className="bg-white text-[#004C70] px-4 py-2 rounded-lg">Lanjutkan Chat</button>
+        </div>
+      )}
 
-        if (!newMessage.trim()) {
-            return;
-        }
-
-        const message = {
-            id: Date.now(),
-            sender: "doctor",
-            text: newMessage,
-        };
-
-        setMessages([...messages, message]);
-        setNewMessage("");
-    }
-
-    function handlePrescriptionChange(event) {
-        const { name, value } = event.target;
-
-        setPrescriptionData({
-            ...prescriptionData,
-            [name]: value,
-        });
-    }
-
-    function handleSavePrescription(event) {
-        event.preventDefault();
-
-        const prescription = {
-            id: Date.now(),
-            patientName: selectedConsultation.patientName,
-            ...prescriptionData,
-        };
-
-        setLastPrescription(prescription);
-
-        const prescriptionMessage = {
-            id: Date.now() + 1,
-            sender: "doctor",
-            text: `Resep dibuat: ${prescriptionData.medicineName}, ${prescriptionData.dosage}. ${prescriptionData.instruction}`,
-        };
-
-        setMessages([...messages, prescriptionMessage]);
-
-        setPrescriptionData({
-            medicineName: "",
-            dosage: "",
-            instruction: "",
-            note: "",
-        });
-
-        setShowPrescriptionOverlay(false);
-    }
-
-    return (
-        <section className="p-6">
+      {/* Antrian Hari Ini */}
+      <div className="flex flex-col gap-3">
+        {todayQueue.map(patient => (
+          <div key={patient.id} className={`bg-white rounded-xl shadow flex justify-between items-center p-4 ${patient.status==="Selesai"?"opacity-70":""}`}>
             <div>
-                <h1 className="text-2xl font-semibold text-prima-black">
-                    Konsultasi Daring
-                </h1>
-
-                <p className="mt-2 text-sm text-prima-gray">
-                    Kelola antrian konsultasi daring pasien dan mulai sesi chat sesuai
-                    jadwal.
-                </p>
+              <p className="text-xs text-gray-500">MULAI: {patient.time}</p>
+              <p className="font-semibold">{patient.name}</p>
+              <p className="text-sm text-gray-500">{patient.age} Thn • {patient.gender} • {patient.duration}</p>
             </div>
+            <button
+              className={`px-4 py-2 rounded ${patient.status==="Mulai"?"bg-[#6B8F71] text-white": patient.status==="Selesai"?"bg-gray-100 text-gray-400":"bg-gray-100 text-gray-400"}`}
+              onClick={()=>startChat(patient)}
+              disabled={patient.status!=="Mulai"}
+            >
+              {patient.status==="Mulai" ? "Mulai Konsultasi" : patient.status==="Selesai" ? "Lihat Resume" : "Belum Waktunya"}
+            </button>
+          </div>
+        ))}
+      </div>
 
-            <div className="mt-6 grid gap-6 lg:grid-cols-3">
-                <aside className="rounded-2xl bg-white p-5 shadow-sm">
-                    <h2 className="text-lg font-semibold text-prima-black">
-                        Antrian Konsultasi
-                    </h2>
-
-                    <div className="mt-4 space-y-3">
-                        {consultationQueue.map((item) => (
-                            <button
-                                key={item.id}
-                                type="button"
-                                onClick={() => setSelectedConsultation(item)}
-                                className={`w-full rounded-2xl border p-4 text-left transition ${selectedConsultation?.id === item.id
-                                        ? "border-prima-green bg-prima-sand"
-                                        : "border-prima-sand hover:border-prima-green hover:bg-prima-sand"
-                                    }`}
-                            >
-                                <p className="font-medium text-prima-black">
-                                    {item.patientName}
-                                </p>
-
-                                <p className="mt-1 text-sm text-prima-gray">
-                                    Jadwal: {item.schedule}
-                                </p>
-
-                                <p className="mt-2 text-sm text-prima-black">{item.topic}</p>
-
-                                <span className="mt-3 inline-block rounded-full bg-prima-sand px-3 py-1 text-xs text-prima-teal">
-                                    {item.status}
-                                </span>
-                            </button>
-                        ))}
-                    </div>
-                </aside>
-
-                <div className="rounded-2xl bg-white p-5 shadow-sm lg:col-span-2">
-                    <div className="flex items-start justify-between gap-4">
-                        <div>
-                            <h2 className="text-lg font-semibold text-prima-black">
-                                Ruang Chat Konsultasi
-                            </h2>
-
-                            <p className="mt-1 text-sm text-prima-gray">
-                                Pilih pasien dari antrian untuk memulai sesi konsultasi teks.
-                            </p>
-                        </div>
-
-                        <button
-                            type="button"
-                            disabled={!selectedConsultation}
-                            onClick={() => setShowPrescriptionOverlay(true)}
-                            className="rounded-xl bg-prima-green px-4 py-2 text-sm font-medium text-white disabled:cursor-not-allowed disabled:opacity-50"
-                        >
-                            Buat Resep
-                        </button>
-                    </div>
-
-                    {!selectedConsultation && (
-                        <div className="mt-5 rounded-2xl bg-prima-sand p-4">
-                            <p className="text-sm text-prima-gray">
-                                Belum ada sesi chat aktif.
-                            </p>
-                        </div>
-                    )}
-
-                    {selectedConsultation && (
-                        <div className="mt-5 rounded-2xl bg-prima-sand p-4">
-                            <p className="text-sm text-prima-gray">Sesi aktif dengan:</p>
-
-                            <h3 className="mt-1 text-lg font-semibold text-prima-black">
-                                {selectedConsultation.patientName}
-                            </h3>
-
-                            <p className="mt-2 text-sm text-prima-gray">
-                                Jadwal: {selectedConsultation.schedule}
-                            </p>
-
-                            <p className="mt-1 text-sm text-prima-black">
-                                {selectedConsultation.topic}
-                            </p>
-
-                            {lastPrescription && (
-                                <div className="mt-4 rounded-2xl bg-white p-4">
-                                    <p className="text-sm font-semibold text-prima-black">
-                                        Resep Terakhir
-                                    </p>
-
-                                    <p className="mt-2 text-sm text-prima-gray">
-                                        Obat: {lastPrescription.medicineName}
-                                    </p>
-
-                                    <p className="mt-1 text-sm text-prima-gray">
-                                        Dosis: {lastPrescription.dosage}
-                                    </p>
-
-                                    <p className="mt-1 text-sm text-prima-gray">
-                                        Aturan pakai: {lastPrescription.instruction}
-                                    </p>
-                                </div>
-                            )}
-
-                            <div className="mt-5 space-y-3">
-                                {messages.map((message) => (
-                                    <div
-                                        key={message.id}
-                                        className={`flex ${message.sender === "doctor"
-                                                ? "justify-end"
-                                                : "justify-start"
-                                            }`}
-                                    >
-                                        <div
-                                            className={`max-w-xs rounded-2xl px-4 py-3 text-sm ${message.sender === "doctor"
-                                                    ? "bg-prima-green text-white"
-                                                    : "bg-white text-prima-black"
-                                                }`}
-                                        >
-                                            {message.text}
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-
-                            <form onSubmit={handleSendMessage} className="mt-5 flex gap-3">
-                                <input
-                                    type="text"
-                                    value={newMessage}
-                                    onChange={(event) => setNewMessage(event.target.value)}
-                                    className="flex-1 rounded-xl border border-prima-sand px-4 py-3 text-sm text-prima-black outline-none focus:border-prima-green"
-                                    placeholder="Tulis balasan dokter..."
-                                />
-
-                                <button
-                                    type="submit"
-                                    className="rounded-xl bg-prima-green px-5 py-3 text-sm font-medium text-white"
-                                >
-                                    Kirim
-                                </button>
-                            </form>
-                        </div>
-                    )}
-                </div>
+      {/* Chat Box */}
+      {activeChat && (
+        <div className="bg-white p-4 rounded-xl shadow mt-4 flex flex-col gap-3">
+          {messages.map(m => (
+            <div key={m.id} className={`max-w-xs p-3 rounded-2xl ${m.sender==="doctor"?"bg-[#6B8F71] text-white self-end":"bg-[#EDE8DC] text-black self-start"}`}>
+              {m.text}
             </div>
-
-            {showPrescriptionOverlay && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 px-4">
-                    <div className="w-full max-w-xl rounded-2xl bg-white p-6 shadow-lg">
-                        <div className="flex items-start justify-between gap-4">
-                            <div>
-                                <h2 className="text-xl font-semibold text-prima-black">
-                                    Buat Resep Konsultasi
-                                </h2>
-
-                                <p className="mt-1 text-sm text-prima-gray">
-                                    Resep untuk pasien {selectedConsultation?.patientName}.
-                                </p>
-                            </div>
-
-                            <button
-                                type="button"
-                                onClick={() => setShowPrescriptionOverlay(false)}
-                                className="rounded-xl border border-prima-sand px-3 py-2 text-sm text-prima-gray"
-                            >
-                                Tutup
-                            </button>
-                        </div>
-
-                        <form onSubmit={handleSavePrescription} className="mt-5 space-y-4">
-                            <div>
-                                <label className="text-sm font-medium text-prima-black">
-                                    Nama Obat
-                                </label>
-
-                                <input
-                                    type="text"
-                                    name="medicineName"
-                                    value={prescriptionData.medicineName}
-                                    onChange={handlePrescriptionChange}
-                                    required
-                                    className="mt-2 w-full rounded-xl border border-prima-sand px-4 py-3 text-sm text-prima-black outline-none focus:border-prima-green"
-                                    placeholder="Contoh: Paracetamol 500mg"
-                                />
-                            </div>
-
-                            <div>
-                                <label className="text-sm font-medium text-prima-black">
-                                    Dosis
-                                </label>
-
-                                <input
-                                    type="text"
-                                    name="dosage"
-                                    value={prescriptionData.dosage}
-                                    onChange={handlePrescriptionChange}
-                                    required
-                                    className="mt-2 w-full rounded-xl border border-prima-sand px-4 py-3 text-sm text-prima-black outline-none focus:border-prima-green"
-                                    placeholder="Contoh: 3x sehari"
-                                />
-                            </div>
-
-                            <div>
-                                <label className="text-sm font-medium text-prima-black">
-                                    Aturan Pakai
-                                </label>
-
-                                <textarea
-                                    name="instruction"
-                                    value={prescriptionData.instruction}
-                                    onChange={handlePrescriptionChange}
-                                    required
-                                    rows={3}
-                                    className="mt-2 w-full rounded-xl border border-prima-sand px-4 py-3 text-sm text-prima-black outline-none focus:border-prima-green"
-                                    placeholder="Contoh: Diminum setelah makan selama 3 hari."
-                                />
-                            </div>
-
-                            <div>
-                                <label className="text-sm font-medium text-prima-black">
-                                    Catatan Tambahan
-                                </label>
-
-                                <textarea
-                                    name="note"
-                                    value={prescriptionData.note}
-                                    onChange={handlePrescriptionChange}
-                                    rows={3}
-                                    className="mt-2 w-full rounded-xl border border-prima-sand px-4 py-3 text-sm text-prima-black outline-none focus:border-prima-green"
-                                    placeholder="Contoh: Kontrol ulang jika gejala memburuk."
-                                />
-                            </div>
-
-                            <div className="flex justify-end gap-3">
-                                <button
-                                    type="button"
-                                    onClick={() => setShowPrescriptionOverlay(false)}
-                                    className="rounded-xl border border-prima-gray px-5 py-3 text-sm font-medium text-prima-gray"
-                                >
-                                    Batal
-                                </button>
-
-                                <button
-                                    type="submit"
-                                    className="rounded-xl bg-prima-green px-5 py-3 text-sm font-medium text-white"
-                                >
-                                    Simpan Resep
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            )}
-        </section>
-    );
+          ))}
+          <form className="flex gap-3 mt-3" onSubmit={sendMessage}>
+            <input type="text" name="message" placeholder="Ketik pesan..." className="flex-1 p-3 rounded-xl border border-gray-300"/>
+            <button type="submit" className="bg-[#6B8F71] text-white px-4 py-3 rounded-xl">Kirim</button>
+          </form>
+        </div>
+      )}
+    </main>
+  );
 }
-
-export default ConsultationPage;
