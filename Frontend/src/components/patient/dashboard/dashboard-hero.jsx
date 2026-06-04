@@ -13,12 +13,9 @@ function DashboardHero({
               Dashboard Pasien
             </p>
 
-            <h1 className="text-4xl font-bold mt-2">
+            <h1 className="text-3xl font-bold mt-2">
               Selamat Datang,
-              {" "}
-              {patientName}
-              {" "}
-              👋
+              {" "}{patientName} 👋
             </h1>
           </div>
 

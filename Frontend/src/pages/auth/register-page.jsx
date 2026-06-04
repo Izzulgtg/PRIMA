@@ -39,7 +39,7 @@ const handleRegister = async () => {
   try {
 
     await api.post(
-      "/register-pasien",
+      "/auth/register-pasien",
       {
         nama_lengkap: name,
         email,

@@ -12,6 +12,8 @@ import MedicationHistoryCard from "@/components/patient/health-records/medicatio
 
 import { formatDate } from "@/utils/patient/format-date";
 import { dummyHealthRecords } from "@/data/dummy-health-records";
+import { getMedicalHistory } from "@/services/patient/health-record-service";
+import { getProfile } from "@/services/patient/profile-service";
 
 function HealthRecordsPage() {
   const [records, setRecords] = useState([]);
@@ -21,8 +23,24 @@ function HealthRecordsPage() {
     useState("");
 
   useEffect(() => {
-    setRecords(dummyHealthRecords);
-    setLoading(false);
+    const fetchRecords = async () => {
+      try {
+        const profile = await getProfile();
+
+        const data =
+          await getMedicalHistory(
+            profile.id
+          );
+
+        setRecords(data);
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchRecords();
   }, []);
 
   const sortedRecords = useMemo(() => {

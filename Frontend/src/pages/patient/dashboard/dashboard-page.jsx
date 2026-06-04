@@ -1,92 +1,142 @@
 import { useEffect, useState } from "react";
 
+import { getProfile } from "@/services/patient/profile-service";
+
 import DashboardHero from "@/components/patient/dashboard/dashboard-hero";
 import PatientStatsCard from "@/components/patient/dashboard/patient-stats-card";
 import UpcomingAppointmentCard from "@/components/patient/dashboard/upcoming-appointment-card";
 import QuickActionGrid from "@/components/patient/dashboard/quick-action-grid";
 import RecentActivityList from "@/components/patient/dashboard/recent-activity-list";
+import ArticleCard from "@/components/patient/dashboard/article-card";
 
 function PatientDashboardPage() {
   const [profile, setProfile] = useState(null);
+  const [loading, setLoading] = useState(true);
+
   const [stats, setStats] = useState([]);
   const [activities, setActivities] = useState([]);
   const [upcomingAppointment, setUpcomingAppointment] =
     useState(null);
 
-  useEffect(() => {
-    /*
-      Karena login masih dummy,
-      kita buat data dummy juga
-    */
+  const [articles, setArticles] = useState([]);
+  const [error, setError] = useState(null);
 
-    const dummyPatient = {
-      nama: "Verdi",
-      email: "verdi@gmail.com",
+  useEffect(() => {
+    const fetchDashboardData = async () => {
+      try {
+        const profileData = await getProfile();
+
+        setProfile(profileData);
+
+        // sementara dummy
+        setStats([
+          {
+            title: "Total Konsultasi",
+            value: 12,
+          },
+          {
+            title: "Janji Aktif",
+            value: 2,
+          },
+          {
+            title: "Resep Aktif",
+            value: 3,
+          },
+          {
+            title: "Pemeriksaan Terakhir",
+            value: "29 Mei",
+          },
+        ]);
+
+        setActivities([
+          {
+            title: "Konsultasi dengan Dr. Dila Andini",
+            time: "29 Mei 2026",
+          },
+          {
+            title: "Pemeriksaan Umum",
+            time: "20 Mei 2026",
+          },
+          {
+            title: "Pengambilan Resep",
+            time: "18 Mei 2026",
+          },
+          {
+            title: "Konsultasi Online",
+            time: "15 Mei 2026",
+          },
+        ]);
+
+        setUpcomingAppointment({
+          doctor: "Dr. Dila Andini",
+          date: "5 Juni 2026",
+          time: "13:00 WIB",
+        });
+
+        setArticles([
+          {
+            image:
+              "https://images.unsplash.com/photo-1576091160550-2173dba999ef",
+            category: "Kesehatan",
+            title:
+              "Pentingnya Pemeriksaan Kesehatan Secara Berkala",
+            date: "2 Juni 2026",
+          },
+          {
+            image:
+              "https://images.unsplash.com/photo-1584515933487-779824d29309",
+            category: "Lifestyle",
+            title:
+              "5 Kebiasaan Sehat yang Bisa Dilakukan Setiap Hari",
+            date: "30 Mei 2026",
+          },
+          {
+            image:
+              "https://images.unsplash.com/photo-1512678080530-7760d81faba6",
+            category: "Nutrisi",
+            title:
+              "Panduan Pola Makan Seimbang untuk Menjaga Imunitas",
+            date: "28 Mei 2026",
+          },
+        ]);
+      } catch (error) {
+        console.error(error);
+        setError("Gagal memuat data dashboard");
+      } finally {
+        setLoading(false);
+      }
     };
 
-    setProfile(dummyPatient);
-
-    setStats([
-      {
-        title: "Total Konsultasi",
-        value: 12,
-      },
-      {
-        title: "Janji Aktif",
-        value: 2,
-      },
-      {
-        title: "Resep Aktif",
-        value: 3,
-      },
-      {
-        title: "Pemeriksaan Terakhir",
-        value: "29 Mei",
-      },
-    ]);
-
-    setActivities([
-      {
-        title: "Konsultasi dengan Dr. Dila Andini",
-        time: "29 Mei 2026",
-      },
-      {
-        title: "Pemeriksaan Umum",
-        time: "20 Mei 2026",
-      },
-      {
-        title: "Pengambilan Resep",
-        time: "18 Mei 2026",
-      },
-      {
-        title: "Konsultasi Online",
-        time: "15 Mei 2026",
-      },
-      {
-        title: "Medical Checkup",
-        time: "10 Mei 2026",
-      },
-    ]);
-
-    setUpcomingAppointment({
-      doctor: "Dila Andini",
-      date: "5 Juni 2026",
-      time: "13:00 WIB",
-    });
+    fetchDashboardData();
   }, []);
+
+  if (error) {
+    return (
+      <div className="rounded-3xl border border-red-200 bg-red-50 p-6">
+        <p className="text-red-600">
+          {error}
+        </p>
+      </div>
+    );
+  }
+  console.log("PROFILE STATE:", profile);
 
   return (
     <div className="space-y-6">
 
       <DashboardHero
-        patientName={profile?.nama || "Pasien"}
+        patientName={
+          loading
+            ? "Memuat..."
+            : profile?.nama_lengkap || "Pasien"
+        }
         appointment={upcomingAppointment}
       />
 
       <section className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
-        {stats.map((item, index) => (
+        {stats.map((item) => (
           <PatientStatsCard
-            key={index}
+            key={item.title}
             title={item.title}
             value={item.value}
           />
@@ -104,9 +154,45 @@ function PatientDashboardPage() {
         </div>
 
         <RecentActivityList
-          loading={false}
+          loading={loading}
           activities={activities}
         />
+
+      </section>
+
+      <section className="space-y-4">
+
+        <div>
+          <p className="text-sm text-prima-secondary">
+            Edukasi Kesehatan
+          </p>
+
+          <h2 className="text-2xl font-bold text-prima-text mt-1">
+            Artikel Terbaru
+          </h2>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+
+          {articles.length > 0 ? (
+            articles.map((article) => (
+              <ArticleCard
+                key={article.title}
+                image={article.image}
+                category={article.category}
+                title={article.title}
+                date={article.date}
+              />
+            ))
+          ) : (
+            <div className="col-span-full text-center py-8">
+              <p className="text-prima-secondary">
+                Belum ada artikel tersedia.
+              </p>
+            </div>
+          )}
+
+        </div>
 
       </section>
 

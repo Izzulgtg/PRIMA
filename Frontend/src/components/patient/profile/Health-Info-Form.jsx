@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
 import { updateProfile } from "@/services/patient/profile-service";
+import { useNavigate } from "react-router-dom";
 
 const HealthInfoForm = ({
   profile,
   setProfile,
 }) => {
+  const navigate = useNavigate();
   const [formData, setFormData] =
     useState({
       nama_lengkap: "",
@@ -108,6 +110,7 @@ const HealthInfoForm = ({
         response.message ||
           "Profil berhasil diperbarui"
       );
+      navigate("/patient/profile");
     } catch (error) {
       console.error(
         "Update profile error:",
@@ -240,11 +243,11 @@ const HealthInfoForm = ({
               Pilih Jenis Kelamin
             </option>
 
-            <option value="Laki-laki">
+            <option value="laki-laki">
               Laki-laki
             </option>
 
-            <option value="Perempuan">
+            <option value="perempuan">
               Perempuan
             </option>
           </select>

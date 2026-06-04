@@ -5,6 +5,8 @@ import {
   User,
   Pencil,
 } from "lucide-react";
+import { formatDate } from "@/utils/patient/format-date";
+import { formatDateOnly } from "@/utils/patient/format-date-only";
 
 const PatientProfileCard = ({ profile }) => {
   const navigate = useNavigate();
@@ -112,15 +114,8 @@ const PatientProfileCard = ({ profile }) => {
 
             <p className="font-medium text-prima-text">
               {profile?.tanggal_lahir
-                ? new Date(
+                ? formatDateOnly(
                     profile.tanggal_lahir
-                  ).toLocaleDateString(
-                    "id-ID",
-                    {
-                      day: "2-digit",
-                      month: "long",
-                      year: "numeric",
-                    }
                   )
                 : "-"}
             </p>
@@ -146,7 +141,7 @@ const PatientProfileCard = ({ profile }) => {
             </p>
 
             <p className="font-medium text-prima-text">
-              #{profile?.id || "-"}
+              ID No {profile?.id || "-"}
             </p>
 
           </div>
@@ -164,9 +159,7 @@ const PatientProfileCard = ({ profile }) => {
           </p>
 
           <p className="mt-2 text-sm text-prima-text">
-            {new Date(
-              profile.last_login_at
-            ).toLocaleString("id-ID")}
+            {formatDate(profile.last_login_at)}
           </p>
 
         </div>

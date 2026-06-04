@@ -8,7 +8,7 @@ const ArticleCard = ({
     <div className="overflow-hidden rounded-3xl bg-prima-card shadow-sm">
 
       <img
-        src={image}
+        src={image || "/placeholder-article.jpg"}
         alt={title}
         className="h-52 w-full object-cover"
       />
@@ -19,7 +19,7 @@ const ArticleCard = ({
           {category}
         </span>
 
-        <h3 className="mt-3 text-base font-semibold text-prima-text">
+        <h3 className="mt-3 line-clamp-2 text-base font-semibold text-prima-text">
           {title}
         </h3>
 

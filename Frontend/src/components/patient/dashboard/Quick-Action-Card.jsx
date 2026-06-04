@@ -10,12 +10,14 @@ function QuickActionCard({
   return (
     <Link
       to={path}
+      aria-label={title}
       className="
         group
         bg-prima-background
         border border-[#F1ECE4]
         rounded-[24px]
         p-5
+        min-h-[170px]
         transition-all
         duration-300
         hover:shadow-md
@@ -26,11 +28,11 @@ function QuickActionCard({
 
         <div>
 
-          <div className="w-12 h-12 rounded-2xl bg-prima-sand flex items-center justify-center text-prima-green">
-
-            <Icon size={22} />
-
-          </div>
+          {Icon && (
+            <div className="w-12 h-12 rounded-2xl bg-prima-sand flex items-center justify-center text-prima-green">
+              <Icon size={22} />
+            </div>
+          )}
 
           <h3 className="mt-4 font-semibold text-prima-text">
             {title}
