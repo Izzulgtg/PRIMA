@@ -23,6 +23,7 @@ import DashboardPage from "../pages/admin/dashboard-page"
 import MaintenancePage from "../pages/admin/maintenance-page"
 import SupportPage from "../pages/admin/support-page"
 import DataManagerPage from "../pages/admin/data-manager-page"
+import ProtectedRoute from "./ProtectedRoute";  
 
 import RegisterPage from "../pages/auth/register-page"
 import LoginPage from "../pages/auth/login-page"
@@ -61,36 +62,46 @@ function AppRouter() {
 
         {/* ADMIN */}
         <Route
-          path="/admin"
-          element={<AdminLayout />}
-        >
+  path="/admin"
+  element={
+    <ProtectedRoute allowedRole="admin">
+      <AdminLayout />
+    </ProtectedRoute>
+  }
+>
+  <Route
+    path="dashboard"
+    element={<DashboardPage />}
+  />
 
-          <Route
-            path="dashboard"
-            element={<DashboardPage />}
-          />
+  <Route
+    path="maintenance"
+    element={<MaintenancePage />}
+  />
 
-          <Route
-            path="maintenance"
-            element={<MaintenancePage />}
-          />
+  <Route
+    path="support"
+    element={<SupportPage />}
+  />
 
-          <Route
-            path="support"
-            element={<SupportPage />}
-          />
-
-          <Route
-            path="data-manager"
-            element={<DataManagerPage />}
-          />
-
-        </Route>
+  <Route
+    path="data-manager"
+    element={<DataManagerPage />}
+  />
+</Route>
 
         {/* Patient */}
         <Route
         path="/patient"
-        element={<PatientLayout />}>
+       element={
+            <ProtectedRoute
+              allowedRole="pasien"
+            >
+              <PatientLayout />
+            </ProtectedRoute>
+          }
+
+          >
         
           <Route
             path="dashboard"
@@ -145,12 +156,34 @@ function AppRouter() {
         </Route>
 
         {/* DOCTOR */}
-        <Route path="/doctor" element={<DoctorLayout />}>
-          <Route path="dashboard" element={<DoctorDashboard />} />
-          <Route path="queue" element={<QueuePage />} />
-          <Route path="schedule" element={<SchedulePage />} />
-          <Route path="/doctor/consultation" element={<ConsultationPage />} />
-        </Route>
+        <Route
+  path="/doctor"
+  element={
+    <ProtectedRoute allowedRole="dokter">
+      <DoctorLayout />
+    </ProtectedRoute>
+  }
+>
+  <Route
+    path="dashboard"
+    element={<DoctorDashboard />}
+  />
+
+  <Route
+    path="queue"
+    element={<QueuePage />}
+  />
+
+  <Route
+    path="schedule"
+    element={<SchedulePage />}
+  />
+
+  <Route
+    path="consultation"
+    element={<ConsultationPage />}
+  />
+</Route>
 
 
         

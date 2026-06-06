@@ -64,8 +64,11 @@ function DashboardPage() {
             System Active
           </Badge>
 
-          <Button variant="primary">
-            + Tambah Slot
+          <Button
+            variant="primary"
+            onClick={() => setIsModalOpen(true)}
+          >
+            + Tambah User
           </Button>
 
         </div>
@@ -412,7 +415,10 @@ function DashboardPage() {
             Data Pengguna
           </h2>
 
-          <Button variant="primary">
+          <Button
+            variant="primary"
+            onClick={() => setIsModalOpen(true)}
+          >
             Tambah User
           </Button>
 
@@ -531,9 +537,24 @@ function DashboardPage() {
         title="Tambah Data"
       >
 
-        <p className="text-prima-muted">
-          Ini isi modal PRIMA.
-        </p>
+<Input placeholder="Nama User" />
+
+<Input
+  placeholder="Email"
+  className="mt-4"
+/>
+
+<Input
+  placeholder="Role"
+  className="mt-4"
+/>
+
+<Button
+  className="mt-4"
+  variant="primary"
+>
+  Simpan
+</Button>
 
       </Modal>
 

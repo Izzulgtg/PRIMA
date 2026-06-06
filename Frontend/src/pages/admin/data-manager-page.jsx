@@ -8,6 +8,24 @@ import Table from "../../components/ui/table"
 function DataManagerPage() {
 
   const [activeTab, setActiveTab] = useState("backup")
+  const handleBackup = () => {
+
+  const waktuBackup =
+    new Date().toLocaleString()
+
+  localStorage.setItem(
+    "lastBackup",
+    waktuBackup
+  )
+
+  alert("Backup berhasil dilakukan")
+}
+  const handleValidation = () => {
+
+  alert(
+    "Validasi berhasil. Tidak ditemukan data corrupt."
+  )
+}
 
   return (
     <div className="space-y-10">
@@ -135,7 +153,10 @@ function DataManagerPage() {
 
               </div>
 
-              <Button variant="primary">
+              <Button
+                variant="primary"
+                onClick={handleBackup}
+              >
                 Backup Sekarang
               </Button>
 
@@ -553,7 +574,10 @@ function DataManagerPage() {
 
                 </div>
 
-                <Button variant="outline">
+                <Button
+                  variant="outline"
+                  onClick={handleValidation}
+                >
                   Jalankan Validasi
                 </Button>
 
@@ -583,7 +607,10 @@ function DataManagerPage() {
 
                 </div>
 
-                <Button variant="primary">
+                <Button
+                  variant="primary"
+                  onClick={handleValidation}
+                >
                   Jalankan Validasi
                 </Button>
 
@@ -607,7 +634,12 @@ function DataManagerPage() {
                     Alamat domisili tidak lengkap
                   </p>
 
-                  <button className="text-prima-green">
+                  <button
+                    className="text-prima-green"
+                    onClick={() =>
+                      alert("Data berhasil diperbaiki")
+                    }
+                  >
                     Perbaiki
                   </button>
 
@@ -661,7 +693,10 @@ function DataManagerPage() {
 
                 </div>
 
-                <Button variant="outline">
+                <Button
+                  variant="outline"
+                  onClick={handleValidation}
+                >
                   Deteksi Sekarang
                 </Button>
 
@@ -674,7 +709,10 @@ function DataManagerPage() {
           {/* ACTIONS */}
           <div className="flex gap-5">
 
-            <Button variant="primary">
+            <Button
+              variant="primary"
+              onClick={handleValidation}
+            >
               Jalankan Semua Validasi
             </Button>
 
