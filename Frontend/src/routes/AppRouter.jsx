@@ -33,6 +33,8 @@ import DoctorDashboard from "../pages/doctor/DoctorDashboard";
 import QueuePage from "../pages/doctor/QueuePage";
 import SchedulePage from "../pages/doctor/SchedulePage";
 import ConsultationPage from "../pages/doctor/ConsultationPage";
+import MonitoringPage from "../pages/doctor/MonitoringPage";
+import ConsultationChatPage from "../pages/doctor/ConsultationChatPage";
 
 // IMPORT FILE PROFILE DOKTER DI SINI
 import ProfileDokter from "../pages/doctor/ProfileDokter";
@@ -167,11 +169,10 @@ function AppRouter() {
           <Route path="dashboard" element={<DoctorDashboard />} />
           <Route path="queue" element={<QueuePage />} />
           <Route path="schedule" element={<SchedulePage />} />
-          
-          {/* Diperbaiki agar tidak ada /doctor/ di dalam rute anak */}
+          <Route path="monitoring" element={<MonitoringPage />} />
           <Route path="consultation" element={<ConsultationPage />} />
+          <Route path="/doctor/consultation-chat" element={<ConsultationChatPage />} />
           
-          {/* RUTE PROFILE DOKTER DITAMBAHKAN DI SINI */}
           <Route path="profile" element={<ProfileDokter />} />
           <Route path="medicine" element={<ManajemenObat />} />
         </Route>

@@ -2,7 +2,6 @@
 import React, { useState } from "react";
 import AddSlotModal from "../../components/doctor/AddSlotModal"; // pakai file komponenmu
 import SlotCard from "../../components/doctor/SlotCard";
-import Calendar from "../../components/doctor/Calendar";
 
 export default function SchedulePage() {
   const [showAddModal, setShowAddModal] = useState(false);
