@@ -40,13 +40,9 @@ exports.createObat = async (req, res) => {
 // =========================================================================
 exports.getAllObat = async (req, res) => {
   try {
-    const query = `
-      SELECT o.*, k.nama_kategori, s.nama_supplier 
-      FROM obat o
-      LEFT JOIN kategori_obat k ON o.kategori_obat_id = k.id
-      LEFT JOIN supplier s ON o.supplier_id = s.id
-      WHERE o.deleted_at IS NULL
-    `;
+    // Pakai SELECT * dulu agar aman dan sesuai dengan tabel aslimu
+    const query = `SELECT * FROM obat ORDER BY id ASC`;
+    
     const [results] = await db.query(query);
     return res.status(200).json({ success: true, data: results });
   } catch (error) {

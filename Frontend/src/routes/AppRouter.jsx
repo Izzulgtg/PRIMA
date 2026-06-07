@@ -36,6 +36,7 @@ import ConsultationPage from "../pages/doctor/ConsultationPage";
 
 // IMPORT FILE PROFILE DOKTER DI SINI
 import ProfileDokter from "../pages/doctor/ProfileDokter";
+import ManajemenObat from "../pages/doctor/ManajemenObat";
 
 
 function AppRouter() {
@@ -172,6 +173,7 @@ function AppRouter() {
           
           {/* RUTE PROFILE DOKTER DITAMBAHKAN DI SINI */}
           <Route path="profile" element={<ProfileDokter />} />
+          <Route path="medicine" element={<ManajemenObat />} />
         </Route>
 
       </Routes>
