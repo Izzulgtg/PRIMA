@@ -24,6 +24,11 @@ import MaintenancePage from "../pages/admin/maintenance-page"
 import SupportPage from "../pages/admin/support-page"
 import DataManagerPage from "../pages/admin/data-manager-page"
 
+import PrivacyPolicyPage from "../pages/legal/privacy-policy-page";
+import TermsPage from "../pages/legal/terms-page";
+import DisclaimerPage from "../pages/legal/disclaimer-page";
+import ContactPage from "../pages/legal/contact-page";
+
 import RegisterPage from "../pages/auth/register-page"
 import LoginPage from "../pages/auth/login-page"
 
@@ -154,7 +159,25 @@ function AppRouter() {
           <Route path="/doctor/consultation" element={<ConsultationPage />} />
         </Route>
 
+        <Route
+          path="/privacy-policy"
+          element={<PrivacyPolicyPage />}
+        />
 
+        <Route
+          path="/terms"
+          element={<TermsPage />}
+        />
+
+        <Route
+          path="/disclaimer"
+          element={<DisclaimerPage />}
+        />
+
+        <Route
+          path="/contact"
+          element={<ContactPage />}
+        />
         
 
       </Routes>

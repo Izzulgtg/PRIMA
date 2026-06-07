@@ -1,6 +1,6 @@
 import Button from "../../components/ui/button"
 import Input from "../../components/ui/input"
-import loginBanner from "../../assets/images/login-banner.webp"
+import loginBanner from "../../assets/images/login-banner.jpg"
 import { useNavigate } from "react-router-dom"
 import { useState } from "react"
 import api from "../../services/api"
@@ -333,15 +333,24 @@ const handleLogin = async () => {
 
         <div className="flex gap-8">
 
-          <p className="text-prima-muted text-sm">
+          <p
+            className="text-prima-muted cursor-pointer"
+            onClick={() => navigate("/contact")}
+          >
             Kontak Kami
           </p>
 
-          <p className="text-prima-muted text-sm">
+          <p
+            onClick={() => navigate("/privacy-policy")}
+            className="text-prima-muted cursor-pointer"
+          >
             Kebijakan Privasi
           </p>
 
-          <p className="text-prima-muted text-sm">
+          <p
+            onClick={() => navigate("/disclaimer")}
+            className="text-prima-muted cursor-pointer"
+          >
             Disclaimer
           </p>
 
@@ -355,4 +364,4 @@ const handleLogin = async () => {
 )
 }
 
-export default LoginPage
+export default LoginPage  
