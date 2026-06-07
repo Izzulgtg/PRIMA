@@ -404,8 +404,11 @@ exports.buatPendaftaran = async (req, res) => {
         SELECT COUNT(*) total
         FROM pendaftaran
         WHERE slot_id = ?
-          AND status != 'Dibatalkan'
-      `,
+          AND status IN(
+          'menunggu',
+          'terjadwal'
+          )
+        `,
         [slot_id]
       );
 

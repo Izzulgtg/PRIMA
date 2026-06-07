@@ -10,15 +10,15 @@ function TimeSlotPicker({
 
       {slots.map((slot) => (
         <AppointmentSlotCard
-          key={slot.time}
-          time={slot.time}
-          status={slot.status}
-          disabled={slot.status === "Busy"}
+          key={slot.id}
+          time={`${slot.jam_mulai} - ${slot.jam_selesai}`}
+          status={`Kuota ${slot.kuota}`}
           selected={
-            selectedSlot === slot.time
+            selectedSlot?.id ===
+            slot.id
           }
           onClick={() =>
-            onSelect(slot.time)
+            onSelect(slot)
           }
         />
       ))}

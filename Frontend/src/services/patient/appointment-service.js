@@ -1,74 +1,62 @@
 import api from "../api";
 
-export const createAppointment =
-  async (payload) => {
-    try {
-      const { data } =
-        await api.post(
-          "/pasien/daftar",
-          payload
-        );
+export const createAppointment = async (
+  payload
+) => {
+  const { data } = await api.post(
+    "/pasien/daftar",
+    payload
+  );
 
-      return data;
-    } catch (error) {
-      console.error(
-        "Gagal membuat appointment",
-        error
-      );
-      throw error;
-    }
-  };
+  return data;
+};
 
 export const getAppointments =
   async () => {
-    try {
-      const { data } =
-        await api.get(
-          "/pasien/pendaftaran"
-        );
-
-      return data.data;
-    } catch (error) {
-      console.error(
-        "Gagal mengambil appointment",
-        error
+    const { data } =
+      await api.get(
+        "/pasien/pendaftaran"
       );
-      throw error;
-    }
+
+    return data.data;
   };
 
 export const getUpcomingAppointment =
   async () => {
-    try {
-      const { data } =
-        await api.get(
-          "/pasien/pendaftaran/upcoming"
-        );
-
-      return data.data;
-    } catch (error) {
-      console.error(
-        "Gagal mengambil upcoming appointment",
-        error
+    const { data } =
+      await api.get(
+        "/pasien/pendaftaran/upcoming"
       );
-      throw error;
-    }
+
+    return data.data;
   };
 
 export const cancelAppointment =
   async (id) => {
-    try {
-      const { data } =
-        await api.put(
-          `/pasien/pendaftaran/${id}/cancel`
-        );
-
-      return data;
-    } catch (error) {
-      console.error(
-        "Gagal membatalkan appointment",
-        error
+    const { data } =
+      await api.put(
+        `/pasien/pendaftaran/${id}/cancel`
       );
-      throw error;
-    }
+
+    return data;
+  };
+
+export const getDoctors =
+  async () => {
+    const { data } =
+      await api.get(
+        "/pasien/dokter"
+      );
+
+    return data.data;
+  };
+
+export const getDoctorSlots =
+  async (doctorId) => {
+    const { data } =
+      await api.get(
+        `/pasien/dokter/${doctorId}/slots`
+      );
+
+    return data.data;
   };

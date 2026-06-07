@@ -1,13 +1,30 @@
-import { useState } from "react";
+import { 
+  useEffect,
+  useState,
+} from "react";
 
 import AppointmentStepper from "@/components/patient/appointment/appointment-stepper";
 import AppointmentDatePicker from "@/components/patient/appointment/appointment-date-picker";
 import TimeSlotPicker from "@/components/patient/appointment/time-slot-picker";
 import AppointmentForm from "@/components/patient/appointment/appointment-form";
 import AppointmentSummaryCard from "@/components/patient/appointment/appointment-summary-card";
-import {createAppointment} from "@/services/patient/appointment-service";
+import {
+  createAppointment,
+  getDoctors,
+  getDoctorSlots,
+} from "@/services/patient/appointment-service";
 
 function PatientAppointmentPage() {
+  const [doctors, setDoctors] =
+    useState([]);
+
+  const [
+    selectedDoctor,
+    setSelectedDoctor,
+  ] = useState(null);
+
+  const [slots, setSlots] =
+    useState([]);
   const [step, setStep] =
     useState(1);
 
@@ -15,48 +32,95 @@ function PatientAppointmentPage() {
     useState("");
 
   const [selectedSlot, setSelectedSlot] =
-    useState("");
+    useState(null);
+  
+  useEffect(() => {
+    const fetchDoctors =
+      async () => {
+        try {
+          const data =
+            await getDoctors();
 
-  const slots = [
-    {
-      time: "09:00 AM",
-      status: "Available",
-    },
-    {
-      time: "10:00 AM",
-      status: "Available",
-    },
-    {
-      time: "11:00 AM",
-      status: "Limited Slot",
-    },
-    {
-      time: "01:00 PM",
-      status: "Available",
-    },
-    {
-      time: "02:00 PM",
-      status: "Busy",
-    },
-    {
-      time: "03:00 PM",
-      status: "Available",
-    },
-  ];
+          setDoctors(data);
 
-  const handleSubmit = async (formData) => {
-    try {const user =
-      JSON.parse(localStorage.getItem("user"));
-      const payload = {
-        pasien_id: user.id,
-        dokter_id: 1,
-        tanggal_periksa: selectedDate,
-        keluhan: formData.keluhan
+          if (data.length > 0) {
+            setSelectedDoctor(
+              data[0]
+            );
+          }
+        } catch (error) {
+          console.error(error);
+        }
       };
-      const result = await createAppointment(payload);
-      alert(`Pendaftaran berhasil. Nomor antrean: ${result.data.nomor_antrean}`);
-    } catch (error) {console.error(error);}
+
+    fetchDoctors();
+  }, []);
+
+  useEffect(() => {
+    if (!selectedDoctor) return;
+
+    const fetchSlots =
+      async () => {
+        try {
+          const data =
+            await getDoctorSlots(
+              selectedDoctor.id
+            );
+
+          setSlots(data);
+        } catch (error) {
+          console.error(error);
+        }
+      };
+
+    fetchSlots();
+  }, [selectedDoctor]);
+
+  const handleSubmit = async (
+    formData
+  ) => {
+    try {
+      const payload = {
+        dokter_id:
+          selectedDoctor.id,
+
+        slot_id:
+          selectedSlot.id,
+
+        jenis_kunjungan:
+          formData.jenis_kunjungan,
+
+        keluhan_utama:
+          formData.keluhan_utama,
+
+        durasi_keluhan:
+          formData.durasi_keluhan,
+
+        metode_bayar:
+          formData.metode_bayar,
+      };
+
+      const result =
+        await createAppointment(
+          payload
+        );
+
+      alert(
+        result.message ||
+          "Pendaftaran berhasil"
+      );
+    } catch (error) {
+      console.error(error);
+
+      alert(
+        error?.response?.data
+          ?.message ||
+          "Gagal membuat pendaftaran"
+      );
+    }
   };
+  console.log("Selected Doctor", selectedDoctor);
+  console.log("Slots", slots);
 
   return (
     <div className="space-y-6">
@@ -97,6 +161,47 @@ function PatientAppointmentPage() {
             {step === 1 && (
               <div>
 
+                <div className="mb-6">
+
+                  <label className="mb-2 block text-sm font-medium text-prima-text">
+                    Pilih Dokter
+                  </label>
+
+                  <select
+                    value={
+                      selectedDoctor?.id || ""
+                    }
+                    onChange={(e) => {
+                      const doctor =
+                        doctors.find(
+                          (d) =>
+                            d.id ===
+                            Number(
+                              e.target.value
+                            )
+                        );
+
+                      setSelectedDoctor(
+                        doctor
+                      );
+                    }}
+                    className="w-full rounded-xl border border-[#E5E7EB] p-3"
+                  >
+
+                    {doctors.map((doctor) => (
+                      <option
+                        key={doctor.id}
+                        value={doctor.id}
+                      >
+                        {doctor.nama_lengkap}
+                        {" - "}
+                        {doctor.spesialisasi}
+                      </option>
+                    ))}
+
+                  </select>
+
+                </div>
                 <AppointmentDatePicker
                   value={selectedDate}
                   onChange={setSelectedDate}
@@ -205,9 +310,16 @@ function PatientAppointmentPage() {
         <div>
 
           <AppointmentSummaryCard
-            doctor="Dr. Sarah Johnson"
+            doctor={
+              selectedDoctor
+                ?.nama_lengkap || "-"
+            }
             date={selectedDate}
-            slot={selectedSlot}
+            slot={
+              selectedSlot
+                ? `${selectedSlot.jam_mulai} - ${selectedSlot.jam_selesai}`
+                : "-"
+            }
           />
 
         </div>
