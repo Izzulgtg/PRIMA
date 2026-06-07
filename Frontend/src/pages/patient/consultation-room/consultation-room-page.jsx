@@ -9,6 +9,7 @@ import {
   getMessages,
   getSessionDetail,
   sendMessage as sendMessageApi,
+  finishConsultation,
 } from "@/services/patient/consultation-service";
 
 function ConsultationRoomPage() {
@@ -20,19 +21,25 @@ function ConsultationRoomPage() {
   const currentUser =
     JSON.parse(localStorage.getItem("user")) || {};
 
-  const [messages, setMessages] = useState([]);
-  const [session, setSession] = useState(null);
+  const [messages, setMessages] =
+    useState([]);
 
-  const [loading, setLoading] = useState(true);
-  const [sending, setSending] = useState(false);
+  const [session, setSession] =
+    useState(null);
+
+  const [loading, setLoading] =
+    useState(true);
+
+  const [sending, setSending] =
+    useState(false);
 
   const [remainingSeconds, setRemainingSeconds] =
     useState(1800);
 
   /*
-  |--------------------------------------------------------------------------
+  |------------------------------------------------------------------
   | LOAD SESSION
-  |--------------------------------------------------------------------------
+  |------------------------------------------------------------------
   */
 
   const loadSession = async () => {
@@ -50,9 +57,9 @@ function ConsultationRoomPage() {
   };
 
   /*
-  |--------------------------------------------------------------------------
+  |------------------------------------------------------------------
   | LOAD MESSAGES
-  |--------------------------------------------------------------------------
+  |------------------------------------------------------------------
   */
 
   const loadMessages = async () => {
@@ -72,40 +79,76 @@ function ConsultationRoomPage() {
   };
 
   /*
-  |--------------------------------------------------------------------------
+  |------------------------------------------------------------------
   | INITIAL LOAD
-  |--------------------------------------------------------------------------
+  |------------------------------------------------------------------
   */
 
-  const loadInitialData = async () => {
-    await Promise.all([
-      loadSession(),
-      loadMessages(),
-    ]);
-  };
+  const loadInitialData =
+    async () => {
+      await Promise.all([
+        loadSession(),
+        loadMessages(),
+      ]);
+    };
 
   /*
-  |--------------------------------------------------------------------------
-  | POLLING
-  |--------------------------------------------------------------------------
+  |------------------------------------------------------------------
+  | FIRST LOAD + POLLING
+  |------------------------------------------------------------------
   */
 
   useEffect(() => {
     loadInitialData();
 
-    const interval = setInterval(
-      loadMessages,
-      5000
-    );
+    const interval =
+      setInterval(() => {
+        loadMessages();
+        loadSession();
+      }, 5000);
 
     return () =>
       clearInterval(interval);
   }, [sessionId]);
 
   /*
-  |--------------------------------------------------------------------------
+  |------------------------------------------------------------------
+  | SET TIMER FROM DATABASE
+  |------------------------------------------------------------------
+  */
+
+  useEffect(() => {
+    if (!session?.durasi_menit)
+      return;
+
+    setRemainingSeconds(
+      session.durasi_menit * 60
+    );
+  }, [session?.durasi_menit]);
+
+  /*
+  |------------------------------------------------------------------
+  | STATUS CHECK
+  |------------------------------------------------------------------
+  */
+
+  useEffect(() => {
+    if (!session) return;
+
+    if (
+      session.status ===
+      "menunggu"
+    ) {
+      navigate(
+        "/patient/waiting-room"
+      );
+    }
+  }, [session, navigate]);
+
+  /*
+  |------------------------------------------------------------------
   | AUTO SCROLL
-  |--------------------------------------------------------------------------
+  |------------------------------------------------------------------
   */
 
   useEffect(() => {
@@ -115,56 +158,84 @@ function ConsultationRoomPage() {
   }, [messages]);
 
   /*
-  |--------------------------------------------------------------------------
-  | TIMER
-  |--------------------------------------------------------------------------
+  |------------------------------------------------------------------
+  | TIMER COUNTDOWN
+  |------------------------------------------------------------------
   */
 
   useEffect(() => {
-    const timer = setInterval(() => {
-      setRemainingSeconds((prev) =>
-        prev > 0 ? prev - 1 : 0
-      );
-    }, 1000);
+    const timer =
+      setInterval(() => {
+        setRemainingSeconds(
+          (prev) =>
+            prev > 0
+              ? prev - 1
+              : 0
+        );
+      }, 1000);
 
     return () =>
       clearInterval(timer);
   }, []);
 
   /*
-  |--------------------------------------------------------------------------
+  |------------------------------------------------------------------
   | SEND MESSAGE
-  |--------------------------------------------------------------------------
+  |------------------------------------------------------------------
   */
 
-  const handleSendMessage = async (
-    text
-  ) => {
-    if (!text?.trim()) return;
+  const handleSendMessage =
+    async (text) => {
+      if (!text?.trim())
+        return;
 
-    try {
-      setSending(true);
+      try {
+        setSending(true);
 
-      await sendMessageApi(
-        sessionId,
-        text
-      );
+        await sendMessageApi(
+          sessionId,
+          text
+        );
 
-      await loadMessages();
-    } catch (error) {
-      console.error(
-        "Send message error:",
-        error
-      );
-    } finally {
-      setSending(false);
-    }
-  };
+        await loadMessages();
+      } catch (error) {
+        console.error(
+          "Send message error:",
+          error
+        );
+      } finally {
+        setSending(false);
+      }
+    };
 
   /*
-  |--------------------------------------------------------------------------
+  |------------------------------------------------------------------
+  | FINISH CONSULTATION
+  |------------------------------------------------------------------
+  */
+
+  const handleFinishConsultation =
+    async () => {
+      try {
+        await finishConsultation(
+          sessionId
+        );
+
+        navigate(
+          "/patient/consultation"
+        );
+      } catch (error) {
+        console.error(
+          "Finish consultation error:",
+          error
+        );
+      }
+    };
+
+  /*
+  |------------------------------------------------------------------
   | HELPERS
-  |--------------------------------------------------------------------------
+  |------------------------------------------------------------------
   */
 
   const formatMessageTime = (
@@ -172,15 +243,19 @@ function ConsultationRoomPage() {
   ) => {
     return new Date(
       dateString
-    ).toLocaleTimeString("id-ID", {
-      hour: "2-digit",
-      minute: "2-digit",
-    });
+    ).toLocaleTimeString(
+      "id-ID",
+      {
+        hour: "2-digit",
+        minute: "2-digit",
+      }
+    );
   };
 
-  const minutes = Math.floor(
-    remainingSeconds / 60
-  );
+  const minutes =
+    Math.floor(
+      remainingSeconds / 60
+    );
 
   const seconds =
     remainingSeconds % 60;
@@ -197,9 +272,9 @@ function ConsultationRoomPage() {
       ?.toUpperCase() || "D";
 
   /*
-  |--------------------------------------------------------------------------
+  |------------------------------------------------------------------
   | LOADING
-  |--------------------------------------------------------------------------
+  |------------------------------------------------------------------
   */
 
   if (loading) {
@@ -277,10 +352,8 @@ function ConsultationRoomPage() {
             </h3>
 
             <button
-              onClick={() =>
-                navigate(
-                  "/patient/consultation"
-                )
+              onClick={
+                handleFinishConsultation
               }
               className="
                 mt-3
@@ -317,28 +390,34 @@ function ConsultationRoomPage() {
 
           </div>
 
-          {messages.map((message) => (
-            <ChatBubble
-              key={message.id}
-              sender={
-                message.pengirim_id ===
-                currentUser.id
-                  ? "patient"
-                  : "doctor"
-              }
-              message={message.isi}
-              time={formatMessageTime(
-                message.created_at
-              )}
-            />
-          ))}
+          {messages.map(
+            (message) => (
+              <ChatBubble
+                key={message.id}
+                sender={
+                  message.pengirim_id ===
+                  currentUser.id
+                    ? "patient"
+                    : "doctor"
+                }
+                message={
+                  message.isi
+                }
+                time={formatMessageTime(
+                  message.created_at
+                )}
+              />
+            )
+          )}
 
           <div ref={chatEndRef} />
 
         </div>
 
         <ChatInput
-          onSend={handleSendMessage}
+          onSend={
+            handleSendMessage
+          }
           sending={sending}
         />
 

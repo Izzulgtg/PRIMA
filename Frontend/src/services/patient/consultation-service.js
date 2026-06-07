@@ -85,3 +85,19 @@ export const getQueue =
 
     return response.data;
   };
+
+/*
+|--------------------------------------------------------------------------
+| FINISH CONSULTATION
+|--------------------------------------------------------------------------
+*/
+
+export const finishConsultation =
+  async (sessionId) => {
+    const response =
+      await api.patch(
+        `/consultations/${sessionId}/finish`
+      );
+
+    return response.data;
+  };

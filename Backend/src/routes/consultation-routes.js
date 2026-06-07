@@ -9,5 +9,6 @@ router.get("/queue",controller.getQueue);
 router.get("/:id",controller.getSessionDetail);
 router.get("/:id/messages",controller.getMessages);
 router.post("/:id/messages",controller.sendMessage);
+router.patch("/:id/finish",verifyToken,controller.finishConsultation);
 
 module.exports = router;

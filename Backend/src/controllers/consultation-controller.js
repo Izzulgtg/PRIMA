@@ -205,3 +205,39 @@ exports.sendMessage = async (
     });
   }
 };
+
+// =========================================================================
+// FINISH CONSULTATION
+// =========================================================================
+
+exports.finishConsultation =
+  async (req, res) => {
+    try {
+      const { id } = req.params;
+
+      await db.query(
+        `
+        UPDATE konsultasi
+        SET
+          status = 'selesai',
+          selesai_at = NOW()
+        WHERE id = ?
+        `,
+        [id]
+      );
+
+      return res.json({
+        success: true,
+        message:
+          "Konsultasi berhasil diselesaikan",
+      });
+    } catch (error) {
+      console.error(error);
+
+      return res.status(500).json({
+        success: false,
+        message:
+          "Gagal menyelesaikan konsultasi",
+      });
+    }
+  };
