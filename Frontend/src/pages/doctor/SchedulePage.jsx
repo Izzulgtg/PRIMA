@@ -3,10 +3,10 @@ import { useState } from "react";
 import { Check } from "lucide-react";
 
 const initialSlots = [
-  { id: 1, time: "08.00 - 08.30", patient: "Budi Wijaya", type: "Tatap Muka", status: "Aktif", button: "Lanjut Periksa", bg: "bg-[#F1F9F5]", border: "border-[#E2E8ED]" },
-  { id: 2, time: "08.30 - 09.00", patient: "Slot Tersedia", type: ["Daring", "Tersedia"], status: "Aktif", button: "Panggil", bg: "bg-[#E8F4FF]", border: "border-[#D9EFFF]" },
-  { id: 3, time: "09.00 - 09.30", patient: "Siti Aminah", type: "Tatap Muka", status: "Selesai", button: <Check className="text-white" />, bg: "bg-[#F7F6F4]", border: "border-[#000]" },
-  { id: 4, time: "09.30 - 10.00", patient: "Slot Nonaktif", type: "Tatap Muka", status: "Tutup", button: "Buka Slot", bg: "bg-[#FFEAEA]", border: "border-[#F5C6C6]" },
+  { id: 1, time: "08:00 - 08:30", patient: "Budi Wijaya", type: "Tatap Muka", status: "Aktif", button: "Lanjut Periksa", bg: "bg-[#F1F9F5]", border: "border-[#E2E8ED]" },
+  { id: 2, time: "08:30 - 09:00", patient: "Slot Tersedia", type: ["Daring", "Tersedia"], status: "Aktif", button: "Panggil", bg: "bg-[#E8F4FF]", border: "border-[#D9EFFF]" },
+  { id: 3, time: "09:00 - 09:30", patient: "Siti Aminah", type: "Tatap Muka", status: "Selesai", button: <Check className="text-white" />, bg: "bg-[#F7F6F4]", border: "border-[#000]" },
+  { id: 4, time: "09:30 - 10:00", patient: "Slot Nonaktif", type: "Tatap Muka", status: "Tutup", button: "Buka Slot", bg: "bg-[#FFEAEA]", border: "border-[#F5C6C6]" },
 ];
 
 const weekSummary = [
@@ -33,10 +33,6 @@ export default function SchedulePage() {
   const [visitType, setVisitType] = useState("Keduanya");
   const [startTime, setStartTime] = useState("08:00");
   const [endTime, setEndTime] = useState("08:30");
-
-  const [quota, setQuota] = useState(1);
-  const [slotStatus, setSlotStatus] = useState("Buka");
-
 
 
   const toggleDay = (day) => {
@@ -122,9 +118,9 @@ export default function SchedulePage() {
   const [editType, setEditType] =
     useState("Keduanya");
 
-  return (
-    <>
-      <div className="flex flex-col px-8 py-7 space-y-6 bg-[#F7F3EB] min-h-screen">
+return (
+  <>
+    <div className="flex flex-col px-8 py-7 space-y-6 bg-[#F7F3EB] min-h-screen">  
         <div className="flex gap-4">
           {/* Kiri: Kalender + Ringkasan */}
           <div className="flex flex-col gap-4 w-[220px]">
@@ -152,7 +148,6 @@ export default function SchedulePage() {
               </div>
             </div>
 
-            {/* Ringkasan Bulan */}
             <div className="bg-white p-4 rounded shadow-md text-center">
               <h3 className="text-[12px] text-gray-500 mb-2">Ringkasan Bulan Ini</h3>
               <div className="grid grid-cols-3 gap-2 text-[12px] font-semibold">
@@ -228,7 +223,6 @@ export default function SchedulePage() {
           </div>
         </div>
 
-        {/* 7 Hari ke Depan */}
         <div className="grid grid-cols-6 gap-2 mt-4">
           {weekSummary.map((w, i) => (
             <div key={i} className="p-3 bg-[#F7F6F4] rounded text-center text-[12px]">
@@ -239,7 +233,6 @@ export default function SchedulePage() {
           ))}
         </div>
 
-        {/* Jadwal Libur & Cuti */}
         <div className="space-y-2 mt-4">
           {holidays.map((h, i) => (
             <div key={i} className="flex justify-between items-center p-4 bg-[#F7F6F4] rounded">
@@ -251,336 +244,290 @@ export default function SchedulePage() {
             </div>
           ))}
         </div>
+    </div>
 
-        {/* Modal Add Slot */}
-        {showAddModal && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+      {showAddModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+          <div className="relative w-full max-w-xl rounded-[20px] bg-white shadow-2xl">
+            <div className="flex items-center justify-between border-b border-[#EDE8DC] px-6 py-5">
+              <h2 className="text-sm font-medium text-[#1E1E1E]">
+                Tambah Slot Jadwal
+              </h2>
 
-            <div className="relative w-full max-w-xl rounded-[20px] bg-white shadow-2xl">
+              <button
+                onClick={() => setShowAddModal(false)}
+                className="text-xl text-[#6B7280]"
+              >
+                ×
+              </button>
+            </div>
 
-              {/* Header */}
-              <div className="flex items-center justify-between border-b border-[#EDE8DC] px-6 py-5">
-                <h2 className="text-sm font-medium text-[#1E1E1E]">
-                  Tambah Slot Jadwal
-                </h2>
+            <div className="p-5">
+              <div className="mb-4 flex items-center gap-3 rounded-xl bg-[#F5F0E8] p-4">
+                <div className="h-12 w-12 rounded-full bg-[#6B8F71]" />
 
-                <button
-                  onClick={() => setShowAddModal(false)}
-                  className="text-xl text-[#6B7280]"
-                >
-                  ×
+                <div>
+                  <p className="text-sm font-medium text-[#1E1E1E]">
+                    Dr. Zeki
+                  </p>
+
+                  <p className="text-xs text-[#4A7C8E]">
+                    Dokter Umum
+                  </p>
+                </div>
+              </div>
+
+              <div className="mb-5 flex rounded-xl bg-[#F5F0E8] p-1">
+                <button className="flex-1 rounded-lg bg-white py-2 text-sm font-medium shadow-sm">
+                  Satu Hari
+                </button>
+
+                <button className="flex-1 py-2 text-sm font-medium text-[#6B7280]">
+                  Berulang
                 </button>
               </div>
 
-              {/* Content */}
-              <div className="p-5">
+              <div className="mb-4">
+                <p className="mb-3 text-sm text-[#1E1E1E]">
+                  Pilih Hari Berulang
+                </p>
 
-                {/* Dokter */}
-                <div className="mb-4 flex items-center gap-3 rounded-xl bg-[#F5F0E8] p-4">
-                  <div className="h-12 w-12 rounded-full bg-[#6B8F71]" />
-
-                  <div>
-                    <p className="text-sm font-medium text-[#1E1E1E]">
-                      Dr. Zeki
-                    </p>
-
-                    <p className="text-xs text-[#4A7C8E]">
-                      Dokter Umum
-                    </p>
-                  </div>
-                </div>
-
-                {/* Tab */}
-                <div className="mb-5 flex rounded-xl bg-[#F5F0E8] p-1">
-                  <button className="flex-1 rounded-lg bg-white py-2 text-sm font-medium shadow-sm">
-                    Satu Hari
-                  </button>
-
-                  <button className="flex-1 py-2 text-sm font-medium text-[#6B7280]">
-                    Berulang
-                  </button>
-                </div>
-
-                {/* Hari */}
-                <div className="mb-4">
-                  <p className="mb-3 text-sm text-[#1E1E1E]">
-                    Pilih Hari Berulang
-                  </p>
-
-                  <div className="flex flex-wrap gap-2">
-                    {["Sen", "Sel", "Rab", "Kam", "Jum", "Sab", "Min"].map((day) => (
-                      <button
-                        key={day}
-                        onClick={() => toggleDay(day)}
-                        className={`rounded-lg px-4 py-2 text-xs font-medium transition
-        ${selectedDays.includes(day)
-                            ? "bg-[#6B8F71] text-white"
-                            : "bg-[#ECE8E0] text-[#1E1E1E]"
-                          }`}
-                      >
-                        {day}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Jam */}
-                <div className="mb-5 grid grid-cols-2 gap-3">
-
-                  <div>
-                    <label className="mb-2 block text-xs text-[#6B7280]">
-                      Jam Mulai
-                    </label>
-
-                    <input
-                      type="time"
-                      value={startTime}
-                      onChange={(e) => setStartTime(e.target.value)}
-                      className="w-full rounded-xl border border-[#EDE8DC] bg-[#F5F0E8] px-4 py-3 outline-none"
-                    />
-
-                    <div>
-                      <label className="mb-2 block text-xs text-[#6B7280]">
-                        Jam Selesai
-                      </label>
-
-                      <input
-                        type="time"
-                        value={endTime}
-                        onChange={(e) => setEndTime(e.target.value)}
-                        className="w-full rounded-xl border border-[#EDE8DC] bg-[#F5F0E8] px-4 py-3 outline-none"
-                      />
-
-                    </div>
-
-                    {/* Tipe */}
-                    <div className="mb-5">
-                      <p className="mb-3 text-sm text-[#1E1E1E]">
-                        Tipe Kunjungan
-                      </p>
-
-                      <div className="grid grid-cols-3 gap-3">
-                        {["Tatap Muka", "Daring", "Keduanya"].map(
-                          (item) => (
-                            <button
-                              key={item}
-                              onClick={() => setVisitType(item)}
-                              className={`rounded-xl border p-4
-        ${visitType === item
-                                  ? "border-[#6B8F71] bg-[#EEF5EF]"
-                                  : "border-[#EDE8DC]"
-                                }`}
-                            >
-                              <p className="text-xs font-medium">
-                                {item}
-                              </p>
-                            </button>
-                          )
-                        )}
-                      </div>
-                    </div>
-
-                  </div>
-
-                  {/* Footer */}
-                  <div className="flex gap-3 border-t border-[#EDE8DC] p-4">
+                <div className="flex flex-wrap gap-2">
+                  {["Sen", "Sel", "Rab", "Kam", "Jum", "Sab", "Min"].map((day) => (
                     <button
-                      onClick={() => setShowAddModal(false)}
-                      className="flex-1 rounded-xl border border-[#D7D7D7] py-3 text-sm font-medium"
+                      key={day}
+                      onClick={() => toggleDay(day)}
+                      className={`rounded-lg px-4 py-2 text-xs font-medium transition ${
+                        selectedDays.includes(day)
+                          ? "bg-[#6B8F71] text-white"
+                          : "bg-[#ECE8E0] text-[#1E1E1E]"
+                      }`}
                     >
-                      Batal
+                      {day}
                     </button>
-
-                    <button
-                      onClick={handleAddSlot}
-                      className="flex-1 rounded-xl bg-[#567A58] py-3 text-sm font-medium text-white"
-                    >
-                      Buat Semua Slot
-                    </button>
-                  </div>
-
+                  ))}
                 </div>
-
               </div>
 
+              <div className="mb-5 grid grid-cols-2 gap-3">
+                <div>
+                  <label className="mb-2 block text-xs text-[#6B7280]">
+                    Jam Mulai
+                  </label>
+
+                  <input
+                    type="time"
+                    value={startTime}
+                    onChange={(e) => setStartTime(e.target.value)}
+                    className="w-full rounded-xl border border-[#EDE8DC] bg-[#F5F0E8] px-4 py-3 outline-none"
+                  />
+                </div>
+
+                <div>
+                  <label className="mb-2 block text-xs text-[#6B7280]">
+                    Jam Selesai
+                  </label>
+
+                  <input
+                    type="time"
+                    value={endTime}
+                    onChange={(e) => setEndTime(e.target.value)}
+                    className="w-full rounded-xl border border-[#EDE8DC] bg-[#F5F0E8] px-4 py-3 outline-none"
+                  />
+                </div>
+              </div>
+
+              <div className="mb-5">
+                <p className="mb-3 text-sm text-[#1E1E1E]">
+                  Tipe Kunjungan
+                </p>
+
+                <div className="grid grid-cols-3 gap-3">
+                  {["Tatap Muka", "Daring", "Keduanya"].map((item) => (
+                    <button
+                      key={item}
+                      onClick={() => setVisitType(item)}
+                      className={`rounded-xl border p-4 ${
+                        visitType === item
+                          ? "border-[#6B8F71] bg-[#EEF5EF]"
+                          : "border-[#EDE8DC]"
+                      }`}
+                    >
+                      <p className="text-xs font-medium">
+                        {item}
+                      </p>
+                    </button>
+                  ))}
+                </div>
+              </div>
             </div>
 
+            <div className="flex gap-3 border-t border-[#EDE8DC] p-4">
+              <button
+                onClick={() => setShowAddModal(false)}
+                className="flex-1 rounded-xl border border-[#D7D7D7] py-3 text-sm font-medium"
+              >
+                Batal
+              </button>
 
-            {showEditModal && (
-              <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+              <button
+                onClick={handleAddSlot}
+                className="flex-1 rounded-xl bg-[#567A58] py-3 text-sm font-medium text-white"
+              >
+                Buat Semua Slot
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
-                <div className="w-[560px] rounded-2xl bg-[#F5F0E8] shadow-2xl">
+      {showEditModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+          <div className="w-[560px] rounded-2xl bg-[#F5F0E8] shadow-2xl">
+            <div className="flex items-center justify-between px-6 py-5">
+              <h2 className="text-sm font-medium text-[#1E1E1E]">
+                Edit Slot: {selectedSlot?.time}
+              </h2>
 
-                  {/* Header */}
-                  <div className="flex items-center justify-between px-6 py-5">
-                    <h2 className="text-sm font-medium text-[#1E1E1E]">
-                      Edit Slot: {selectedSlot?.time}
-                    </h2>
+              <button
+                onClick={() => setShowEditModal(false)}
+                className="text-xl text-[#6B7280]"
+              >
+                ×
+              </button>
+            </div>
 
-                    <button
-                      onClick={() => setShowEditModal(false)}
-                      className="text-xl text-[#6B7280]"
-                    >
-                      ×
-                    </button>
-                  </div>
-
-                  <div className="px-6 pb-6">
-
-                    {/* Jam */}
-                    <div className="grid grid-cols-2 gap-3 mb-4">
-
-                      <div>
-                        <label>Jam Mulai</label>
-                        <input
-                          type="time"
-                          value={startTime}
-                          onChange={(e) => setStartTime(e.target.value)}
-                          className="w-full rounded-xl border border-[#EDE8DC] bg-[#F5F0E8] px-4 py-3 outline-none"
-                        />
-                      </div>
-
-                      <div>
-                        <label>Jam Selesai</label>
-                        <input
-                          type="time"
-                          value={endTime}
-                          onChange={(e) => setEndTime(e.target.value)}
-                          className="w-full rounded-xl border border-[#EDE8DC] bg-[#F5F0E8] px-4 py-3 outline-none"
-                        />
-                      </div>
-
-                    </div>
-
-                    {/* Tipe */}
-                    <p className="text-sm mb-2">
-                      Tipe Kunjungan
-                    </p>
-
-                    <div className="grid grid-cols-3 gap-2 mb-5">
-                      {["Tatap Muka", "Daring", "Keduanya"].map((item) => (
-                        <button
-                          key={item}
-                          onClick={() => setEditType(item)}
-                          className={`rounded-lg py-2 text-sm border
-        ${editType === item
-                              ? "border-[#6B8F71] bg-[#EEF5EF] text-[#567A58]"
-                              : "bg-white"
-                            }`}
-                        >
-                          {item}
-                        </button>
-                      ))}
-                    </div>
-
-                    {/* Kuota */}
-                    <p className="text-sm mb-2">
-                      Kuota
-                    </p>
-
-                    <div className="flex items-center gap-2 mb-5">
-
-                      <button
-                        onClick={() =>
-                          setEditQuota(Math.max(1, editQuota - 1))
-                        }
-                        className="h-10 w-10 rounded-lg bg-[#ECE8E0]"
-                      >
-                        -
-                      </button>
-
-                      <div className="flex-1 rounded-lg bg-[#ECE8E0] py-3 text-center">
-                        {editQuota}
-                      </div>
-
-                      <button
-                        onClick={() =>
-                          setEditQuota(editQuota + 1)
-                        }
-                        className="h-10 w-10 rounded-lg bg-[#ECE8E0]"
-                      >
-                        +
-                      </button>
-
-                    </div>
-
-                    {/* Keterangan */}
-                    <p className="text-sm mb-2">
-                      Keterangan
-                    </p>
-
-                    <textarea
-                      rows="3"
-                      defaultValue="Prioritas pasien kontrol rutin"
-                      className="mb-5 w-full resize-none rounded-lg bg-[#ECE8E0] p-4 outline-none"
-                    />
-
-                    {/* Status Slot */}
-                    <div className="mb-6 flex items-center justify-between rounded-xl bg-[#ECE8E0] p-4">
-
-                      <div>
-                        <p className="text-sm font-medium">
-                          Status Slot
-                        </p>
-
-                        <p className="text-xs text-[#6B7280]">
-                          Tentukan apakah slot ini dapat dipesan oleh pasien.
-                        </p>
-                      </div>
-
-                      <div className="flex rounded-full bg-white p-1">
-
-                        <button
-                          onClick={() => setEditStatus("Buka")}
-                          className={`rounded-full px-4 py-1 text-xs
-       ${editStatus === "Buka"
-                              ? "bg-[#6B8F71] text-white"
-                              : ""
-                            }`}
-                        >
-                          Buka
-                        </button>
-
-                        <button
-                          onClick={() => setEditStatus("Tutup")}
-                          className={`rounded-full px-4 py-1 text-xs
-       ${editStatus === "Tutup"
-                              ? "bg-red-500 text-white"
-                              : ""
-                            }`}
-                        >
-                          Tutup
-                        </button>
-
-                      </div>
-
-                    </div>
-
-                    {/* Button */}
-                    <button
-                      onClick={handleUpdateSlot}
-                      className="w-full rounded-xl bg-[#567A58] py-3 text-sm font-medium text-white shadow"
-                    >
-                      Simpan Perubahan
-                    </button>
-
-                    <button
-                      onClick={() => {
-                        if (selectedSlot) {
-                          handleDeleteSlot(selectedSlot.id);
-                          setShowEditModal(false);
-                        }
-                      }}
-                    >
-                      Hapus Slot Ini
-                    </button>
-
-                  </div>
-
+            <div className="px-6 pb-6">
+              <div className="grid grid-cols-2 gap-3 mb-4">
+                <div>
+                  <label>Jam Mulai</label>
+                  <input
+                    type="time"
+                    value={startTime}
+                    onChange={(e) => setStartTime(e.target.value)}
+                    className="w-full rounded-xl border border-[#EDE8DC] bg-[#F5F0E8] px-4 py-3 outline-none"
+                  />
                 </div>
 
+                <div>
+                  <label>Jam Selesai</label>
+                  <input
+                    type="time"
+                    value={endTime}
+                    onChange={(e) => setEndTime(e.target.value)}
+                    className="w-full rounded-xl border border-[#EDE8DC] bg-[#F5F0E8] px-4 py-3 outline-none"
+                  />
+                </div>
               </div>
-            )}
-          </>
-        );
+
+              <p className="text-sm mb-2">
+                Tipe Kunjungan
+              </p>
+
+              <div className="grid grid-cols-3 gap-2 mb-5">
+                {["Tatap Muka", "Daring", "Keduanya"].map((item) => (
+                  <button
+                    key={item}
+                    onClick={() => setEditType(item)}
+                    className={`rounded-lg py-2 text-sm border ${
+                      editType === item
+                        ? "border-[#6B8F71] bg-[#EEF5EF] text-[#567A58]"
+                        : "bg-white"
+                    }`}
+                  >
+                    {item}
+                  </button>
+                ))}
+              </div>
+
+              <p className="text-sm mb-2">
+                Kuota
+              </p>
+
+              <div className="flex items-center gap-2 mb-5">
+                <button
+                  onClick={() => setEditQuota(Math.max(1, editQuota - 1))}
+                  className="h-10 w-10 rounded-lg bg-[#ECE8E0]"
+                >
+                  -
+                </button>
+
+                <div className="flex-1 rounded-lg bg-[#ECE8E0] py-3 text-center">
+                  {editQuota}
+                </div>
+
+                <button
+                  onClick={() => setEditQuota(editQuota + 1)}
+                  className="h-10 w-10 rounded-lg bg-[#ECE8E0]"
+                >
+                  +
+                </button>
+              </div>
+
+              <p className="text-sm mb-2">
+                Keterangan
+              </p>
+
+              <textarea
+                rows="3"
+                defaultValue="Prioritas pasien kontrol rutin"
+                className="mb-5 w-full resize-none rounded-lg bg-[#ECE8E0] p-4 outline-none"
+              />
+
+              <div className="mb-6 flex items-center justify-between rounded-xl bg-[#ECE8E0] p-4">
+                <div>
+                  <p className="text-sm font-medium">
+                    Status Slot
+                  </p>
+
+                  <p className="text-xs text-[#6B7280]">
+                    Tentukan apakah slot ini dapat dipesan oleh pasien.
+                  </p>
+                </div>
+
+                <div className="flex rounded-full bg-white p-1">
+                  <button
+                    onClick={() => setEditStatus("Buka")}
+                    className={`rounded-full px-4 py-1 text-xs ${
+                      editStatus === "Buka" ? "bg-[#6B8F71] text-white" : ""
+                    }`}
+                  >
+                    Buka
+                  </button>
+
+                  <button
+                    onClick={() => setEditStatus("Tutup")}
+                    className={`rounded-full px-4 py-1 text-xs ${
+                      editStatus === "Tutup" ? "bg-red-500 text-white" : ""
+                    }`}
+                  >
+                    Tutup
+                  </button>
+                </div>
+              </div>
+
+              <button
+                onClick={handleUpdateSlot}
+                className="w-full rounded-xl bg-[#567A58] py-3 text-sm font-medium text-white shadow"
+              >
+                Simpan Perubahan
+              </button>
+
+              <button
+                onClick={() => {
+                  if (selectedSlot) {
+                    handleDeleteSlot(selectedSlot.id);
+                    setShowEditModal(false);
+                  }
+                }}
+                className="mt-3 w-full rounded-xl border border-red-300 py-3 text-sm font-medium text-red-500"
+              >
+                Hapus Slot Ini
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+  </>
+);
 }

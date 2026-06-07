@@ -562,7 +562,7 @@ exports.getStatistics = async (req, res) => {
 
     console.log("DOKTER ID =", dokterId);
 
-    const [trenKunjungan] = await db.query(`
+    const [tren] = await db.query(`
   SELECT
     DATE(created_at) tanggal,
     COUNT(*) total
