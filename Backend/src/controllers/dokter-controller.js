@@ -253,19 +253,19 @@ exports.getDaftarPasienForDokter = async (req, res) => {
   try {
     const query = `
       SELECT 
-  u.id, 
-  u.nama_lengkap AS nama, 
-  pp.nik,
-  pp.jenis_kelamin,
-  TIMESTAMPDIFF(YEAR, pp.tanggal_lahir, CURDATE()) AS umur,
-  COUNT(DISTINCT rm.id) AS visits,
-  MAX(rm.created_at) AS lastVisit,
-  (SELECT keluhan FROM rekam_medis WHERE pasien_id = u.id ORDER BY created_at DESC LIMIT 1) AS lastComplaint
-FROM users u
-LEFT JOIN profil_pasien pp ON u.id = pp.user_id
-LEFT JOIN rekam_medis rm ON u.id = rm.pasien_id
-WHERE u.role = 'pasien'
-GROUP BY u.id, u.nama_lengkap, pp.nik, pp.jenis_kelamin, pp.tanggal_lahir
+        u.id, 
+        u.nama_lengkap AS nama, 
+        pp.nik,
+        pp.jenis_kelamin,
+        TIMESTAMPDIFF(YEAR, pp.tanggal_lahir, CURDATE()) AS umur,
+        COUNT(DISTINCT rm.id) AS visits,
+        MAX(rm.created_at) AS lastVisit,
+        (SELECT keluhan FROM rekam_medis WHERE pasien_id = u.id ORDER BY created_at DESC LIMIT 1) AS lastComplaint
+      FROM users u
+      LEFT JOIN profil_pasien pp ON u.id = pp.user_id
+      LEFT JOIN rekam_medis rm ON u.id = rm.pasien_id
+      WHERE u.role = 'pasien'
+      GROUP BY u.id, u.nama_lengkap, pp.nik, pp.jenis_kelamin, pp.tanggal_lahir
     `;
 
     const [rows] = await db.query(query);
@@ -289,16 +289,16 @@ exports.getDetailPasienForDokter = async (req, res) => {
     // A. Ambil Info Profil Dasar Pasien
     const [pasienResult] = await db.query(
       `
-SELECT 
-  u.id, 
-  u.nama_lengkap AS nama, 
-  pp.nik,
-  pp.jenis_kelamin, 
-  TIMESTAMPDIFF(YEAR, pp.tanggal_lahir, CURDATE()) AS umur
-FROM users u
-LEFT JOIN profil_pasien pp ON u.id = pp.user_id
-WHERE u.id = ? AND u.role = 'pasien'
-    `,
+      SELECT 
+        u.id, 
+        u.nama_lengkap AS nama, 
+        pp.nik,
+        pp.jenis_kelamin, 
+        TIMESTAMPDIFF(YEAR, pp.tanggal_lahir, CURDATE()) AS umur
+      FROM users u
+      LEFT JOIN profil_pasien pp ON u.id = pp.user_id
+      WHERE u.id = ? AND u.role = 'pasien'
+      `,
       [pasien_id]
     );
 
@@ -320,7 +320,7 @@ WHERE u.id = ? AND u.role = 'pasien'
       JOIN users ud ON rm.dokter_id = ud.id
       WHERE rm.pasien_id = ?
       ORDER BY rm.created_at DESC
-    `,
+      `,
       [pasien_id]
     );
 
@@ -331,7 +331,7 @@ WHERE u.id = ? AND u.role = 'pasien'
         r.id AS resep_id,
         rm.created_at AS tanggal_kunjungan,
         o.nama AS nama_obat,
-        rd.jumlah,       -- ✨ DIUBAH DARI rd.dosis MENJADI rd.jumlah
+        rd.jumlah,
         rd.aturan_pakai
       FROM resep r
       JOIN rekam_medis rm ON r.rekam_medis_id = rm.id
@@ -339,7 +339,7 @@ WHERE u.id = ? AND u.role = 'pasien'
       JOIN obat o ON rd.obat_id = o.id
       WHERE rm.pasien_id = ?
       ORDER BY rm.created_at DESC
-    `,
+      `,
       [pasien_id]
     );
 
@@ -353,6 +353,53 @@ WHERE u.id = ? AND u.role = 'pasien'
     });
   } catch (error) {
     console.error('Error saat mengambil detail pasien untuk dokter:', error);
+    return res.status(500).json({ message: 'Terjadi kesalahan pada server.' });
+  }
+};
+
+// =========================================================================
+// 10. GET: DOKTER MELIHAT PROFIL SAYA (Disinkronkan namanya ke Router)
+// =========================================================================
+exports.getProfilDokter = async (req, res) => {
+  // Mengambil id dari parameter URL, jika tidak ada baru ambil dari req.user.id (Token JWT)
+  const dokter_id = req.params.id || (req.user ? req.user.id : null); 
+
+  if (!dokter_id) {
+    return res.status(400).json({ message: 'ID Dokter tidak valid atau tidak ditemukan.' });
+  }
+
+  try {
+    const query = `
+      SELECT 
+        u.id AS user_id,
+        u.nama_lengkap,
+        u.email,
+        pd.id AS profil_id,
+        pd.nik,
+        pd.tanggal_lahir,
+        pd.jenis_kelamin,
+        pd.spesialisasi,
+        pd.nomor_sip,
+        pd.sip_expired_at,
+        pd.institusi,
+        pd.jam_praktik_default
+      FROM users u
+      JOIN profil_dokter pd ON u.id = pd.user_id
+      WHERE u.id = ? AND u.role = 'dokter'
+    `;
+
+    const [results] = await db.query(query, [dokter_id]);
+
+    if (results.length === 0) {
+      return res.status(404).json({ message: 'Profil dokter tidak ditemukan.' });
+    }
+
+    return res.status(200).json({
+      success: true,
+      data: results[0] // Karena data profil cuma 1 baris
+    });
+  } catch (error) {
+    console.error('Error saat mengambil profil dokter:', error);
     return res.status(500).json({ message: 'Terjadi kesalahan pada server.' });
   }
 };

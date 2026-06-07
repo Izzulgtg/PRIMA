@@ -44,7 +44,8 @@ import MonitoringPage from "../pages/doctor/MonitoringPage";
 import ManajemenObat from "../pages/doctor/ManajemenObat";
 import ConsultationChatPage from "../pages/doctor/ConsultationChatPage";
 import DaftarPasien from "../pages/doctor/DaftarPasien";
-
+// 📑 PERBAIKAN 1: Mengubah path import dari components ke pages sesuai struktur foldermu
+import ProfileDokter from "../pages/doctor/ProfileDokter"; 
 
 
 function AppRouter() {
@@ -166,7 +167,10 @@ function AppRouter() {
           <Route path="queue" element={<QueuePage />} />
           <Route path="schedule" element={<SchedulePage />} />
           <Route path="consultation" element={<ConsultationPage />} />
+          {/* 📑 PERBAIKAN 2: Menambahkan rute monitoring yang sempat tertinggal */}
+          <Route path="monitoring" element={<MonitoringPage />} /> 
           <Route path="medicine" element={<ManajemenObat />} />
+          <Route path="profile" element={<ProfileDokter />} />
           <Route path="medical-records" element={<DaftarPasien />} />
           <Route path="patient-list" element={<DaftarPasien />} />
         </Route>

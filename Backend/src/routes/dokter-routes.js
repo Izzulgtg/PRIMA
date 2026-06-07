@@ -18,5 +18,6 @@ router.put('/antrean/:pendaftaran_id/status', dokterController.updateStatusAntre
 
 router.get('/pasien', dokterController.getDaftarPasienForDokter);
 router.get('/pasien/:id', dokterController.getDetailPasienForDokter);
+router.get('/profil/:id', dokterController.getProfilDokter);
 
 module.exports = router;

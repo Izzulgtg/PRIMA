@@ -1,4 +1,4 @@
-import { NavLink, Outlet } from "react-router-dom";
+import { NavLink, Outlet, Link } from "react-router-dom"; // ✨ PERBAIKAN: Menambahkan Link di sini
 import {
   LayoutDashboard,
   ClipboardList,
@@ -42,7 +42,7 @@ function DoctorLayout() {
     },
     {
       label: "Daftar Pasien",
-      path: "/doctor/medical-records",
+      path: "/doctor/medical-records", // 💡 Catatan: pastikan path ini sama dengan di App.jsx
       icon: Users,
     },
     {
@@ -73,10 +73,9 @@ function DoctorLayout() {
                 key={menu.path}
                 to={menu.path}
                 className={({ isActive }) =>
-                  `flex items-center gap-3 rounded-[10px] px-3 py-3 text-[13px] font-medium transition ${
-                    isActive
-                      ? "bg-[#6F9A7B] text-white"
-                      : "text-[#3F4B4B] hover:bg-white/70"
+                  `flex items-center gap-3 rounded-[10px] px-3 py-3 text-[13px] font-medium transition ${isActive
+                    ? "bg-[#6F9A7B] text-white"
+                    : "text-[#3F4B4B] hover:bg-white/70"
                   }`
                 }
               >
@@ -119,17 +118,18 @@ function DoctorLayout() {
             <div className="mx-5 h-8 w-px bg-[#E8E5DF]" />
 
             <div className="flex items-center gap-3">
-              <div className="text-right">
-                <p className="text-[12px] font-semibold text-[#1E1E1E]">
-                  Dr. Zeki
-                </p>
-                <p className="text-[10px] text-[#6B7280]">Dokter Umum</p>
-              </div>
+              {/* Sekarang Link ini akan berfungsi dengan aman */}
+              <Link to="/doctor/profile" className="dokter-info-link" style={{ textDecoration: 'none', color: 'inherit' }}>
+                <div className="nama-dokter text-right">
+                  <h4 className="font-bold">Dr. Dila</h4>
+                  <p className="text-xs text-gray-500">Dokter Umum</p>
+                </div>
+              </Link>
 
               <img
                 src="https://i.pravatar.cc/100?img=12"
-                alt="Dr. Zeki"
-                className="h-10 w-10 rounded-full border-2 border-[#E4E5E1] object-cover"
+                alt="Dr. Dila"
+                className="h-10 w-10 rounded-full border-2 border-[#E4E5E1] object-cover cursor-pointer"
               />
             </div>
           </div>
