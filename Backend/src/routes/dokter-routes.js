@@ -21,3 +21,6 @@ router.get('/pasien/:id', dokterController.getDetailPasienForDokter);
 router.get('/profil/:id', dokterController.getProfilDokter);
 
 module.exports = router;
+router.get('/monitoring/obat', dokterController.getMonitoringObat);
+router.get('/monitoring/kunjungan', dokterController.getLogKunjungan);
+router.get('/monitoring/summary', dokterController.getMonitoringSummary);

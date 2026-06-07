@@ -403,3 +403,142 @@ exports.getProfilDokter = async (req, res) => {
     return res.status(500).json({ message: 'Terjadi kesalahan pada server.' });
   }
 };
+
+// =========================================================================
+// 11. GET: MONITORING - REKAP PENGELUARAN OBAT & STOK
+// =========================================================================
+exports.getMonitoringObat = async (req, res) => {
+  try {
+    // 1. Ambil 10 obat paling banyak digunakan
+    const topObatQuery = `
+      SELECT o.id, o.nama, o.stok, SUM(rd.jumlah) as total_penggunaan
+      FROM obat o
+      LEFT JOIN resep_detail rd ON o.id = rd.obat_id
+      GROUP BY o.id, o.nama, o.stok
+      ORDER BY total_penggunaan DESC
+      LIMIT 10
+    `;
+    const [topObat] = await db.query(topObatQuery);
+
+    // 2. Cek obat yang akan kadaluarsa (dalam 30 hari) atau stok menipis
+    const warningQuery = `
+      SELECT nama, stok, tanggal_kadaluarsa 
+      FROM obat 
+      WHERE tanggal_kadaluarsa <= DATE_ADD(CURDATE(), INTERVAL 30 DAY)
+         OR stok <= batas_minimum
+    `;
+    const [warnings] = await db.query(warningQuery);
+
+    return res.status(200).json({
+      success: true,
+      data: {
+        topObat,
+        warnings
+      }
+    });
+  } catch (error) {
+    console.error('Error getMonitoringObat:', error);
+    return res.status(500).json({ message: 'Terjadi kesalahan server.' });
+  }
+};
+
+// =========================================================================
+// 12. GET: MONITORING - LOG KUNJUNGAN PASIEN
+// =========================================================================
+exports.getLogKunjungan = async (req, res) => {
+  const dokter_id = req.user.id; // Diambil dari token
+
+  try {
+    const query = `
+      SELECT 
+        rm.created_at AS tanggal,
+        u.nama_lengkap AS nama_pasien,
+        rm.keluhan,
+        rm.diagnosis,
+        p.tipe_kunjungan -- Jika ada kolom tipe (Tatap Muka/Daring) di tabel pendaftaran
+      FROM rekam_medis rm
+      JOIN pendaftaran p ON rm.pendaftaran_id = p.id
+      JOIN users u ON rm.pasien_id = u.id
+      WHERE rm.dokter_id = ?
+      ORDER BY rm.created_at DESC
+      LIMIT 50
+    `;
+    const [logs] = await db.query(query, [dokter_id]);
+
+    return res.status(200).json({
+      success: true,
+      data: logs
+    });
+  } catch (error) {
+    console.error('Error getLogKunjungan:', error);
+    return res.status(500).json({ message: 'Terjadi kesalahan server.' });
+  }
+};
+
+// =========================================================================
+// 13. GET: MONITORING - STATISTIK RINGKASAN & TREN KONSULTASI
+// =========================================================================
+exports.getMonitoringSummary = async (req, res) => {
+  const dokter_id = req.user.id;
+
+  try {
+    // 1. Hitung Total Pasien Unik yang pernah ditangani dokter ini
+    const [pasienCount] = await db.query(
+      `SELECT COUNT(DISTINCT pasien_id) as total FROM rekam_medis WHERE dokter_id = ?`,
+      [dokter_id]
+    );
+
+    // 2. Hitung Total Konsultasi Selesai bulan ini
+    const [konsultasiBulanIni] = await db.query(
+      `SELECT COUNT(id) as total FROM rekam_medis 
+       WHERE dokter_id = ? AND MONTH(created_at) = MONTH(CURDATE()) AND YEAR(created_at) = YEAR(CURDATE())`,
+      [dokter_id]
+    );
+
+    // 3. Hitung Total Resep Obat yang pernah dibuat
+    const [resepCount] = await db.query(
+      `SELECT COUNT(r.id) as total FROM resep r 
+       JOIN rekam_medis rm ON r.rekam_medis_id = rm.id 
+       WHERE rm.dokter_id = ?`,
+      [dokter_id]
+    );
+
+    // 4. Ambil data Tren Konsultasi (6 Bulan Terakhir) untuk Grafik
+    const [trenKonsultasi] = await db.query(
+      `SELECT 
+        DATE_FORMAT(created_at, '%b %Y') as bulan, 
+        COUNT(id) as jumlah 
+       FROM rekam_medis 
+       WHERE dokter_id = ? AND created_at >= DATE_SUB(CURDATE(), INTERVAL 6 MONTH)
+       GROUP BY YEAR(created_at), MONTH(created_at), DATE_FORMAT(created_at, '%b %Y')
+       ORDER BY YEAR(created_at) ASC, MONTH(created_at) ASC`,
+      [dokter_id]
+    );
+
+    // 5. Demografi Pasien (Ringkasan Pasien berdasarkan Jenis Kelamin)
+    const [demografi] = await db.query(
+      `SELECT pp.jenis_kelamin, COUNT(DISTINCT rm.pasien_id) as jumlah
+       FROM rekam_medis rm
+       JOIN profil_pasien pp ON rm.pasien_id = pp.user_id
+       WHERE rm.dokter_id = ?
+       GROUP BY pp.jenis_kelamin`,
+      [dokter_id]
+    );
+
+    return res.status(200).json({
+      success: true,
+      data: {
+        cards: {
+          totalPasien: pasienCount[0].total,
+          konsultasiBulanIni: konsultasiBulanIni[0].total,
+          totalResep: resepCount[0].total,
+        },
+        tren: trenKonsultasi,
+        demografi: demografi
+      }
+    });
+  } catch (error) {
+    console.error('Error getMonitoringSummary:', error);
+    return res.status(500).json({ message: 'Terjadi kesalahan server.' });
+  }
+};
