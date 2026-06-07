@@ -3,118 +3,142 @@ const db = require("../config/db");
 // ======================================================
 // DASHBOARD PASIEN
 // ======================================================
-exports.getDashboard = async (
-  req,
-  res
-) => {
-  try {
-    const pasien_id = req.user.id;
+exports.getDashboard =
+  async (req, res) => {
+    try {
+      const pasienId =
+        req.user.id;
 
-    const [[totalPendaftaran]] =
-      await db.query(
-        `
-        SELECT COUNT(*) AS total
+      const [appointments] =
+        await db.query(
+          `
+        SELECT COUNT(*) total
         FROM pendaftaran
         WHERE pasien_id = ?
       `,
-        [pasien_id]
-      );
+          [pasienId]
+        );
 
-    const [[totalRekamMedis]] =
-      await db.query(
-        `
-        SELECT COUNT(*) AS total
+      const [records] =
+        await db.query(
+          `
+        SELECT COUNT(*) total
         FROM rekam_medis
         WHERE pasien_id = ?
       `,
-        [pasien_id]
-      );
+          [pasienId]
+        );
 
-    const [[pendaftaranTerakhir]] =
-      await db.query(
-        `
+      const [upcoming] =
+        await db.query(
+          `
         SELECT
-          nomor_antrian,
-          status,
-          tanggal_periksa
-        FROM pendaftaran
-        WHERE pasien_id = ?
-        ORDER BY created_at DESC
+          p.nomor_antrian,
+          js.tanggal,
+          js.jam_mulai,
+          u.nama_lengkap
+            AS nama_dokter
+
+        FROM pendaftaran p
+
+        JOIN jadwal_slots js
+          ON p.slot_id = js.id
+
+        JOIN users u
+          ON p.dokter_id = u.id
+
+        WHERE p.pasien_id = ?
+          AND js.tanggal >= CURDATE()
+
+        ORDER BY js.tanggal ASC
         LIMIT 1
       `,
-        [pasien_id]
-      );
+          [pasienId]
+        );
 
-    return res.status(200).json({
-      success: true,
-      data: {
-        total_pendaftaran:
-          totalPendaftaran.total,
-        total_rekam_medis:
-          totalRekamMedis.total,
-        pendaftaran_terakhir:
-          pendaftaranTerakhir || null,
-      },
-    });
-  } catch (error) {
-    console.error(error);
+      return res.status(200).json({
+        success: true,
+        data: {
+          total_pendaftaran:
+            appointments[0].total,
 
-    return res.status(500).json({
-      success: false,
-      message:
-        "Gagal mengambil data dashboard",
-    });
-  }
-};
+          total_rekam_medis:
+            records[0].total,
+
+          upcoming:
+            upcoming[0] || null,
+        },
+      });
+    } catch (error) {
+      console.error(error);
+
+      return res.status(500).json({
+        success: false,
+      });
+    }
+  };
 
 // ======================================================
 // PROFILE PASIEN
 // ======================================================
-exports.getProfilePasien = async (
-  req,
-  res
-) => {
+exports.getProfilePasien = async (req, res) => {
   try {
-    const pasien_id = req.user.id;
+    const userId = req.user.id;
 
-    const [result] =
-      await db.query(
-        `
-        SELECT
-          id,
-          nama_lengkap,
-          email,
-          nomor_hp,
-          nik,
-          jenis_kelamin,
-          tanggal_lahir,
-          role,
-          created_at
-        FROM users
-        WHERE id = ?
-      `,
-        [pasien_id]
-      );
+    const query = `
+      SELECT
+        u.id,
+        u.nama_lengkap,
+        u.email,
+        u.nomor_hp,
+        u.role,
+        u.last_login_at,
 
-    if (result.length === 0) {
+        p.nik,
+        p.tanggal_lahir,
+        p.jenis_kelamin,
+        p.golongan_darah,
+        p.alamat,
+        p.nomor_bpjs,
+        p.faskes_bpjs,
+        p.kelas_bpjs,
+        p.tinggi_badan,
+        p.berat_badan,
+        p.tekanan_darah,
+        p.riwayat_alergi,
+        p.riwayat_penyakit,
+        p.obat_rutin
+
+      FROM users u
+      LEFT JOIN profil_pasien p
+        ON u.id = p.user_id
+
+      WHERE u.id = ?
+        AND u.deleted_at IS NULL
+    `;
+
+    const [rows] = await db.query(
+      query,
+      [userId]
+    );
+
+    if (!rows.length) {
       return res.status(404).json({
         success: false,
-        message:
-          "Data pasien tidak ditemukan",
+        message: "Profil tidak ditemukan",
       });
     }
 
     return res.status(200).json({
       success: true,
-      data: result[0],
+      data: rows[0],
     });
   } catch (error) {
     console.error(error);
 
     return res.status(500).json({
       success: false,
-      message:
-        "Gagal mengambil profile pasien",
+      message: "Gagal mengambil profil",
     });
   }
 };
@@ -122,81 +146,88 @@ exports.getProfilePasien = async (
 // ======================================================
 // PENDAFTARAN BEROBAT
 // ======================================================
-exports.buatPendaftaran = async (
-  req,
-  res
-) => {
+exports.buatPendaftaran = async (req, res) => {
+  const {
+    dokter_id,
+    slot_id,
+    jenis_kunjungan,
+    keluhan_utama,
+    durasi_keluhan,
+    metode_bayar,
+  } = req.body;
+
+  const pasien_id = req.user.id;
+
+  if (
+    !dokter_id ||
+    !slot_id ||
+    !jenis_kunjungan
+  ) {
+    return res.status(400).json({
+      success: false,
+      message:
+        "Dokter, slot dan jenis kunjungan wajib dipilih",
+    });
+  }
+
   try {
-    const pasien_id = req.user.id;
+    const [slot] = await db.query(
+      `
+      SELECT *
+      FROM jadwal_slots
+      WHERE id = ?
+      AND status = 'buka'
+      `,
+      [slot_id]
+    );
 
-    const {
-      dokter_id,
-      keluhan,
-      tanggal_periksa,
-    } = req.body;
-
-    if (
-      !dokter_id ||
-      !tanggal_periksa
-    ) {
-      return res.status(400).json({
+    if (!slot.length) {
+      return res.status(404).json({
         success: false,
         message:
-          "Dokter dan tanggal periksa wajib diisi",
+          "Slot jadwal tidak ditemukan",
       });
     }
 
-    const [antreanResult] =
-      await db.query(
-        `
-        SELECT COUNT(*) AS total_antrean
-        FROM pendaftaran
-        WHERE dokter_id = ?
-        AND DATE(tanggal_periksa)
-            = DATE(?)
+    const [queue] = await db.query(
+      `
+      SELECT COUNT(*) total
+      FROM pendaftaran
+      WHERE slot_id = ?
       `,
-        [
-          dokter_id,
-          tanggal_periksa,
-        ]
-      );
+      [slot_id]
+    );
 
-    const nomorAntreanBaru =
-      antreanResult[0]
-        .total_antrean + 1;
+    const nomorAntrean =
+      `A-${queue[0].total + 1}`;
 
-    const [insertResult] =
-      await db.query(
-        `
-        INSERT INTO pendaftaran (
-          pasien_id,
-          dokter_id,
-          nomor_antrian,
-          status,
-          keluhan,
-          tanggal_periksa,
-          created_at,
-          updated_at
-        )
-        VALUES (
-          ?,
-          ?,
-          ?,
-          'Mengantre',
-          ?,
-          ?,
-          NOW(),
-          NOW()
-        )
+    const [result] = await db.query(
+      `
+      INSERT INTO pendaftaran
+      (
+        pasien_id,
+        dokter_id,
+        slot_id,
+        nomor_antrian,
+        jenis_kunjungan,
+        keluhan_utama,
+        durasi_keluhan,
+        metode_bayar
+      )
+      VALUES
+      (?, ?, ?, ?, ?, ?, ?, ?)
       `,
-        [
-          pasien_id,
-          dokter_id,
-          nomorAntreanBaru,
-          keluhan || null,
-          tanggal_periksa,
-        ]
-      );
+      [
+        pasien_id,
+        dokter_id,
+        slot_id,
+        nomorAntrean,
+        jenis_kunjungan,
+        keluhan_utama || null,
+        durasi_keluhan || null,
+        metode_bayar || "umum",
+      ]
+    );
 
     return res.status(201).json({
       success: true,
@@ -204,10 +235,9 @@ exports.buatPendaftaran = async (
         "Pendaftaran berhasil",
       data: {
         pendaftaran_id:
-          insertResult.insertId,
-        nomor_antrean:
-          nomorAntreanBaru,
-        status: "Mengantre",
+          result.insertId,
+        nomor_antrian:
+          nomorAntrean,
       },
     });
   } catch (error) {
@@ -216,7 +246,7 @@ exports.buatPendaftaran = async (
     return res.status(500).json({
       success: false,
       message:
-        "Terjadi kesalahan server",
+        "Gagal melakukan pendaftaran",
     });
   }
 };
@@ -227,37 +257,46 @@ exports.buatPendaftaran = async (
 exports.getPendaftaranSaya =
   async (req, res) => {
     try {
-      const pasien_id =
+      const pasienId =
         req.user.id;
 
-      const [results] =
+      const query = `
+      SELECT
+        p.id,
+        p.nomor_antrian,
+        p.status,
+        p.jenis_kunjungan,
+        p.keluhan_utama,
+
+        js.tanggal,
+        js.jam_mulai,
+        js.jam_selesai,
+
+        u.nama_lengkap
+          AS nama_dokter
+
+      FROM pendaftaran p
+
+      JOIN jadwal_slots js
+        ON p.slot_id = js.id
+
+      JOIN users u
+        ON p.dokter_id = u.id
+
+      WHERE p.pasien_id = ?
+
+      ORDER BY js.tanggal DESC
+      `;
+
+      const [rows] =
         await db.query(
-          `
-        SELECT
-          p.id,
-          p.nomor_antrean,
-          p.status,
-          p.keluhan,
-          p.tanggal_periksa,
-          u.nama_lengkap
-            AS nama_dokter
-        FROM pendaftaran p
-
-        JOIN users u
-          ON p.dokter_id = u.id
-
-        WHERE p.pasien_id = ?
-
-        ORDER BY
-          p.tanggal_periksa DESC
-      `,
-          [pasien_id]
+          query,
+          [pasienId]
         );
 
       return res.status(200).json({
         success: true,
-        count: results.length,
-        data: results,
+        data: rows,
       });
     } catch (error) {
       console.error(error);
@@ -265,7 +304,7 @@ exports.getPendaftaranSaya =
       return res.status(500).json({
         success: false,
         message:
-          "Gagal mengambil riwayat pendaftaran",
+          "Gagal mengambil data pendaftaran",
       });
     }
   };

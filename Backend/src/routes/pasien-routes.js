@@ -11,25 +11,26 @@ router.use(
   requireRole("pasien")
 );
 
-// Dashboard
 router.get(
   "/dashboard",
   pasienController.getDashboard
 );
 
-// Pendaftaran Berobat
+router.get(
+  "/profile",
+  pasienController.getProfilePasien
+);
+
 router.post(
   "/daftar",
   pasienController.buatPendaftaran
 );
 
-// Riwayat Pendaftaran
 router.get(
   "/pendaftaran",
   pasienController.getPendaftaranSaya
 );
 
-// Riwayat Rekam Medis
 router.get(
   "/riwayat",
   pasienController.getRiwayatMedisPasien
