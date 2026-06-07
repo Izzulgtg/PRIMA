@@ -39,6 +39,7 @@ import QueuePage from "../pages/doctor/QueuePage";
 import SchedulePage from "../pages/doctor/SchedulePage";
 import ConsultationPage from "../pages/doctor/ConsultationPage";
 import MonitoringPage from "../pages/doctor/MonitoringPage";
+import ManajemenObat from "../pages/doctor/ManajemenObat";
 import ConsultationChatPage from "../pages/doctor/ConsultationChatPage";
 
 
@@ -157,6 +158,7 @@ function AppRouter() {
           <Route path="queue" element={<QueuePage />} />
           <Route path="schedule" element={<SchedulePage />} />
           <Route path="/doctor/consultation" element={<ConsultationPage />} />
+          <Route path="medicine" element={<ManajemenObat />} />
         </Route>
 
         <Route
