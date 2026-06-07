@@ -13,7 +13,7 @@ import AdminProfilePage from "../pages/admin/admin-profile-page";
 import PatientDashboardPage from "../pages/patient/dashboard/dashboard-page"
 import PatientAppointmentPage from "../pages/patient/appointment/appointment-page"
 import PatientConsultationPage from "../pages/patient/consultation/consultation-page"
-import PatientHealthRecordsPage  from "../pages/patient/health-records/health-records-page"
+import PatientHealthRecordsPage from "../pages/patient/health-records/health-records-page"
 import PatientProfilePage from "../pages/patient/profile/profile-page"
 import EditProfilePage from "../pages/patient/profile/edit-profile-page"
 import PatientSecurityPage from "../pages/patient/security/security-page"
@@ -44,9 +44,11 @@ import MonitoringPage from "../pages/doctor/MonitoringPage";
 import StatisticsPage from "../pages/doctor/StatisticsPage";
 import ManajemenObat from "../pages/doctor/ManajemenObat";
 import ConsultationChatPage from "../pages/doctor/ConsultationChatPage";
+import AddSlotPage from "../pages/doctor/AddSlotPage";
+
 import DaftarPasien from "../pages/doctor/DaftarPasien";
 // 📑 PERBAIKAN 1: Mengubah path import dari components ke pages sesuai struktur foldermu
-import ProfileDokter from "../pages/doctor/ProfileDokter"; 
+import ProfileDokter from "../pages/doctor/ProfileDokter";
 
 
 function AppRouter() {
@@ -107,9 +109,9 @@ function AppRouter() {
 
         {/* Patient */}
         <Route
-        path="/patient"
-        element={<PatientLayout />}>
-        
+          path="/patient"
+          element={<PatientLayout />}>
+
           <Route
             path="dashboard"
             element={<PatientDashboardPage />}
@@ -121,45 +123,45 @@ function AppRouter() {
           />
 
           <Route
-              path = "consultation"
-              element = {<PatientConsultationPage />}
+            path="consultation"
+            element={<PatientConsultationPage />}
           />
 
           <Route
-              path = "consultation-room"
-              element = {<ConsultationRoomPage/>}
+            path="consultation-room"
+            element={<ConsultationRoomPage />}
           />
 
           <Route
-              path = "waiting-room"
-              element = {<WaitingRoomPage/>}
+            path="waiting-room"
+            element={<WaitingRoomPage />}
           />
 
           <Route
-              path="health-records"
-              element={<PatientHealthRecordsPage/>}
+            path="health-records"
+            element={<PatientHealthRecordsPage />}
           />
 
           <Route
-              path="profile"
-              element={<PatientProfilePage />}
+            path="profile"
+            element={<PatientProfilePage />}
           />
 
           <Route
-              path="profile/edit"
-              element={<EditProfilePage  />}
+            path="profile/edit"
+            element={<EditProfilePage />}
           />
 
           <Route
-              path="security"
-              element={<PatientSecurityPage />}
+            path="security"
+            element={<PatientSecurityPage />}
           />
 
           <Route
-              path="setting"
-              element={<PatientSettingPage />}
+            path="setting"
+            element={<PatientSettingPage />}
           />
-        
+
         </Route>
 
         {/* DOCTOR */}
@@ -168,16 +170,14 @@ function AppRouter() {
           <Route path="queue" element={<QueuePage />} />
           <Route path="schedule" element={<SchedulePage />} />
           <Route path="consultation" element={<ConsultationPage />} />
-          {/* 📑 PERBAIKAN 2: Menambahkan rute monitoring yang sempat tertinggal */}
-          <Route path="monitoring" element={<MonitoringPage />} /> 
+          <Route path="monitoring" element={<MonitoringPage />} />
           <Route path="medicine" element={<ManajemenObat />} />
           <Route path="profile" element={<ProfileDokter />} />
           <Route path="medical-records" element={<DaftarPasien />} />
           <Route path="patient-list" element={<DaftarPasien />} />
-          <Route
-  path="statistics"
-  element={<StatisticsPage />}
-/>
+          <Route path="schedule/add" element={<AddSlotPage />} />
+          <Route path="statistics" element={<StatisticsPage />} />
+          <Route path="consultation-chat" element={<ConsultationChatPage />} />
         </Route>
 
         {/* LEGAL & INFO */}
@@ -200,10 +200,8 @@ function AppRouter() {
           path="/contact"
           element={<ContactPage />}
         />
-        
 
       </Routes>
-
     </BrowserRouter>
   )
 }
