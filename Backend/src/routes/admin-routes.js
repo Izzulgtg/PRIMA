@@ -11,5 +11,9 @@ router.post('/dokter', adminController.createDokter);
 router.get('/dokter', adminController.getAllDokter);
 router.put('/dokter/:id', adminController.updateDokter);
 router.delete('/dokter/:id', adminController.softDeleteDokter);
+router.post(
+  "/users",
+  adminController.createUser
+);  
 
 module.exports = router;

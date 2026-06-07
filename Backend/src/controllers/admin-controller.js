@@ -149,3 +149,141 @@ exports.softDeleteDokter = async (req, res) => {
     return res.status(500).json({ message: 'Terjadi kesalahan pada server.' });
   }
 };
+
+exports.createUser = async (req, res) => {
+
+  const {
+    nama_lengkap,
+    email,
+    password,
+    nomor_hp,
+    role,
+  } = req.body;
+
+  if (
+    !nama_lengkap ||
+    !email ||
+    !password ||
+    !role
+  ) {
+    return res.status(400).json({
+      message: "Data wajib belum lengkap"
+    });
+  }
+
+  if (
+  !["admin", "pasien"].includes(role)
+) {
+  return res.status(400).json({
+    message: "Role tidak valid"
+  });
+}
+
+  const connection =
+    await db.getConnection();
+
+  try {
+
+    await connection.beginTransaction();
+
+    const [existingUser] =
+      await connection.query(
+        "SELECT id FROM users WHERE email = ?",
+        [email]
+      );
+
+    if (existingUser.length > 0) {
+
+      await connection.rollback();
+
+      return res.status(400).json({
+        message: "Email sudah digunakan"
+      });
+
+    }
+
+    const hashedPassword =
+      await bcrypt.hash(password, 10);
+
+    const [userResult] =
+      await connection.query(
+        `
+        INSERT INTO users
+        (
+          nama_lengkap,
+          email,
+          password,
+          role,
+          nomor_hp,
+          is_active
+        )
+        VALUES (?, ?, ?, ?, ?, 1)
+        `,
+        [
+          nama_lengkap,
+          email,
+          hashedPassword,
+          role,
+          nomor_hp || null
+        ]
+      );
+
+    const userId =
+      userResult.insertId;
+
+    // ADMIN
+    if (role === "admin") {
+
+      await connection.query(
+        `
+        INSERT INTO profil_admin
+        (
+          user_id
+        )
+        VALUES (?)
+        `,
+        [userId]
+      );
+
+    }
+
+    // PASIEN
+    if (role === "pasien") {
+
+      await connection.query(
+        `
+        INSERT INTO profil_pasien
+        (
+          user_id
+        )
+        VALUES (?)
+        `,
+        [userId]
+      );
+
+    }
+
+    await connection.commit();
+
+    return res.status(201).json({
+      success: true,
+      message: "User berhasil dibuat"
+    });
+
+  } catch (error) {
+
+    await connection.rollback();
+
+    console.error(error);
+
+    return res.status(500).json({
+      message: "Server Error"
+    });
+
+  } finally {
+
+    connection.release();
+
+  }
+
+};

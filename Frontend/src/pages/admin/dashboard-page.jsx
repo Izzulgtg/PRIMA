@@ -6,6 +6,7 @@ import Card from "../../components/ui/card"
 import Badge from "../../components/ui/badge"
 import Modal from "../../components/ui/modal"
 import Table from "../../components/ui/table"
+import api from "../../services/api";
 import { Stethoscope } from "lucide-react"
 import { Wrench } from "lucide-react"
 import {
@@ -15,7 +16,45 @@ import {
 } from "lucide-react"
 function DashboardPage() {
 
+  const [nama, setNama] = useState("");
+  const [email, setEmail] = useState("");
+  const [role, setRole] = useState("");
+  const [password, setPassword] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false)
+
+  const handleCreateUser = async () => {
+
+  try {
+
+    await api.post(
+      "/admin/users",
+      {
+        nama_lengkap: nama,
+        email,
+        password,
+        role,
+      }
+    );
+
+    alert("User berhasil dibuat");
+
+    setNama("");
+    setEmail("");
+    setPassword("");
+    setRole("");
+
+    setIsModalOpen(false);
+
+  } catch (error) {
+
+    alert(
+      error.response?.data?.message ||
+      "Gagal membuat user"
+    );
+
+  }
+
+};
 
   return (
     <div className="space-y-10">
@@ -547,21 +586,58 @@ function DashboardPage() {
         title="Tambah Data"
       >
 
-<Input placeholder="Nama User" />
+<Input
+  placeholder="Nama User"
+  value={nama}
+  onChange={(e) =>
+    setNama(e.target.value)
+  }
+/>
 
 <Input
   placeholder="Email"
   className="mt-4"
+  value={email}
+  onChange={(e) =>
+    setEmail(e.target.value)
+  }
 />
 
+<select
+  value={role}
+  onChange={(e) =>
+    setRole(e.target.value)
+  }
+  className="
+    w-full
+    mt-4
+    px-4
+    py-3
+    rounded-2xl
+    border
+    border-prima-sand
+    bg-white
+  "
+>
+  <option value="">Pilih Role</option>
+  <option value="admin">Admin</option>
+  <option value="pasien">Pasien</option>
+</select>
+
 <Input
-  placeholder="Role"
+  type="password"
+  placeholder="Password"
   className="mt-4"
+  value={password}
+  onChange={(e) =>
+    setPassword(e.target.value)
+  }
 />
 
 <Button
   className="mt-4"
   variant="primary"
+  onClick={handleCreateUser}
 >
   Simpan
 </Button>
