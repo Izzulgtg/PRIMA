@@ -8,6 +8,8 @@ import AdminLayout from "../layouts/admin-layout"
 import PatientLayout from "../layouts/patient-layout"
 import DoctorLayout from "../layouts/doctor-layout";
 
+import AdminProfilePage from "../pages/admin/admin-profile-page";
+
 import PatientDashboardPage from "../pages/patient/dashboard/dashboard-page"
 import PatientAppointmentPage from "../pages/patient/appointment/appointment-page"
 import PatientConsultationPage from "../pages/patient/consultation/consultation-page"
@@ -92,6 +94,11 @@ function AppRouter() {
           <Route
             path="data-manager"
             element={<DataManagerPage />}
+          />
+
+          <Route
+            path="profile"
+            element={<AdminProfilePage />}
           />
 
         </Route>

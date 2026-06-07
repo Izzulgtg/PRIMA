@@ -150,30 +150,100 @@ exports.logout = async (req, res) => {
 // 4. GET PROFIL SAYA (Mengambil data user + profil sesuai token yang login)
 // =========================================================================
 exports.getProfilSaya = async (req, res) => {
-  try {
-    const userId = req.user.id;
-    const query = `
-      SELECT u.id, u.nama_lengkap, u.email, u.role, u.nomor_hp, u.last_login_at,
-             p.nik, p.tanggal_lahir, p.jenis_kelamin
-      FROM users u
-      LEFT JOIN profil_pasien p ON u.id = p.user_id
-      WHERE u.id = ? AND u.deleted_at IS NULL
-    `;
-    
-    const [results] = await db.query(query, [userId]);
 
-    if (results.length === 0) {
-      return res.status(404).json({ message: 'Data pengguna tidak ditemukan atau sudah dihapus.' });
+  try {
+
+const userId = req.user.id;
+
+const [users] = await db.query(
+  `
+  SELECT
+    id,
+    nama_lengkap,
+    email,
+    role,
+    nomor_hp,
+    last_login_at
+  FROM users
+  WHERE id = ?
+  `,
+  [userId]
+);
+
+
+    if (users.length === 0) {
+      console.log("HASIL QUERY =", results[0]);
+      return res.status(404).json({
+        message: "User tidak ditemukan"
+      });
     }
+
+    const user = users[0];
+
+    let profileData = {};
+
+    if (user.role === "pasien") {
+
+      const [profil] = await db.query(
+        `
+        SELECT
+          nik,
+          tanggal_lahir,
+          jenis_kelamin
+        FROM profil_pasien
+        WHERE user_id = ?
+        `,
+        [userId]
+      );
+
+      profileData = profil[0] || {};
+    }
+
+    if (user.role === "admin") {
+
+  const [profil] = await db.query(
+    `
+    SELECT *
+    FROM profil_admin
+    WHERE user_id = ?
+    `,
+    [userId]
+  );
+
+
+  profileData = profil[0] || {};
+}
+    if (user.role === "dokter") {
+
+      const [profil] = await db.query(
+        `
+        SELECT *
+        FROM profil_dokter
+        WHERE user_id = ?
+        `,
+        [userId]
+      );
+
+      profileData = profil[0] || {};
+    }
+
 
     return res.status(200).json({
       success: true,
-      data: results[0]
+      data: {
+        ...user,
+        ...profileData
+      }
     });
 
   } catch (error) {
-    console.error('Error saat mengambil profil:', error);
-    return res.status(500).json({ message: 'Terjadi kesalahan pada server saat mengambil data profil.' });
+
+    console.error(error);
+
+    return res.status(500).json({
+      message: "Server Error"
+    });
+
   }
 };
 

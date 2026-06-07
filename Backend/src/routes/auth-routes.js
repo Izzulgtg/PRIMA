@@ -15,4 +15,10 @@ router.put("/me",verifyToken,authController.updateProfilSaya);
 // Admin Only
 router.delete("/users/:id",verifyToken,requireRole("admin"),authController.softDeleteUser);
 
+router.get(
+  "/profile",
+  verifyToken,
+  authController.getProfilSaya
+);
+
 module.exports = router;
