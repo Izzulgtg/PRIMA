@@ -52,9 +52,9 @@ function DoctorLayout() {
     },
     {
       label: "Laporan & Statistik",
-      path: "/doctor/reports",
+      path: "/doctor/statistics",
       icon: ChartNoAxesCombined,
-    },
+    }
   ];
 
   return (

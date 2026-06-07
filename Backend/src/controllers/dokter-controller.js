@@ -53,6 +53,8 @@ exports.getAllObat = async (req, res) => {
   try {
     const query = `SELECT * FROM obat WHERE deleted_at IS NULL ORDER BY id ASC`;
     const [results] = await db.query(query);
+
+    
     return res.status(200).json({ success: true, data: results });
   } catch (error) {
     console.error('Error saat mengambil data obat:', error);
@@ -388,7 +390,7 @@ exports.getProfilDokter = async (req, res) => {
       WHERE u.id = ? AND u.role = 'dokter'
     `;
 
-    const [results] = await db.query(query, [dokter_id]);
+    const [results] = await db.query(query, [dokterId]);
 
     if (results.length === 0) {
       return res.status(404).json({ message: 'Profil dokter tidak ditemukan.' });
@@ -455,7 +457,7 @@ exports.getLogKunjungan = async (req, res) => {
         u.nama_lengkap AS nama_pasien,
         rm.keluhan,
         rm.diagnosis,
-        p.tipe_kunjungan -- Jika ada kolom tipe (Tatap Muka/Daring) di tabel pendaftaran
+        p.jenis_kunjungan -- Jika ada kolom tipe (Tatap Muka/Daring) di tabel pendaftaran
       FROM rekam_medis rm
       JOIN pendaftaran p ON rm.pendaftaran_id = p.id
       JOIN users u ON rm.pasien_id = u.id
@@ -463,7 +465,7 @@ exports.getLogKunjungan = async (req, res) => {
       ORDER BY rm.created_at DESC
       LIMIT 50
     `;
-    const [logs] = await db.query(query, [dokter_id]);
+    const [logs] = await db.query(query, [dokterId]);
 
     return res.status(200).json({
       success: true,
@@ -485,14 +487,14 @@ exports.getMonitoringSummary = async (req, res) => {
     // 1. Hitung Total Pasien Unik yang pernah ditangani dokter ini
     const [pasienCount] = await db.query(
       `SELECT COUNT(DISTINCT pasien_id) as total FROM rekam_medis WHERE dokter_id = ?`,
-      [dokter_id]
+      [dokterId]
     );
 
     // 2. Hitung Total Konsultasi Selesai bulan ini
     const [konsultasiBulanIni] = await db.query(
       `SELECT COUNT(id) as total FROM rekam_medis 
        WHERE dokter_id = ? AND MONTH(created_at) = MONTH(CURDATE()) AND YEAR(created_at) = YEAR(CURDATE())`,
-      [dokter_id]
+      [dokterId]
     );
 
     // 3. Hitung Total Resep Obat yang pernah dibuat
@@ -500,7 +502,7 @@ exports.getMonitoringSummary = async (req, res) => {
       `SELECT COUNT(r.id) as total FROM resep r 
        JOIN rekam_medis rm ON r.rekam_medis_id = rm.id 
        WHERE rm.dokter_id = ?`,
-      [dokter_id]
+      [dokterId]
     );
 
     // 4. Ambil data Tren Konsultasi (6 Bulan Terakhir) untuk Grafik
@@ -512,7 +514,7 @@ exports.getMonitoringSummary = async (req, res) => {
        WHERE dokter_id = ? AND created_at >= DATE_SUB(CURDATE(), INTERVAL 6 MONTH)
        GROUP BY YEAR(created_at), MONTH(created_at), DATE_FORMAT(created_at, '%b %Y')
        ORDER BY YEAR(created_at) ASC, MONTH(created_at) ASC`,
-      [dokter_id]
+      [dokterId]
     );
 
     // 5. Demografi Pasien (Ringkasan Pasien berdasarkan Jenis Kelamin)
@@ -522,8 +524,17 @@ exports.getMonitoringSummary = async (req, res) => {
        JOIN profil_pasien pp ON rm.pasien_id = pp.user_id
        WHERE rm.dokter_id = ?
        GROUP BY pp.jenis_kelamin`,
-      [dokter_id]
+      [dokterId]
     );
+    console.log("STATISTICS DATA =", {
+  totalKonsultasi,
+  tatapMuka,
+  daring,
+  rataPerHari,
+  tren,
+  jenisKonsultasi,
+  keluhanTerbanyak
+});
 
     return res.status(200).json({
       success: true,
@@ -540,5 +551,114 @@ exports.getMonitoringSummary = async (req, res) => {
   } catch (error) {
     console.error('Error getMonitoringSummary:', error);
     return res.status(500).json({ message: 'Terjadi kesalahan server.' });
+  }
+};
+
+exports.getStatistics = async (req, res) => {
+  console.log("USER LOGIN =", req.user);
+
+  try {
+    const dokterId = req.user.id;
+
+    console.log("DOKTER ID =", dokterId);
+
+    const [tren] = await db.query(`
+  SELECT
+    DATE(created_at) tanggal,
+    COUNT(*) total
+  FROM rekam_medis
+  WHERE dokter_id = ?
+  GROUP BY DATE(created_at)
+  ORDER BY tanggal
+`, [dokterId]);
+
+    // TOTAL KONSULTASI
+    const [total] = await db.query(`
+      SELECT COUNT(*) AS total
+      FROM rekam_medis
+      WHERE dokter_id = ?
+    `, [dokterId]);
+
+    // TATAP MUKA
+    const [tatapMuka] = await db.query(`
+      SELECT COUNT(*) AS total
+      FROM rekam_medis rm
+      JOIN pendaftaran p
+        ON rm.pendaftaran_id = p.id
+      WHERE rm.dokter_id = ?
+      AND p.jenis_kunjungan = 'tatap_muka'
+    `, [dokterId]);
+
+    // DARING
+    const [daring] = await db.query(`
+      SELECT COUNT(*) AS total
+      FROM rekam_medis rm
+      JOIN pendaftaran p
+        ON rm.pendaftaran_id = p.id
+      WHERE rm.dokter_id = ?
+      AND p.jenis_kunjungan = 'daring'
+    `, [dokterId]);
+
+    // TREN KONSULTASI
+    const [tren] = await db.query(`
+      SELECT
+        DATE(created_at) AS tanggal,
+        COUNT(*) AS total
+      FROM rekam_medis
+      WHERE dokter_id = ?
+      GROUP BY DATE(created_at)
+      ORDER BY tanggal ASC
+    `, [dokterId]);
+
+    // JENIS KONSULTASI
+    const [jenisKonsultasi] = await db.query(`
+      SELECT
+        p.jenis_kunjungan,
+        COUNT(*) AS total
+      FROM rekam_medis rm
+      JOIN pendaftaran p
+        ON rm.pendaftaran_id = p.id
+      WHERE rm.dokter_id = ?
+      GROUP BY p.jenis_kunjungan
+    `, [dokterId]);
+
+    // KELUHAN TERBANYAK
+    const [keluhan] = await db.query(`
+      SELECT
+        keluhan,
+        COUNT(*) AS total
+      FROM rekam_medis
+      WHERE dokter_id = ?
+      AND keluhan IS NOT NULL
+      AND keluhan <> ''
+      GROUP BY keluhan
+      ORDER BY total DESC
+      LIMIT 5
+    `, [dokterId]);
+
+    return res.json({
+  success: true,
+  data: {
+    cards: {
+      totalKonsultasi: total[0].total,
+      tatapMuka: tatapMuka[0].total,
+      daring: daring[0].total,
+      rataPerHari: (
+        total[0].total / 30
+      ).toFixed(1)
+    },
+    tren,
+    keluhanTerbanyak: keluhan
+  }
+});
+
+  } catch (err) {
+    console.error("GET STATISTICS ERROR:", err);
+
+    return res.status(500).json({
+      success: false,
+      message: "Server Error",
+      error: err.message,
+    });
   }
 };
