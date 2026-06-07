@@ -151,51 +151,133 @@ exports.getProfilePasien = async (req, res) => {
 // ======================================================
 // UPDATE PROFILE PASIEN
 // ======================================================
-exports.updateProfilePasien =
-  async (req, res) => {
-    try {
-      const userId =
-        req.user.id;
+exports.updateProfilePasien = async (req, res) => {
+  try {
+    const userId = req.user.id;
 
-      const {
+    const {
+      nama_lengkap,
+      nomor_hp,
+
+      nik,
+      tanggal_lahir,
+      jenis_kelamin,
+
+      golongan_darah,
+      alamat,
+
+      nomor_bpjs,
+      faskes_bpjs,
+      kelas_bpjs,
+
+      tinggi_badan,
+      berat_badan,
+      tekanan_darah,
+
+      riwayat_alergi,
+      riwayat_penyakit,
+      obat_rutin,
+    } = req.body;
+    if (
+      nik &&
+      (nik.length !== 16 || isNaN(nik))
+    ) {
+      return res.status(400).json({
+        success: false,
+        message:
+          "NIK harus terdiri dari 16 digit angka",
+      });
+    }
+    if (
+      !nama_lengkap ||
+      !nama_lengkap.trim()
+    ) {
+      return res.status(400).json({
+        success: false,
+        message:
+          "Nama lengkap wajib diisi",
+      });
+    }
+    if (
+      nomor_hp &&
+      !/^08\d{8,13}$/.test(nomor_hp)
+    ) {
+      return res.status(400).json({
+        success: false,
+        message: "Format nomor HP tidak valid",
+      });
+    }
+    await db.query(
+      `
+      UPDATE users
+      SET
+        nama_lengkap = ?,
+        nomor_hp = ?
+      WHERE id = ?
+      `,
+      [
         nama_lengkap,
         nomor_hp,
+        userId,
+      ]
+    );
+    const [existingProfile] = await db.query(
+      `
+      SELECT user_id
+      FROM profil_pasien
+      WHERE user_id = ?
+      `,
+      [userId]
+    );
 
-        nik,
-        tanggal_lahir,
-        jenis_kelamin,
-
-        golongan_darah,
-        alamat,
-
-        nomor_bpjs,
-        faskes_bpjs,
-        kelas_bpjs,
-
-        tinggi_badan,
-        berat_badan,
-        tekanan_darah,
-
-        riwayat_alergi,
-        riwayat_penyakit,
-        obat_rutin,
-      } = req.body;
-
+    if (existingProfile.length === 0) {
       await db.query(
         `
-        UPDATE users
-        SET
-          nama_lengkap = ?,
-          nomor_hp = ?
-        WHERE id = ?
-      `,
+        INSERT INTO profil_pasien (
+          user_id,
+          nik,
+          tanggal_lahir,
+          jenis_kelamin,
+          golongan_darah,
+          alamat,
+          nomor_bpjs,
+          faskes_bpjs,
+          kelas_bpjs,
+          tinggi_badan,
+          berat_badan,
+          tekanan_darah,
+          riwayat_alergi,
+          riwayat_penyakit,
+          obat_rutin
+        )
+        VALUES (
+          ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
+        )
+        `,
         [
-          nama_lengkap,
-          nomor_hp,
           userId,
+
+          nik || null,
+          tanggal_lahir || null,
+          jenis_kelamin || null,
+
+          golongan_darah || null,
+          alamat || null,
+
+          nomor_bpjs || null,
+          faskes_bpjs || null,
+          kelas_bpjs || null,
+
+          tinggi_badan || null,
+          berat_badan || null,
+          tekanan_darah || null,
+
+          riwayat_alergi || null,
+          riwayat_penyakit || null,
+          obat_rutin || null,
         ]
       );
-
+    } else {
       await db.query(
         `
         UPDATE profil_pasien
@@ -203,24 +285,19 @@ exports.updateProfilePasien =
           nik = ?,
           tanggal_lahir = ?,
           jenis_kelamin = ?,
-
           golongan_darah = ?,
           alamat = ?,
-
           nomor_bpjs = ?,
           faskes_bpjs = ?,
           kelas_bpjs = ?,
-
           tinggi_badan = ?,
           berat_badan = ?,
           tekanan_darah = ?,
-
           riwayat_alergi = ?,
           riwayat_penyakit = ?,
           obat_rutin = ?
-
         WHERE user_id = ?
-      `,
+        `,
         [
           nik,
           tanggal_lahir,
@@ -244,20 +321,25 @@ exports.updateProfilePasien =
           userId,
         ]
       );
-
-      return res.status(200).json({
-        success: true,
-        message:
-          "Profil berhasil diperbarui",
-      });
-    } catch (error) {
-      console.error(error);
-
-      return res.status(500).json({
-        success: false,
-      });
     }
-  };
+    return res.status(200).json({
+      success: true,
+      message: "Profil berhasil diperbarui",
+    });
+  } catch (error) {
+    console.error(
+      "Update Profile Error:",
+      error
+    );
+
+    return res.status(500).json({
+      success: false,
+      message: "Gagal memperbarui profil",
+    });
+  }
+};
+
+
 
 // ======================================================
 // PENDAFTARAN BEROBAT
@@ -292,7 +374,7 @@ exports.buatPendaftaran = async (req, res) => {
       SELECT *
       FROM jadwal_slots
       WHERE id = ?
-      AND status = 'buka'
+        AND status = 'buka'
       `,
       [slot_id]
     );
@@ -302,6 +384,17 @@ exports.buatPendaftaran = async (req, res) => {
         success: false,
         message:
           "Slot jadwal tidak ditemukan",
+      });
+    }
+
+    if (
+      slot[0].dokter_id !==
+      Number(dokter_id)
+    ) {
+      return res.status(400).json({
+        success: false,
+        message:
+          "Slot tidak sesuai dengan dokter yang dipilih",
       });
     }
 

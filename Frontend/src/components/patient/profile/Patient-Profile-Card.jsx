@@ -12,8 +12,7 @@ import { formatDateOnly } from "@/utils/patient/format-date-only";
 const PatientProfileCard = ({ profile }) => {
   const navigate = useNavigate();
   const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
+    localStorage.clear();
 
     // optional: reset state kalau nanti pakai context
     navigate("/");
@@ -172,6 +171,60 @@ const PatientProfileCard = ({ profile }) => {
 
         </div>
       )}
+
+      <div className="mt-6 border-t border-[#F1ECE4] pt-6">
+        <h3 className="font-semibold text-prima-text">
+          Informasi Kesehatan
+        </h3>
+
+        <div className="mt-4 grid grid-cols-2 gap-4">
+
+          <div>
+            <p className="text-xs text-prima-secondary">
+              Golongan Darah
+            </p>
+
+            <p className="font-medium text-prima-text">
+              {profile?.golongan_darah || "-"}
+            </p>
+          </div>
+
+          <div>
+            <p className="text-xs text-prima-secondary">
+              Tinggi Badan
+            </p>
+
+            <p className="font-medium text-prima-text">
+              {profile?.tinggi_badan
+                ? `${profile.tinggi_badan} cm`
+                : "-"}
+            </p>
+          </div>
+
+          <div>
+            <p className="text-xs text-prima-secondary">
+              Berat Badan
+            </p>
+
+            <p className="font-medium text-prima-text">
+              {profile?.berat_badan
+                ? `${profile.berat_badan} kg`
+                : "-"}
+            </p>
+          </div>
+
+          <div>
+            <p className="text-xs text-prima-secondary">
+              Nomor BPJS
+            </p>
+
+            <p className="font-medium text-prima-text">
+              {profile?.nomor_bpjs || "-"}
+            </p>
+          </div>
+
+        </div>
+      </div>
 
       {/* Tombol Edit */}
       <button

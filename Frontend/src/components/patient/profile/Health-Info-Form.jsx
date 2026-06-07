@@ -1,19 +1,37 @@
 import { useEffect, useState } from "react";
-import { updateProfile } from "@/services/patient/profile-service";
 import { useNavigate } from "react-router-dom";
+
+import { updateProfile } from "@/services/patient/profile-service";
 
 const HealthInfoForm = ({
   profile,
   setProfile,
 }) => {
   const navigate = useNavigate();
+
   const [formData, setFormData] =
     useState({
       nama_lengkap: "",
       nomor_hp: "",
+
       nik: "",
       tanggal_lahir: "",
       jenis_kelamin: "",
+
+      golongan_darah: "",
+      alamat: "",
+
+      nomor_bpjs: "",
+      faskes_bpjs: "",
+      kelas_bpjs: "",
+
+      tinggi_badan: "",
+      berat_badan: "",
+      tekanan_darah: "",
+
+      riwayat_alergi: "",
+      riwayat_penyakit: "",
+      obat_rutin: "",
     });
 
   const [isSaving, setIsSaving] =
@@ -29,7 +47,8 @@ const HealthInfoForm = ({
       nomor_hp:
         profile.nomor_hp || "",
 
-      nik: profile.nik || "",
+      nik:
+        profile.nik || "",
 
       tanggal_lahir:
         profile.tanggal_lahir?.substring(
@@ -39,6 +58,39 @@ const HealthInfoForm = ({
 
       jenis_kelamin:
         profile.jenis_kelamin || "",
+
+      golongan_darah:
+        profile.golongan_darah || "",
+
+      alamat:
+        profile.alamat || "",
+
+      nomor_bpjs:
+        profile.nomor_bpjs || "",
+
+      faskes_bpjs:
+        profile.faskes_bpjs || "",
+
+      kelas_bpjs:
+        profile.kelas_bpjs || "",
+
+      tinggi_badan:
+        profile.tinggi_badan || "",
+
+      berat_badan:
+        profile.berat_badan || "",
+
+      tekanan_darah:
+        profile.tekanan_darah || "",
+
+      riwayat_alergi:
+        profile.riwayat_alergi || "",
+
+      riwayat_penyakit:
+        profile.riwayat_penyakit || "",
+
+      obat_rutin:
+        profile.obat_rutin || "",
     });
   }, [profile]);
 
@@ -74,6 +126,36 @@ const HealthInfoForm = ({
     }
 
     if (
+      formData.nomor_bpjs &&
+      formData.nomor_bpjs.length < 10
+    ) {
+      alert(
+        "Nomor BPJS tidak valid"
+      );
+      return;
+    }
+
+    if (
+      formData.tinggi_badan &&
+      Number(formData.tinggi_badan) <= 0
+    ) {
+      alert(
+        "Tinggi badan tidak valid"
+      );
+      return;
+    }
+
+    if (
+      formData.berat_badan &&
+      Number(formData.berat_badan) <= 0
+    ) {
+      alert(
+        "Berat badan tidak valid"
+      );
+      return;
+    }
+
+    if (
       formData.nomor_hp &&
       !/^08\d{8,13}$/.test(
         formData.nomor_hp
@@ -90,15 +172,7 @@ const HealthInfoForm = ({
 
       const response =
         await updateProfile({
-          nama_lengkap:
-            formData.nama_lengkap,
-          nomor_hp:
-            formData.nomor_hp,
-          nik: formData.nik,
-          tanggal_lahir:
-            formData.tanggal_lahir,
-          jenis_kelamin:
-            formData.jenis_kelamin,
+          ...formData,
         });
 
       setProfile((prev) => ({
@@ -110,7 +184,10 @@ const HealthInfoForm = ({
         response.message ||
           "Profil berhasil diperbarui"
       );
-      navigate("/patient/profile");
+
+      navigate(
+        "/patient/profile"
+      );
     } catch (error) {
       console.error(
         "Update profile error:",
@@ -128,7 +205,7 @@ const HealthInfoForm = ({
   };
 
   return (
-    <div className="rounded-[28px] bg-prima-card p-8 border border-[#F1ECE4] shadow-sm">
+    <div className="rounded-[28px] border border-[#F1ECE4] bg-prima-card p-8 shadow-sm">
       <h2 className="mb-6 text-2xl font-bold text-prima-text">
         Edit Informasi Profil
       </h2>
@@ -152,8 +229,7 @@ const HealthInfoForm = ({
                 e.target.value
               )
             }
-            placeholder="Masukkan nama lengkap"
-            className="w-full rounded-xl border border-gray-200 p-3 focus:border-prima-green focus:outline-none"
+            className="w-full rounded-xl border border-gray-200 p-3"
           />
         </div>
 
@@ -195,8 +271,7 @@ const HealthInfoForm = ({
                 e.target.value
               )
             }
-            placeholder="16 digit NIK"
-            className="w-full rounded-xl border border-gray-200 p-3 focus:border-prima-green focus:outline-none"
+            className="w-full rounded-xl border border-gray-200 p-3"
           />
         </div>
 
@@ -217,7 +292,7 @@ const HealthInfoForm = ({
                 e.target.value
               )
             }
-            className="w-full rounded-xl border border-gray-200 p-3 focus:border-prima-green focus:outline-none"
+            className="w-full rounded-xl border border-gray-200 p-3"
           />
         </div>
 
@@ -237,7 +312,7 @@ const HealthInfoForm = ({
                 e.target.value
               )
             }
-            className="w-full rounded-xl border border-gray-200 p-3 focus:border-prima-green focus:outline-none"
+            className="w-full rounded-xl border border-gray-200 p-3"
           >
             <option value="">
               Pilih Jenis Kelamin
@@ -252,6 +327,293 @@ const HealthInfoForm = ({
             </option>
           </select>
         </div>
+
+        {/* Golongan Darah */}
+        <div>
+          <label className="mb-2 block text-sm font-medium text-prima-text">
+            Golongan Darah
+          </label>
+
+          <select
+            value={
+              formData.golongan_darah
+            }
+            onChange={(e) =>
+              handleChange(
+                "golongan_darah",
+                e.target.value
+              )
+            }
+            className="w-full rounded-xl border border-gray-200 p-3"
+          >
+            <option value="">
+              Pilih
+            </option>
+
+            <option value="A">
+              A
+            </option>
+
+            <option value="A-">
+              A-
+            </option>
+
+            <option value="B">
+              B
+            </option>
+
+            <option value="B-">
+              B-
+            </option>
+
+            <option value="AB">
+              AB
+            </option>
+            
+            <option value="AB-">
+              AB-
+            </option>
+
+            <option value="O">
+              O
+            </option>
+
+            <option value="O-">
+              O-
+            </option>
+          </select>
+        </div>
+
+        {/* Tinggi Badan */}
+        <div>
+          <label className="mb-2 block text-sm font-medium text-prima-text">
+            Tinggi Badan (cm)
+          </label>
+
+          <input
+            type="number"
+            value={
+              formData.tinggi_badan
+            }
+            onChange={(e) =>
+              handleChange(
+                "tinggi_badan",
+                e.target.value
+              )
+            }
+            className="w-full rounded-xl border border-gray-200 p-3"
+          />
+        </div>
+
+        {/* Berat Badan */}
+        <div>
+          <label className="mb-2 block text-sm font-medium text-prima-text">
+            Berat Badan (kg)
+          </label>
+
+          <input
+            type="number"
+            value={
+              formData.berat_badan
+            }
+            onChange={(e) =>
+              handleChange(
+                "berat_badan",
+                e.target.value
+              )
+            }
+            className="w-full rounded-xl border border-gray-200 p-3"
+          />
+        </div>
+
+        {/* Tekanan Darah */}
+        <div>
+          <label className="mb-2 block text-sm font-medium text-prima-text">
+            Tekanan Darah
+          </label>
+
+          <input
+            type="text"
+            placeholder="120/80"
+            value={
+              formData.tekanan_darah
+            }
+            onChange={(e) =>
+              handleChange(
+                "tekanan_darah",
+                e.target.value
+              )
+            }
+            className="w-full rounded-xl border border-gray-200 p-3"
+          />
+        </div>
+
+        {/* Alamat */}
+        <div className="md:col-span-2">
+          <label className="mb-2 block text-sm font-medium text-prima-text">
+            Alamat
+          </label>
+
+          <textarea
+            rows={3}
+            value={formData.alamat}
+            onChange={(e) =>
+              handleChange(
+                "alamat",
+                e.target.value
+              )
+            }
+            className="w-full rounded-xl border border-gray-200 p-3"
+          />
+        </div>
+
+        <div className="md:col-span-2 mt-4">
+          <h3 className="text-lg font-semibold text-prima-text">
+            Informasi BPJS
+          </h3>
+        </div>
+
+        {/* Nomor BPJS */}
+        <div>
+          <label className="mb-2 block text-sm font-medium text-prima-text">
+            Nomor BPJS
+          </label>
+
+          <input
+            type="text"
+            value={formData.nomor_bpjs}
+            onChange={(e) =>
+              handleChange(
+                "nomor_bpjs",
+                e.target.value
+              )
+            }
+            placeholder="Masukkan nomor BPJS"
+            className="w-full rounded-xl border border-gray-200 p-3 focus:border-prima-green focus:outline-none"
+          />
+        </div>
+
+        {/* Faskes BPJS */}
+        <div>
+          <label className="mb-2 block text-sm font-medium text-prima-text">
+            Faskes BPJS
+          </label>
+
+          <input
+            type="text"
+            value={formData.faskes_bpjs}
+            onChange={(e) =>
+              handleChange(
+                "faskes_bpjs",
+                e.target.value
+              )
+            }
+            className="w-full rounded-xl border border-gray-200 p-3"
+          />
+        </div>
+
+        {/* Kelas BPJS */}
+        <div>
+          <label className="mb-2 block text-sm font-medium text-prima-text">
+            Kelas BPJS
+          </label>
+
+          <select
+            value={formData.kelas_bpjs}
+            onChange={(e) =>
+              handleChange(
+                "kelas_bpjs",
+                e.target.value
+              )
+            }
+            className="w-full rounded-xl border border-gray-200 p-3"
+          >
+            <option value="">
+              Pilih Kelas
+            </option>
+
+            <option value="1">
+              Kelas 1
+            </option>
+
+            <option value="2">
+              Kelas 2
+            </option>
+
+            <option value="3">
+              Kelas 3
+            </option>
+          </select>
+        </div>
+
+        <div className="md:col-span-2 mt-4">
+          <h3 className="text-lg font-semibold text-prima-text">
+            Riwayat Kesehatan
+          </h3>
+        </div>
+        {/* Riwayat Penyakit */}
+        <div className="md:col-span-2">
+          <label className="mb-2 block text-sm font-medium text-prima-text">
+            Riwayat Penyakit
+          </label>
+
+          <textarea
+            rows={3}
+            value={
+              formData.riwayat_penyakit
+            }
+            onChange={(e) =>
+              handleChange(
+                "riwayat_penyakit",
+                e.target.value
+              )
+            }
+            className="w-full rounded-xl border border-gray-200 p-3"
+          />
+        </div>
+
+        {/* Riwayat Alergi */}
+        <div className="md:col-span-2">
+          <label className="mb-2 block text-sm font-medium text-prima-text">
+            Riwayat Alergi
+          </label>
+
+          <textarea
+            rows={3}
+            value={
+              formData.riwayat_alergi
+            }
+            onChange={(e) =>
+              handleChange(
+                "riwayat_alergi",
+                e.target.value
+              )
+            }
+            className="w-full rounded-xl border border-gray-200 p-3"
+          />
+        </div>
+
+        {/* Obat Rutin */}
+        <div className="md:col-span-2">
+          <label className="mb-2 block text-sm font-medium text-prima-text">
+            Obat Rutin
+          </label>
+
+          <textarea
+            rows={3}
+            value={
+              formData.obat_rutin
+            }
+            onChange={(e) =>
+              handleChange(
+                "obat_rutin",
+                e.target.value
+              )
+            }
+            className="w-full rounded-xl border border-gray-200 p-3"
+          />
+        </div>
+
       </div>
 
       <button

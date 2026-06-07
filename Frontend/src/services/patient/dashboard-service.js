@@ -2,10 +2,19 @@ import api from "../api";
 
 export const getDashboard =
   async () => {
-    const response =
-      await api.get(
-        "/pasien/dashboard"
+    try {
+      const { data } =
+        await api.get(
+          "/pasien/dashboard"
+        );
+
+      return data.data;
+    } catch (error) {
+      console.error(
+        "Gagal mengambil dashboard",
+        error
       );
 
-    return response.data.data;
+      throw error;
+    }
   };

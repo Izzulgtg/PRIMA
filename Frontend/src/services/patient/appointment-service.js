@@ -2,41 +2,73 @@ import api from "../api";
 
 export const createAppointment =
   async (payload) => {
-    const response =
-      await api.post(
-        "/pasien/daftar",
-        payload
-      );
+    try {
+      const { data } =
+        await api.post(
+          "/pasien/daftar",
+          payload
+        );
 
-    return response.data;
+      return data;
+    } catch (error) {
+      console.error(
+        "Gagal membuat appointment",
+        error
+      );
+      throw error;
+    }
   };
 
 export const getAppointments =
   async () => {
-    const response =
-      await api.get(
-        "/pasien/pendaftaran"
-      );
+    try {
+      const { data } =
+        await api.get(
+          "/pasien/pendaftaran"
+        );
 
-    return response.data.data;
+      return data.data;
+    } catch (error) {
+      console.error(
+        "Gagal mengambil appointment",
+        error
+      );
+      throw error;
+    }
   };
 
 export const getUpcomingAppointment =
   async () => {
-    const response =
-      await api.get(
-        "/pasien/pendaftaran/upcoming"
-      );
+    try {
+      const { data } =
+        await api.get(
+          "/pasien/pendaftaran/upcoming"
+        );
 
-    return response.data.data;
+      return data.data;
+    } catch (error) {
+      console.error(
+        "Gagal mengambil upcoming appointment",
+        error
+      );
+      throw error;
+    }
   };
 
 export const cancelAppointment =
   async (id) => {
-    const response =
-      await api.put(
-        `/pasien/pendaftaran/${id}/cancel`
-      );
+    try {
+      const { data } =
+        await api.put(
+          `/pasien/pendaftaran/${id}/cancel`
+        );
 
-    return response.data;
+      return data;
+    } catch (error) {
+      console.error(
+        "Gagal membatalkan appointment",
+        error
+      );
+      throw error;
+    }
   };
