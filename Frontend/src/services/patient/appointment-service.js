@@ -1,48 +1,42 @@
 import api from "../api";
 
-/**
- * Membuat appointment baru
- */
-export const createAppointment = async (payload) => {
-  const response = await api.post(
-    "/pasien/daftar",
-    payload
-  );
+export const createAppointment =
+  async (payload) => {
+    const response =
+      await api.post(
+        "/pasien/daftar",
+        payload
+      );
 
-  return response.data;
-};
+    return response.data;
+  };
 
-/**
- * Mengambil semua appointment pasien
- */
-export const getAppointments = async () => {
-  const response = await api.get(
-    "/pasien/appointments"
-  );
+export const getAppointments =
+  async () => {
+    const response =
+      await api.get(
+        "/pasien/pendaftaran"
+      );
 
-  return response.data.data;
-};
+    return response.data.data;
+  };
 
-/**
- * Mengambil appointment terdekat
- */
-export const getUpcomingAppointment = async () => {
-  const response = await api.get(
-    "/pasien/appointments/upcoming"
-  );
+export const getUpcomingAppointment =
+  async () => {
+    const response =
+      await api.get(
+        "/pasien/pendaftaran/upcoming"
+      );
 
-  return response.data.data;
-};
+    return response.data.data;
+  };
 
-/**
- * Membatalkan appointment
- */
-export const cancelAppointment = async (
-  appointmentId
-) => {
-  const response = await api.delete(
-    `/pasien/appointments/${appointmentId}`
-  );
+export const cancelAppointment =
+  async (id) => {
+    const response =
+      await api.put(
+        `/pasien/pendaftaran/${id}/cancel`
+      );
 
-  return response.data;
-};
+    return response.data;
+  };

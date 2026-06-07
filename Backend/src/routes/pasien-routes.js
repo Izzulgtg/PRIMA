@@ -6,34 +6,32 @@ const pasienController = require("../controllers/pasien-controller");
 const verifyToken = require("../middlewares/auth-middleware");
 const requireRole = require("../middlewares/role-middleware");
 
-router.use(
-  verifyToken,
-  requireRole("pasien")
-);
+// Semua endpoint pasien wajib login
+router.use(verifyToken,requireRole("pasien"));
 
-router.get(
-  "/dashboard",
-  pasienController.getDashboard
-);
+// Dashboard
+router.get("/dashboard",pasienController.getDashboard);
 
-router.get(
-  "/profile",
-  pasienController.getProfilePasien
-);
+// Profile
+router.get("/profile",pasienController.getProfilePasien);
 
-router.post(
-  "/daftar",
-  pasienController.buatPendaftaran
-);
+router.put("/profile",pasienController.updateProfilePasien);
 
-router.get(
-  "/pendaftaran",
-  pasienController.getPendaftaranSaya
-);
+// Appointment
+router.post("/daftar",pasienController.buatPendaftaran);
 
-router.get(
-  "/riwayat",
-  pasienController.getRiwayatMedisPasien
-);
+router.get("/pendaftaran",pasienController.getPendaftaranSaya);
+
+router.get("/pendaftaran/upcoming",pasienController.getUpcomingAppointment);
+
+router.put("/pendaftaran/:id/cancel",pasienController.cancelAppointment);
+
+// Rekam Medis
+router.get("/riwayat",pasienController.getRiwayatMedisPasien);
+
+// Dokter & Jadwal
+router.get("/dokter",pasienController.getDokterList);
+
+router.get("/dokter/:id/slots",pasienController.getDokterSlots);
 
 module.exports = router;

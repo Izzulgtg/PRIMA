@@ -48,7 +48,13 @@ exports.getDashboard =
           ON p.dokter_id = u.id
 
         WHERE p.pasien_id = ?
-          AND js.tanggal >= CURDATE()
+          AND (
+            js.tanggal > CURDATE()
+            OR (
+              js.tanggal = CURDATE()
+              AND js.jam_mulai >= CURTIME()
+            )
+          )
 
         ORDER BY js.tanggal ASC
         LIMIT 1
@@ -142,6 +148,116 @@ exports.getProfilePasien = async (req, res) => {
     });
   }
 };
+// ======================================================
+// UPDATE PROFILE PASIEN
+// ======================================================
+exports.updateProfilePasien =
+  async (req, res) => {
+    try {
+      const userId =
+        req.user.id;
+
+      const {
+        nama_lengkap,
+        nomor_hp,
+
+        nik,
+        tanggal_lahir,
+        jenis_kelamin,
+
+        golongan_darah,
+        alamat,
+
+        nomor_bpjs,
+        faskes_bpjs,
+        kelas_bpjs,
+
+        tinggi_badan,
+        berat_badan,
+        tekanan_darah,
+
+        riwayat_alergi,
+        riwayat_penyakit,
+        obat_rutin,
+      } = req.body;
+
+      await db.query(
+        `
+        UPDATE users
+        SET
+          nama_lengkap = ?,
+          nomor_hp = ?
+        WHERE id = ?
+      `,
+        [
+          nama_lengkap,
+          nomor_hp,
+          userId,
+        ]
+      );
+
+      await db.query(
+        `
+        UPDATE profil_pasien
+        SET
+          nik = ?,
+          tanggal_lahir = ?,
+          jenis_kelamin = ?,
+
+          golongan_darah = ?,
+          alamat = ?,
+
+          nomor_bpjs = ?,
+          faskes_bpjs = ?,
+          kelas_bpjs = ?,
+
+          tinggi_badan = ?,
+          berat_badan = ?,
+          tekanan_darah = ?,
+
+          riwayat_alergi = ?,
+          riwayat_penyakit = ?,
+          obat_rutin = ?
+
+        WHERE user_id = ?
+      `,
+        [
+          nik,
+          tanggal_lahir,
+          jenis_kelamin,
+
+          golongan_darah,
+          alamat,
+
+          nomor_bpjs,
+          faskes_bpjs,
+          kelas_bpjs,
+
+          tinggi_badan,
+          berat_badan,
+          tekanan_darah,
+
+          riwayat_alergi,
+          riwayat_penyakit,
+          obat_rutin,
+
+          userId,
+        ]
+      );
+
+      return res.status(200).json({
+        success: true,
+        message:
+          "Profil berhasil diperbarui",
+      });
+    } catch (error) {
+      console.error(error);
+
+      return res.status(500).json({
+        success: false,
+      });
+    }
+  };
 
 // ======================================================
 // PENDAFTARAN BEROBAT
@@ -189,14 +305,27 @@ exports.buatPendaftaran = async (req, res) => {
       });
     }
 
-    const [queue] = await db.query(
-      `
-      SELECT COUNT(*) total
-      FROM pendaftaran
-      WHERE slot_id = ?
+    const [queue] =
+      await db.query(
+        `
+        SELECT COUNT(*) total
+        FROM pendaftaran
+        WHERE slot_id = ?
+          AND status != 'Dibatalkan'
       `,
-      [slot_id]
-    );
+        [slot_id]
+      );
+
+    if (
+      queue[0].total >=
+      slot[0].kuota
+    ) {
+      return res.status(400).json({
+        success: false,
+        message:
+          "Kuota slot sudah penuh",
+      });
+    }
 
     const nomorAntrean =
       `A-${queue[0].total + 1}`;
@@ -408,6 +537,214 @@ exports.getRiwayatMedisPasien =
         success: false,
         message:
           "Gagal mengambil riwayat medis",
+      });
+    }
+  };
+
+// ======================================================
+// MENDAPATKAN APPOINTMENT YANG AKAN DATANG
+// ======================================================
+exports.getUpcomingAppointment =
+  async (req, res) => {
+    try {
+      const pasienId =
+        req.user.id;
+
+      const query = `
+        SELECT
+          p.id,
+          p.nomor_antrian,
+          p.status,
+          p.jenis_kunjungan,
+
+          js.tanggal,
+          js.jam_mulai,
+          js.jam_selesai,
+
+          u.nama_lengkap
+            AS nama_dokter
+
+        FROM pendaftaran p
+
+        JOIN jadwal_slots js
+          ON p.slot_id = js.id
+
+        JOIN users u
+          ON p.dokter_id = u.id
+
+        WHERE p.pasien_id = ?
+          AND (
+            js.tanggal > CURDATE()
+            OR (
+              js.tanggal = CURDATE()
+              AND js.jam_mulai >= CURTIME()
+            )
+          )
+          AND p.status NOT IN
+          ('Selesai','Dibatalkan')
+
+        ORDER BY
+          js.tanggal ASC,
+          js.jam_mulai ASC
+
+        LIMIT 1
+      `;
+
+      const [rows] =
+        await db.query(
+          query,
+          [pasienId]
+        );
+
+      return res.json({
+        success: true,
+        data: rows[0] || null,
+      });
+    } catch (error) {
+      console.error(error);
+
+      return res.status(500).json({
+        success: false,
+      });
+    }
+  };
+
+// ======================================================
+// MEMBATALKAN APPOINTMENT
+// ======================================================
+exports.cancelAppointment =
+  async (req, res) => {
+    try {
+      const { id } = req.params;
+
+      const pasienId =
+        req.user.id;
+
+      const [result] =
+        await db.query(
+          `
+          UPDATE pendaftaran
+          SET status =
+            'Dibatalkan'
+          WHERE id = ?
+            AND pasien_id = ?
+            AND status NOT IN
+            ('Selesai')
+        `,
+          [id, pasienId]
+        );
+
+      if (
+        result.affectedRows === 0
+      ) {
+        return res.status(404).json({
+          success: false,
+          message:
+            "Appointment tidak ditemukan",
+        });
+      }
+
+      return res.json({
+        success: true,
+        message:
+          "Appointment berhasil dibatalkan",
+      });
+    } catch (error) {
+      console.error(error);
+
+      return res.status(500).json({
+        success: false,
+      });
+    }
+  };
+
+// ======================================================
+// LIST DOKTER
+// ======================================================
+exports.getDokterList = async (
+  req,
+  res
+) => {
+  try {
+    const [rows] =
+      await db.query(`
+        SELECT
+          u.id,
+          u.nama_lengkap,
+          pd.spesialisasi
+
+        FROM users u
+
+        JOIN profil_dokter pd
+          ON u.id = pd.user_id
+
+        WHERE u.role = 'dokter'
+          AND u.is_active = 1
+          AND u.deleted_at IS NULL
+
+        ORDER BY
+          u.nama_lengkap ASC
+      `);
+
+    return res.status(200).json({
+      success: true,
+      data: rows,
+    });
+  } catch (error) {
+    console.error(error);
+
+    return res.status(500).json({
+      success: false,
+      message:
+        "Gagal mengambil data dokter",
+    });
+  }
+};
+
+// ======================================================
+// SLOTS DOKTER
+// ======================================================
+exports.getDokterSlots =
+  async (req, res) => {
+    try {
+      const dokterId =
+        req.params.id;
+
+      const [rows] =
+        await db.query(
+          `
+          SELECT
+            id,
+            tanggal,
+            jam_mulai,
+            jam_selesai,
+            kuota,
+            status
+
+          FROM jadwal_slots
+
+          WHERE dokter_id = ?
+            AND tanggal >= CURDATE()
+            AND status = 'buka'
+
+          ORDER BY
+            tanggal ASC,
+            jam_mulai ASC
+        `,
+          [dokterId]
+        );
+
+      return res.status(200).json({
+        success: true,
+        data: rows,
+      });
+    } catch (error) {
+      console.error(error);
+
+      return res.status(500).json({
+        success: false,
+        message:
+          "Gagal mengambil slot dokter",
       });
     }
   };
