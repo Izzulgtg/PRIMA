@@ -10,12 +10,15 @@ function MedicalHistoryFilter({
       }
       className="
         rounded-xl
-        border border-[#E7E1D8]
+        border
+        border-[#E7E1D8]
         bg-white
-        px-4 py-2
+        px-4
+        py-2
         text-sm
         text-prima-text
-        focus:outline-none
+        outline-none
+        focus:border-prima-green
       "
     >
       <option value="">
@@ -28,6 +31,10 @@ function MedicalHistoryFilter({
 
       <option value="menunggu">
         Menunggu
+      </option>
+
+      <option value="resep dikirim">
+        Resep Dikirim
       </option>
 
       <option value="dibatalkan">

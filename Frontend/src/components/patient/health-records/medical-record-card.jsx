@@ -1,5 +1,5 @@
-import PrescriptionStatusBadge from "./prescription-status-badge";
 import MedicineList from "./medicine-list";
+import PrescriptionStatusBadge from "./prescription-status-badge";
 
 function MedicalRecordCard({
   date,
@@ -46,9 +46,9 @@ function MedicalRecordCard({
             {doctor}
           </h4>
 
-          <span className="inline-flex mt-2 rounded-full bg-prima-sand px-3 py-1 text-xs font-medium text-prima-green">
+          <p className="inline-flex mt-2 px-3 py-1 rounded-full bg-prima-sand text-prima-green text-xs font-medium">
             {specialization}
-          </span>
+          </p>
 
         </div>
 
@@ -58,7 +58,7 @@ function MedicalRecordCard({
             Diagnosis
           </p>
 
-          <p className="mt-1 text-prima-text">
+          <p className="text-prima-text mt-1 leading-relaxed">
             {diagnosis}
           </p>
 
@@ -70,7 +70,7 @@ function MedicalRecordCard({
             Complaint
           </p>
 
-          <p className="mt-1 text-prima-text">
+          <p className="text-prima-text mt-1 leading-relaxed">
             {complaint}
           </p>
 
@@ -83,9 +83,9 @@ function MedicalRecordCard({
               Prescription Notes
             </p>
 
-            <div className="mt-2 rounded-2xl bg-prima-sand p-4">
+            <div className="mt-2 bg-prima-sand rounded-2xl p-4">
 
-              <p className="text-prima-text">
+              <p className="text-prima-text leading-relaxed">
                 {prescription}
               </p>
 

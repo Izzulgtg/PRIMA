@@ -1,5 +1,6 @@
 function MedicineList({
   medicines = [],
+  title = "Medicines",
 }) {
   if (!medicines.length) {
     return null;
@@ -7,28 +8,44 @@ function MedicineList({
 
   return (
     <div>
-
       <p className="text-sm text-prima-secondary">
-        Medicines
+        {title}
       </p>
 
       <div className="mt-3 space-y-2">
-
         {medicines.map(
           (medicine, index) => (
             <div
               key={`${medicine}-${index}`}
-              className="rounded-xl bg-prima-sand p-3"
+              className="
+                rounded-xl
+                bg-prima-sand
+                p-3
+              "
             >
-              <span className="text-sm text-prima-text">
-                {medicine}
-              </span>
+              <div className="flex items-center justify-between gap-4">
+                <span className="text-sm font-medium text-prima-text">
+                  {medicine}
+                </span>
+
+                <span
+                  className="
+                    rounded-full
+                    bg-white
+                    px-3
+                    py-1
+                    text-xs
+                    font-medium
+                    text-prima-green
+                  "
+                >
+                  Obat
+                </span>
+              </div>
             </div>
           )
         )}
-
       </div>
-
     </div>
   );
 }

@@ -11,7 +11,6 @@ import MedicalRecordCard from "@/components/patient/health-records/medical-recor
 import MedicationHistoryCard from "@/components/patient/health-records/medication-history-card";
 
 import { formatDate } from "@/utils/patient/format-date";
-import { dummyHealthRecords } from "@/data/dummy-health-records";
 import { getMedicalHistory } from "@/services/patient/health-record-service";
 import { getProfile } from "@/services/patient/profile-service";
 
@@ -25,19 +24,15 @@ function HealthRecordsPage() {
   useEffect(() => {
     const fetchRecords = async () => {
       try {
-        const profile = await getProfile();
-        
-        console.log("PROFILE =", profile);
-        console.log("PROFILE ID =", profile?.id);
-
         const data =
-          await getMedicalHistory(
-            profile.id
-          );
+          await getMedicalHistory();
 
         setRecords(data);
       } catch (error) {
-        console.error(error);
+        console.error(
+          "Gagal mengambil riwayat medis:",
+          error
+        );
       } finally {
         setLoading(false);
       }

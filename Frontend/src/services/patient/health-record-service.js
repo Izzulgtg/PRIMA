@@ -1,11 +1,6 @@
 import api from "../api";
 
-export const getMedicalHistory = async (
-  pasienId
-) => {
-  const response = await api.get(
-    `/pasien/riwayat/${pasienId}`
-  );
-
-  return response.data.data;
+export const getMedicalHistory = async () => {
+  const { data } = await api.get("/pasien/riwayat");
+  return data.data;
 };
