@@ -26,6 +26,9 @@ function HealthRecordsPage() {
     const fetchRecords = async () => {
       try {
         const profile = await getProfile();
+        
+        console.log("PROFILE =", profile);
+        console.log("PROFILE ID =", profile?.id);
 
         const data =
           await getMedicalHistory(

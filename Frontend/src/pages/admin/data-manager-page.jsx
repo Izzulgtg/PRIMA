@@ -6,6 +6,14 @@ import Button from "../../components/ui/button"
 import Table from "../../components/ui/table"
 
 function DataManagerPage() {
+  const [showRestoreModal, setShowRestoreModal] =
+  useState(false)
+
+const [selectedBackup, setSelectedBackup] =
+  useState(null)
+
+  const [autoBackup, setAutoBackup] =
+  useState(true)
 
   const [activeTab, setActiveTab] = useState("backup")
   const handleBackup = () => {
@@ -19,6 +27,24 @@ function DataManagerPage() {
   )
 
   alert("Backup berhasil dilakukan")
+}
+
+const handleRestore = (backupDate) => {
+
+  setSelectedBackup(backupDate)
+
+  setShowRestoreModal(true)
+
+}
+
+const confirmRestore = () => {
+
+  alert(
+    `Restore berhasil dari backup ${selectedBackup}`
+  )
+
+  setShowRestoreModal(false)
+
 }
   const handleValidation = () => {
 
@@ -180,6 +206,31 @@ function DataManagerPage() {
                 Pengaturan Backup
               </h2>
 
+              <div
+              className="
+                flex
+                items-center
+                justify-between
+                mt-6
+                mb-4
+              "
+            >
+
+              <span className="font-medium">
+                Backup Otomatis
+              </span>
+
+              <input
+                type="checkbox"
+                checked={autoBackup}
+                onChange={() =>
+                  setAutoBackup(!autoBackup)
+                }
+              />
+
+            </div>
+
+
               <div className="space-y-6 mt-8">
 
                 <div>
@@ -290,6 +341,10 @@ function DataManagerPage() {
                           Status
                         </th>
 
+                        <th className="text-left py-4 text-prima-muted">
+                          Aksi
+                        </th>
+
                       </tr>
 
                     </thead>
@@ -306,13 +361,48 @@ function DataManagerPage() {
                           245 MB
                         </td>
 
-                        <td className="py-5">
+                       <td className="py-5">
 
-                          <Badge variant="success">
-                            Berhasil
-                          </Badge>
+                        <Badge variant="success">
+                          Berhasil
+                        </Badge>
 
-                        </td>
+                      </td>
+
+                      <td className="py-5">
+
+                        <div className="flex gap-2">
+
+  <Button
+    variant="outline"
+    onClick={() =>
+      handleRestore("29 Apr 2025")
+    }
+  >
+    Restore
+  </Button>
+
+  <Button
+    variant="outline"
+    onClick={() =>
+      alert("Download backup")
+    }
+  >
+    Download
+  </Button>
+
+  <Button
+    variant="outline"
+    onClick={() =>
+      alert("Backup dihapus")
+    }
+  >
+    Delete
+  </Button>
+
+</div>
+
+                      </td>
 
                       </tr>
 
@@ -328,11 +418,22 @@ function DataManagerPage() {
 
                         <td className="py-5">
 
-                          <Badge variant="danger">
-                            Gagal
-                          </Badge>
+                        <Badge variant="danger">
+                          Gagal
+                        </Badge>
 
-                        </td>
+                      </td>
+
+                      <td className="py-5">
+
+                        <Button
+                          variant="outline"
+                          disabled
+                        >
+                          Restore
+                        </Button>
+
+                      </td>
 
                       </tr>
 
@@ -348,9 +449,60 @@ function DataManagerPage() {
 
           </div>
 
+                <Card>
+
+  <h2
+    className="
+      text-2xl
+      font-bold
+      text-prima-text
+    "
+  >
+    Backup Manual Sekarang
+  </h2>
+
+  <p className="text-prima-muted mt-2">
+    Pilih data yang ingin dibackup.
+  </p>
+
+  <div className="flex gap-6 mt-6">
+
+    <label className="flex items-center gap-2">
+      <input type="checkbox" />
+      <span>Data Pasien</span>
+    </label>
+
+    <label className="flex items-center gap-2">
+      <input type="checkbox" />
+      <span>Rekam Medis</span>
+    </label>
+
+    <label className="flex items-center gap-2">
+      <input type="checkbox" />
+      <span>Dokter</span>
+    </label>
+
+    <label className="flex items-center gap-2">
+      <input type="checkbox" />
+      <span>Audit Log</span>
+    </label>
+
+  </div>
+
+  <Button
+    variant="primary"
+    className="mt-6"
+    onClick={handleBackup}
+  >
+    Mulai Backup
+  </Button>
+
+</Card>
+
         </div>
 
       )}
+
 
       {/* AUDIT TAB */}
       {activeTab === "audit" && (
@@ -725,6 +877,84 @@ function DataManagerPage() {
         </div>
 
       )}
+
+    {showRestoreModal && (
+
+  <div
+    className="
+      fixed inset-0
+      bg-black/40
+      flex items-center justify-center
+      z-50
+    "
+  >
+
+    <div
+      className="
+        bg-white
+        rounded-3xl
+        p-8
+        w-[500px]
+      "
+    >
+
+      <h2
+        className="
+          text-3xl
+          font-bold
+          text-red-600
+        "
+      >
+        PERHATIAN: Restore Data
+      </h2>
+
+      <p className="mt-4 text-prima-muted">
+
+        Restore akan mengganti seluruh data
+        sistem dengan backup yang dipilih.
+
+      </p>
+
+<div className="bg-red-50 border border-red-200 rounded-2xl p-4 mt-6">
+
+  Backup Dipilih:
+  <strong>
+    {selectedBackup}
+  </strong>
+
+</div>
+
+<div className="bg-red-50 border border-red-200 rounded-2xl p-4 mt-4">
+
+  ⚠️ Restore akan mengganti seluruh data
+  saat ini dan tidak bisa dibatalkan.
+
+</div>
+
+<div className="flex gap-4 mt-8">
+
+  <Button
+    onClick={confirmRestore}
+  >
+    Saya Mengerti, Restore
+  </Button>
+
+  <Button
+    variant="outline"
+    onClick={() =>
+      setShowRestoreModal(false)
+    }
+  >
+    Batal
+  </Button>
+
+</div>
+
+</div> {/* tutup modal putih */}    
+
+  </div>
+
+)}
 
     </div>
   )

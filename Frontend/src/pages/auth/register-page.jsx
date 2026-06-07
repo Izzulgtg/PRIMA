@@ -74,18 +74,25 @@ const handleRegister = async () => {
 
       <div className="w-full max-w-2xl">
 
-        {/* LOGO */}
-        <div className="text-center mb-10">
+<div className="text-center mb-8">
 
-          <h1 className="text-4xl font-bold text-prima-green">
-            PRIMA
-          </h1>
+  <h1 className="text-4xl font-bold text-prima-green">
+    PRIMA
+  </h1>
 
-          <p className="text-prima-muted mt-2">
-            Health Services
-          </p>
+  <p className="text-prima-muted">
+    Health Services
+  </p>
 
-        </div>
+  <h2 className="text-4xl font-bold mt-8">
+    Buat Akun Baru
+  </h2>
+
+  <p className="text-prima-muted mt-2">
+    Daftar untuk mulai menggunakan layanan kesehatan PRIMA
+  </p>
+
+</div>
 
         {/* CARD */}
         <div
@@ -101,27 +108,6 @@ const handleRegister = async () => {
 
           {/* HEADER */}
           <div className="text-center">
-
-            <h2
-              className="
-                text-4xl
-                font-bold
-                text-prima-text
-              "
-            >
-              Buat Akun Baru
-            </h2>
-
-            <p
-              className="
-                text-prima-muted
-                mt-4
-                leading-relaxed
-              "
-            >
-              Daftar untuk mulai menggunakan
-              layanan kesehatan PRIMA
-            </p>
 
           </div>
 
@@ -408,12 +394,13 @@ const handleRegister = async () => {
 
             {/* BUTTON */}
             <div className="pt-2">
-              <Button
-                variant="primary"
-                onClick={handleRegister}
-              >
-                Daftar Sekarang
-              </Button>
+<Button
+  variant="primary"
+  className="w-full mt-6"
+  onClick={handleRegister}
+>
+  Daftar Sekarang
+</Button>
 
             </div>
 
@@ -425,25 +412,21 @@ const handleRegister = async () => {
                 )
               }
 
-            {/* LOGIN */}
-            <div className="text-center pt-4">
+<div className="mt-8">
 
-              <p className="text-prima-muted text-sm">
-                Sudah punya akun?
-              </p>
+  <div className="text-center text-xs text-prima-muted mb-4">
+    SUDAH PUNYA AKUN?
+  </div>
 
-              <div className="mt-4">
+<Button
+  variant="outline"
+  className="w-full h-14 text-lg"
+  onClick={() => navigate("/login")}
+>
+  Masuk
+</Button>
 
-                <Button
-                  variant="secondary"
-                  onClick={() => navigate("/login")}
-                >
-                  Masuk
-                </Button>
-
-              </div>
-
-            </div>
+</div>
 
           </div>
 

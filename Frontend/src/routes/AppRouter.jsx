@@ -3,7 +3,7 @@ import {
   Routes,
   Route,
 } from "react-router-dom"
-
+import ProtectedRoute from "./ProtectedRoute"
 import AdminLayout from "../layouts/admin-layout"
 import PatientLayout from "../layouts/patient-layout"
 import DoctorLayout from "../layouts/doctor-layout";
@@ -61,11 +61,14 @@ function AppRouter() {
           element={<RegisterPage />}
         />
 
-        {/* ADMIN */}
-        <Route
-          path="/admin"
-          element={<AdminLayout />}
-        >
+<Route
+  path="/admin"
+  element={
+    <ProtectedRoute allowedRole="admin">
+      <AdminLayout />
+    </ProtectedRoute>
+  }
+> 
 
           <Route
             path="dashboard"
@@ -90,9 +93,14 @@ function AppRouter() {
         </Route>
 
         {/* Patient */}
-        <Route
-        path="/patient"
-        element={<PatientLayout />}>
+<Route
+  path="/patient"
+  element={
+    <ProtectedRoute allowedRole="pasien">
+      <PatientLayout />
+    </ProtectedRoute>
+  }
+>
         
           <Route
             path="dashboard"
@@ -147,7 +155,14 @@ function AppRouter() {
         </Route>
 
         {/* DOCTOR */}
-        <Route path="/doctor" element={<DoctorLayout />}>
+        <Route
+  path="/doctor"
+  element={
+    <ProtectedRoute allowedRole="dokter">
+      <DoctorLayout />
+    </ProtectedRoute>
+  }
+>
           <Route path="dashboard" element={<DoctorDashboard />} />
           <Route path="queue" element={<QueuePage />} />
           <Route path="schedule" element={<SchedulePage />} />

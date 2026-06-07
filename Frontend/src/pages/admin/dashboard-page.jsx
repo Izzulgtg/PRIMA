@@ -6,7 +6,13 @@ import Card from "../../components/ui/card"
 import Badge from "../../components/ui/badge"
 import Modal from "../../components/ui/modal"
 import Table from "../../components/ui/table"
-
+import { Stethoscope } from "lucide-react"
+import { Wrench } from "lucide-react"
+import {
+  Users,
+  Activity,
+  ShieldCheck
+} from "lucide-react"
 function DashboardPage() {
 
   const [isModalOpen, setIsModalOpen] = useState(false)
@@ -87,45 +93,32 @@ function DashboardPage() {
       {/* STAT CARDS */}
       <div className="grid grid-cols-3 gap-8">
 
-        <Card>
+       <Card>
+  <div className="flex justify-between items-start">
 
-          <div className="flex items-center justify-between">
+    <div>
+      <p className="text-prima-muted">
+        Total Pasien  
+      </p>
 
-            <div>
+      <h2 className="text-6xl font-bold mt-4">
+        120
+      </h2>
 
-              <p className="text-prima-muted text-sm">
-                Total Pasien
-              </p>
+      <p className="text-prima-green mt-4">
+        +12% bulan ini
+      </p>
+    </div>
 
-              <h2
-                className="
-                  text-5xl
-                  font-bold
-                  text-prima-text
-                  mt-4
-                "
-              >
-                120
-              </h2>
+    <div className="w-20 h-20 rounded-3xl bg-[#DDE8D7] flex items-center justify-center">
+      <Users
+        size={36}
+        className="text-prima-green"
+      />
+    </div>
 
-              <p className="text-prima-green mt-4 text-sm">
-                +12% bulan ini
-              </p>
-
-            </div>
-
-            <div
-              className="
-                w-16
-                h-16
-                rounded-2xl
-                bg-[#DDE8D7]
-              "
-            />
-
-          </div>
-
-        </Card>
+  </div>
+</Card>
 
         <Card>
 
@@ -154,18 +147,26 @@ function DashboardPage() {
 
             </div>
 
-            <div
-              className="
-                w-16
-                h-16
-                rounded-2xl
-                bg-[#DCE9EE]
-              "
-            />
+<div
+  className="
+    w-20
+    h-20
+    rounded-3xl
+    bg-[#DCE9EE]
+    flex
+    items-center
+    justify-center
+  "
+>
+<Stethoscope
+  size={36}
+  className="text-[#4B8196]"
+/>
+</div>
 
-          </div>
+</div> {/* tutup flex */}
 
-        </Card>
+</Card>
 
         <Card>
 
@@ -194,16 +195,25 @@ function DashboardPage() {
 
             </div>
 
-            <div
-              className="
-                w-16
-                h-16
-                rounded-2xl
-                bg-[#F3DDD4]
-              "
-            />
+          <div
+  className="
+    w-20
+    h-20
+    rounded-3xl
+    bg-[#F3DDD4]
+    flex
+    items-center
+    justify-center
+  "
+>
+  <Wrench
+    size={36}
+    className="text-[#C4846A]"
+  />
+</div>
 
           </div>
+          
 
         </Card>
 

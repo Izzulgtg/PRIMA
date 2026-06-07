@@ -2,6 +2,7 @@ function Button({
   children,
   variant = "primary",
   onClick,
+  className = "",
 }) {
 
   const variants = {
@@ -31,6 +32,7 @@ function Button({
         transition-all
         duration-200
         ${variants[variant]}
+        ${className}
       `}
     >
       {children}
