@@ -1,37 +1,50 @@
 const db = require('../config/db');
 
 // =========================================================================
-// 1. POST: DOKTER MENAMBAH DATA OBAT
+// POST: DOKTER MENAMBAH OBAT BARU
 // =========================================================================
 exports.createObat = async (req, res) => {
-  const { nama_obat, kategori_obat_id, supplier_id, stok, harga, deskripsi } = req.body;
+  // Samakan property ini dengan apa yang dikirim dari Frontend
+  const { 
+    nama, 
+    nama_generik, 
+    kategori_id, 
+    supplier_id, 
+    satuan, 
+    stok, 
+    batas_minimum, 
+    tanggal_kadaluarsa, 
+    harga_per_unit 
+  } = req.body;
 
-  if (!nama_obat || !harga) {
-    return res.status(400).json({ message: 'Nama obat dan harga wajib diisi!' });
+  // Validasi minimal nama dan stok tidak kosong
+  if (!nama || stok === undefined) {
+    return res.status(400).json({ message: 'Nama obat dan Stok wajib diisi!' });
   }
 
   try {
     const query = `
-      INSERT INTO obat (nama_obat, kategori_obat_id, supplier_id, stok, harga, deskripsi, created_at, updated_at)
-      VALUES (?, ?, ?, ?, ?, ?, NOW(), NOW())
+      INSERT INTO obat 
+      (nama, nama_generik, kategori_id, supplier_id, satuan, stok, batas_minimum, tanggal_kadaluarsa, harga_per_unit, created_at) 
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())
     `;
-    const [result] = await db.query(query, [
-      nama_obat,
-      kategori_obat_id || null,
-      supplier_id || null,
-      stok || 0,
-      harga,
-      deskripsi || null
+
+    await db.query(query, [
+      nama, 
+      nama_generik || null, 
+      kategori_id || null, 
+      supplier_id || null, 
+      satuan || 'tablet', 
+      stok, 
+      batas_minimum || 0, 
+      tanggal_kadaluarsa || null, 
+      harga_per_unit || 0
     ]);
 
-    return res.status(201).json({
-      success: true,
-      message: 'Data obat baru berhasil ditambahkan oleh Dokter!',
-      obatId: result.insertId
-    });
+    return res.status(201).json({ success: true, message: 'Obat baru berhasil ditambahkan!' });
   } catch (error) {
     console.error('Error saat tambah obat:', error);
-    return res.status(500).json({ message: 'Terjadi kesalahan pada server saat menambah data obat.' });
+    return res.status(500).json({ message: 'Terjadi kesalahan pada server saat menyimpan obat.' });
   }
 };
 
@@ -52,21 +65,24 @@ exports.getAllObat = async (req, res) => {
 };
 
 // =========================================================================
-// 3. PUT: DOKTER MENGUBAH STOK DATA OBAT
+// 3. PUT: DOKTER MENGUBAH DATA OBAT (STOK & KADALUARSA)
 // =========================================================================
 exports.updateObat = async (req, res) => {
   const { id } = req.params;
-  const { stok } = req.body; // Mengambil stok dari payload frontend
+  const { stok, tanggal_kadaluarsa } = req.body;
 
-  // Validasi agar stok tidak kosong
   if (stok === undefined || stok === null) {
     return res.status(400).json({ message: 'Jumlah stok wajib diisi!' });
   }
 
   try {
-    // query yang presisi hanya mengubah kolom stok
-    const query = `UPDATE obat SET stok = ?, updated_at = NOW() WHERE id = ?`;
-    const [result] = await db.query(query, [stok, id]);
+    // Jalankan query untuk mengupdate stok dan tanggal_kadaluarsa sekaligus
+    const query = `
+      UPDATE obat 
+      SET stok = ?, tanggal_kadaluarsa = ?, updated_at = NOW() 
+      WHERE id = ?
+    `;
+    const [result] = await db.query(query, [stok, tanggal_kadaluarsa || null, id]);
     
     if (result.affectedRows === 0) {
       return res.status(404).json({ message: 'Data obat tidak ditemukan.' });
@@ -74,11 +90,11 @@ exports.updateObat = async (req, res) => {
     
     return res.status(200).json({ 
       success: true, 
-      message: 'Stok obat berhasil diperbarui oleh Dokter!' 
+      message: 'Data obat berhasil diperbarui oleh Dokter!' 
     });
   } catch (error) {
-    console.error('Error internal server saat update obat:', error);
-    return res.status(500).json({ message: 'Terjadi kesalahan pada server saat memperbarui data.' });
+    console.error('Error saat update obat:', error);
+    return res.status(500).json({ message: 'Terjadi kesalahan pada server saat memperbarui data obat.' });
   }
 };
 
