@@ -1,4 +1,4 @@
-import { Outlet, NavLink, useLocation } from "react-router-dom";
+import { Outlet, NavLink, Link, useLocation } from "react-router-dom";
 
 function DoctorLayout() {
   const location = useLocation();
@@ -58,11 +58,19 @@ function DoctorLayout() {
 
           <div className="flex items-center gap-5">
             <div className="h-8 w-8 rounded-full bg-[#EDE8DC]" />
-            <div className="text-right">
-              <p className="text-xs font-bold text-[#1E1E1E]">Dr. Zeki</p>
-              <p className="text-[10px] text-[#6B7280]">Dokter Umum</p>
-            </div>
-            <div className="h-9 w-9 rounded-full bg-[#EDE8DC]" />
+            
+            {/* INI BAGIAN YANG DIBUNGKUS LINK */}
+            <Link 
+              to="/doctor/profile" 
+              className="flex items-center gap-3 hover:bg-gray-50 p-1.5 rounded-xl transition cursor-pointer"
+            >
+              <div className="text-right">
+                <p className="text-xs font-bold text-[#1E1E1E]">Dr. Zeki</p>
+                <p className="text-[10px] text-[#6B7280]">Dokter Umum</p>
+              </div>
+              <div className="h-9 w-9 rounded-full bg-[#EDE8DC]" />
+            </Link>
+
           </div>
         </header>
 
