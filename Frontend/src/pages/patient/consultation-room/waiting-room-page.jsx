@@ -1,46 +1,147 @@
+import {
+  useEffect,
+  useState,
+} from "react";
+
 import { ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 import WaitingRoomCard from "@/components/patient/consultation/waiting-room-card";
 import ConsultationQueue from "@/components/patient/consultation/consultation-queue";
 
-import { dummyWaitingRoom } from "@/data/dummy-waiting-room";
+import {
+  getQueue,
+} from "@/services/patient/consultation-service";
+
+import { formatDateOnly } from "@/utils/patient/format-date-only";
+import { formatTime } from "@/utils/patient/format-time";
 
 function WaitingRoomPage() {
   const navigate = useNavigate();
 
-  const { session, queue } =
-    dummyWaitingRoom;
+  const [queueData, setQueueData] =
+    useState(null);
+
+  const [loading, setLoading] =
+    useState(true);
+
+  useEffect(() => {
+    const fetchQueue =
+      async () => {
+        try {
+          const response =
+            await getQueue();
+
+          setQueueData(
+            response.data
+          );
+        } catch (error) {
+          console.error(
+            "Gagal mengambil antrean",
+            error
+          );
+        } finally {
+          setLoading(false);
+        }
+      };
+
+    fetchQueue();
+
+    const interval =
+      setInterval(
+        fetchQueue,
+        5000
+      );
+
+    return () =>
+      clearInterval(interval);
+
+  }, []);
+
+  useEffect(() => {
+    if (
+      queueData?.status ===
+      "berlangsung"
+    ) {
+      navigate(
+        `/patient/consultation-room/${queueData.id}`
+      );
+    }
+  }, [
+    queueData,
+    navigate,
+  ]);
 
   const handleJoinConsultation =
     () => {
-      navigate("/patient/consultation-room");
+      if (!queueData?.id) return;
+
+      navigate(
+        `/patient/consultation-room/${queueData.id}`
+      );
     };
+
+  if (loading) {
+    return (
+      <div className="py-20 text-center">
+        <p className="text-prima-secondary">
+          Memuat data konsultasi...
+        </p>
+      </div>
+    );
+  }
+
+  if (!queueData) {
+    return (
+      <div className="py-20 text-center">
+        <p className="text-red-500">
+          Data konsultasi tidak ditemukan
+        </p>
+      </div>
+    );
+  }
+
+  const formattedDate =
+    formatDateOnly(
+      queueData.tanggal
+    );
+
+  const formattedTime = `${formatTime(
+    queueData.jam_mulai
+  )} - ${formatTime(
+    queueData.jam_selesai
+  )}`;
 
   return (
     <div className="space-y-8">
 
+      {/* BACK BUTTON */}
       <div className="flex items-center justify-between">
+
         <button
           onClick={() =>
-            navigate("/patient/consultation")
+            navigate(
+              "/patient/consultation"
+            )
           }
           className="
-            inline-flex items-center gap-2
-            text-prima-secondary
-            hover:text-prima-green
-            transition-colors
+            inline-flex
+            items-center
+            gap-2
             font-medium
+            text-prima-secondary
+            transition-colors
+            hover:text-prima-green
           "
         >
           <ArrowLeft size={18} />
           Kembali
         </button>
+
       </div>
 
       {/* HERO */}
-      <section className="bg-prima-green rounded-[32px] p-8 text-white">
-
+      <section className="rounded-[32px] bg-prima-green p-8 text-white">
 
         <p className="text-sm opacity-80">
           Waiting Room
@@ -51,34 +152,51 @@ function WaitingRoomPage() {
         </h1>
 
         <p className="mt-4 max-w-2xl text-lg opacity-90">
-          Silakan menunggu hingga dokter memulai sesi
-          konsultasi. Sistem akan mengarahkan Anda ke
-          ruang konsultasi ketika giliran tiba.
+          Silakan menunggu hingga dokter
+          memulai sesi konsultasi.
+          Sistem akan mengarahkan Anda
+          ke ruang konsultasi ketika
+          giliran tiba.
         </p>
 
       </section>
 
       {/* WAITING CARD */}
       <WaitingRoomCard
-        doctorName={session.doctorName}
-        consultationDate={session.consultationDate}
-        consultationTime={session.consultationTime}
-        initialSeconds={session.remainingSeconds}
-        onJoin={handleJoinConsultation}
+        doctorName={
+          queueData.dokter_nama
+        }
+        consultationDate={
+          formattedDate
+        }
+        consultationTime={
+          formattedTime
+        }
+        initialSeconds={600}
+        onJoin={
+          handleJoinConsultation
+        }
       />
 
       {/* QUEUE */}
       <ConsultationQueue
-        queueNumber={queue.queueNumber}
-        currentQueue={queue.currentQueue}
-        estimatedTime={queue.estimatedTime}
-        status={queue.status}
-        canJoin={queue.canJoin}
-        onJoin={handleJoinConsultation}
+        queueNumber={
+          queueData.nomor_antrian
+        }
+        currentQueue={0}
+        estimatedTime="Menunggu"
+        status={queueData.status}
+        canJoin={
+          queueData.status ===
+          "berlangsung"
+        }
+        onJoin={
+          handleJoinConsultation
+        }
       />
 
       {/* INFO */}
-      <section className="bg-prima-card rounded-[32px] border border-[#F1ECE4] p-6 shadow-sm">
+      <section className="rounded-[32px] border border-[#F1ECE4] bg-prima-card p-6 shadow-sm">
 
         <h2 className="text-xl font-bold text-prima-text">
           Informasi Konsultasi
@@ -93,7 +211,7 @@ function WaitingRoomPage() {
             </p>
 
             <p className="mt-2 font-semibold text-prima-text">
-              {session.doctorName}
+              {queueData.dokter_nama}
             </p>
 
           </div>
@@ -105,7 +223,19 @@ function WaitingRoomPage() {
             </p>
 
             <p className="mt-2 font-semibold text-prima-text">
-              {session.consultationDate}
+              {formattedDate}
+            </p>
+
+          </div>
+
+          <div className="rounded-2xl bg-prima-background p-4">
+
+            <p className="text-sm text-prima-secondary">
+              Jam Konsultasi
+            </p>
+
+            <p className="mt-2 font-semibold text-prima-text">
+              {formattedTime}
             </p>
 
           </div>
@@ -116,8 +246,8 @@ function WaitingRoomPage() {
               Status
             </p>
 
-            <p className="mt-2 font-semibold text-prima-green">
-              {session.status}
+            <p className="mt-2 font-semibold capitalize text-prima-green">
+              {queueData.status}
             </p>
 
           </div>
@@ -129,7 +259,7 @@ function WaitingRoomPage() {
             </p>
 
             <p className="mt-2 font-semibold text-prima-text">
-              {queue.queueNumber}
+              {queueData.nomor_antrian}
             </p>
 
           </div>

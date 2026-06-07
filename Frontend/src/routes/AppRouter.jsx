@@ -128,8 +128,8 @@ function AppRouter() {
           />
 
           <Route
-            path="consultation-room"
-            element={<ConsultationRoomPage />}
+              path = "consultation-room/:sessionId"
+              element = {<ConsultationRoomPage/>}
           />
 
           <Route

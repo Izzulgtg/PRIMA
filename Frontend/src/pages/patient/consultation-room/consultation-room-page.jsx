@@ -1,34 +1,112 @@
-import {
-  useEffect,
-  useRef,
-  useState,
-} from "react";
-
+import { useEffect, useRef, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
-import { useNavigate } from "react-router-dom";
 
 import ChatBubble from "@/components/patient/consultation/chat-bubble";
 import ChatInput from "@/components/patient/consultation/chat-input";
-import TypingIndicator from "@/components/patient/consultation/typing-indicator";
 
-import { dummyMessages } from "@/data/dummy-chat-messages";
-import { dummyConsultationSession } from "@/data/dummy-consultation-session";
+import {
+  getMessages,
+  getSessionDetail,
+  sendMessage as sendMessageApi,
+} from "@/services/patient/consultation-service";
 
 function ConsultationRoomPage() {
   const navigate = useNavigate();
-
-  const [messages, setMessages] =
-    useState(dummyMessages);
-
-  const [sending, setSending] =
-    useState(false);
-
-  const [remainingSeconds, setRemainingSeconds] =
-    useState(
-      dummyConsultationSession.duration
-    );
+  const { sessionId } = useParams();
 
   const chatEndRef = useRef(null);
+
+  const currentUser =
+    JSON.parse(localStorage.getItem("user")) || {};
+
+  const [messages, setMessages] = useState([]);
+  const [session, setSession] = useState(null);
+
+  const [loading, setLoading] = useState(true);
+  const [sending, setSending] = useState(false);
+
+  const [remainingSeconds, setRemainingSeconds] =
+    useState(1800);
+
+  /*
+  |--------------------------------------------------------------------------
+  | LOAD SESSION
+  |--------------------------------------------------------------------------
+  */
+
+  const loadSession = async () => {
+    try {
+      const data =
+        await getSessionDetail(sessionId);
+
+      setSession(data);
+    } catch (error) {
+      console.error(
+        "Load session error:",
+        error
+      );
+    }
+  };
+
+  /*
+  |--------------------------------------------------------------------------
+  | LOAD MESSAGES
+  |--------------------------------------------------------------------------
+  */
+
+  const loadMessages = async () => {
+    try {
+      const data =
+        await getMessages(sessionId);
+
+      setMessages(data || []);
+    } catch (error) {
+      console.error(
+        "Load messages error:",
+        error
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  /*
+  |--------------------------------------------------------------------------
+  | INITIAL LOAD
+  |--------------------------------------------------------------------------
+  */
+
+  const loadInitialData = async () => {
+    await Promise.all([
+      loadSession(),
+      loadMessages(),
+    ]);
+  };
+
+  /*
+  |--------------------------------------------------------------------------
+  | POLLING
+  |--------------------------------------------------------------------------
+  */
+
+  useEffect(() => {
+    loadInitialData();
+
+    const interval = setInterval(
+      loadMessages,
+      5000
+    );
+
+    return () =>
+      clearInterval(interval);
+  }, [sessionId]);
+
+  /*
+  |--------------------------------------------------------------------------
+  | AUTO SCROLL
+  |--------------------------------------------------------------------------
+  */
 
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({
@@ -36,63 +114,68 @@ function ConsultationRoomPage() {
     });
   }, [messages]);
 
-  useEffect(() => {
-    if (remainingSeconds <= 0) return;
+  /*
+  |--------------------------------------------------------------------------
+  | TIMER
+  |--------------------------------------------------------------------------
+  */
 
+  useEffect(() => {
     const timer = setInterval(() => {
       setRemainingSeconds((prev) =>
         prev > 0 ? prev - 1 : 0
       );
     }, 1000);
 
-    return () => clearInterval(timer);
-  }, [remainingSeconds]);
+    return () =>
+      clearInterval(timer);
+  }, []);
 
-  const sendMessage = async (
+  /*
+  |--------------------------------------------------------------------------
+  | SEND MESSAGE
+  |--------------------------------------------------------------------------
+  */
+
+  const handleSendMessage = async (
     text
   ) => {
     if (!text?.trim()) return;
 
-    setSending(true);
+    try {
+      setSending(true);
 
-    const newMessage = {
-      id: Date.now(),
-      sender: "patient",
-      message: text,
-      time: new Date().toLocaleTimeString(
-        "id-ID",
-        {
-          hour: "2-digit",
-          minute: "2-digit",
-        }
-      ),
-    };
+      await sendMessageApi(
+        sessionId,
+        text
+      );
 
-    setMessages((prev) => [
-      ...prev,
-      newMessage,
-    ]);
-
-    setTimeout(() => {
-      setMessages((prev) => [
-        ...prev,
-        {
-          id: Date.now() + 1,
-          sender: "doctor",
-          message:
-            "Baik, informasi Anda sudah saya terima. Mohon jelaskan lebih detail mengenai keluhan yang dirasakan.",
-          time: new Date().toLocaleTimeString(
-            "id-ID",
-            {
-              hour: "2-digit",
-              minute: "2-digit",
-            }
-          ),
-        },
-      ]);
-
+      await loadMessages();
+    } catch (error) {
+      console.error(
+        "Send message error:",
+        error
+      );
+    } finally {
       setSending(false);
-    }, 1500);
+    }
+  };
+
+  /*
+  |--------------------------------------------------------------------------
+  | HELPERS
+  |--------------------------------------------------------------------------
+  */
+
+  const formatMessageTime = (
+    dateString
+  ) => {
+    return new Date(
+      dateString
+    ).toLocaleTimeString("id-ID", {
+      hour: "2-digit",
+      minute: "2-digit",
+    });
   };
 
   const minutes = Math.floor(
@@ -108,6 +191,27 @@ function ConsultationRoomPage() {
     seconds
   ).padStart(2, "0")}`;
 
+  const doctorInitial =
+    session?.dokter_nama
+      ?.charAt(0)
+      ?.toUpperCase() || "D";
+
+  /*
+  |--------------------------------------------------------------------------
+  | LOADING
+  |--------------------------------------------------------------------------
+  */
+
+  if (loading) {
+    return (
+      <div className="py-20 text-center">
+        <p className="text-prima-secondary">
+          Memuat percakapan...
+        </p>
+      </div>
+    );
+  }
+
   return (
     <div className="flex h-[calc(100vh-140px)] flex-col gap-6">
 
@@ -116,21 +220,17 @@ function ConsultationRoomPage() {
 
         <div className="flex items-center justify-between">
 
-          {/* LEFT */}
           <div className="flex items-center gap-4">
 
             <button
               onClick={() =>
                 navigate(
-                  "/patient/waiting-room"
+                  "/patient/consultation"
                 )
               }
               className="
-                flex
-                h-12
-                w-12
-                items-center
-                justify-center
+                flex h-12 w-12
+                items-center justify-center
                 rounded-2xl
                 bg-prima-background
                 transition
@@ -141,27 +241,23 @@ function ConsultationRoomPage() {
             </button>
 
             <div className="flex h-14 w-14 items-center justify-center rounded-full bg-prima-green font-bold text-white">
-              {
-                dummyConsultationSession.doctorCode
-              }
+              {doctorInitial}
             </div>
 
             <div>
 
               <h2 className="text-2xl font-bold text-prima-text">
-                {
-                  dummyConsultationSession.doctorName
-                }
+                {session?.dokter_nama ||
+                  "Konsultasi Online"}
               </h2>
 
               <div className="mt-1 flex items-center gap-2">
 
-                <div className="h-2 w-2 rounded-full bg-green-500 animate-pulse" />
+                <div className="h-2 w-2 animate-pulse rounded-full bg-green-500" />
 
-                <p className="text-sm text-prima-secondary">
-                  {
-                    dummyConsultationSession.specialization
-                  }
+                <p className="text-sm capitalize text-prima-secondary">
+                  {session?.status ||
+                    "berlangsung"}
                 </p>
 
               </div>
@@ -170,7 +266,6 @@ function ConsultationRoomPage() {
 
           </div>
 
-          {/* RIGHT */}
           <div className="text-right">
 
             <p className="text-sm text-prima-secondary">
@@ -209,11 +304,10 @@ function ConsultationRoomPage() {
 
       </section>
 
-      {/* CHAT AREA */}
+      {/* CHAT */}
       <section className="flex flex-1 flex-col overflow-hidden rounded-[32px] border border-[#F1ECE4] bg-prima-card shadow-sm">
 
-        {/* CHAT BODY */}
-        <div className="flex-1 overflow-y-auto bg-prima-background p-6 space-y-6">
+        <div className="flex-1 space-y-6 overflow-y-auto bg-prima-background p-6">
 
           <div className="flex justify-center">
 
@@ -223,31 +317,28 @@ function ConsultationRoomPage() {
 
           </div>
 
-          {messages.map(
-            (message) => (
-              <ChatBubble
-                key={message.id}
-                sender={message.sender}
-                message={message.message}
-                time={message.time}
-              />
-            )
-          )}
-
-          <TypingIndicator
-            doctorName={
-              dummyConsultationSession.doctorName
-            }
-            visible={sending}
-          />
+          {messages.map((message) => (
+            <ChatBubble
+              key={message.id}
+              sender={
+                message.pengirim_id ===
+                currentUser.id
+                  ? "patient"
+                  : "doctor"
+              }
+              message={message.isi}
+              time={formatMessageTime(
+                message.created_at
+              )}
+            />
+          ))}
 
           <div ref={chatEndRef} />
 
         </div>
 
-        {/* INPUT */}
         <ChatInput
-          onSend={sendMessage}
+          onSend={handleSendMessage}
           sending={sending}
         />
 

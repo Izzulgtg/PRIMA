@@ -1,52 +1,87 @@
 import api from "../api";
 
-export const getSessionStatus = async (sessionId) => {
-  const response = await api.get(
-    `/consultations/${sessionId}/status`
-  );
+/*
+|--------------------------------------------------------------------------
+| STATUS KONSULTASI
+|--------------------------------------------------------------------------
+*/
 
-  return response.data;
-};
+export const getSessionStatus =
+  async (sessionId) => {
+    const response =
+      await api.get(
+        `/consultations/${sessionId}/status`
+      );
 
-export const getMessages = async (sessionId) => {
-  const response = await api.get(
-    `/consultations/${sessionId}/messages`
-  );
+    return response.data;
+  };
 
-  return response.data;
-};
+/*
+|--------------------------------------------------------------------------
+| DETAIL KONSULTASI
+|--------------------------------------------------------------------------
+*/
 
-export const sendMessage = async (
-  sessionId,
-  message
-) => {
-  const response = await api.post(
-    `/consultations/${sessionId}/messages`,
-    {
-      message,
-    }
-  );
+export const getSessionDetail =
+  async (sessionId) => {
+    const response =
+      await api.get(
+        `/consultations/${sessionId}`
+      );
 
-  return response.data;
-};
+    return response.data.data;
+  };
 
-export const getQueue = async () => {
-  const response = await api.get(
-    "/consultations/queue"
-  );
+/*
+|--------------------------------------------------------------------------
+| PESAN KONSULTASI
+|--------------------------------------------------------------------------
+*/
 
-  return response.data;
-};
+export const getMessages =
+  async (sessionId) => {
+    const response =
+      await api.get(
+        `/consultations/${sessionId}/messages`
+      );
 
-/**
- * Ambil detail sesi konsultasi
- */
-export const getSessionDetail = async (
-  sessionId
-) => {
-  const response = await api.get(
-    `/consultations/${sessionId}`
-  );
+    return response.data.data;
+  };
 
-  return response.data;
-};
+/*
+|--------------------------------------------------------------------------
+| KIRIM PESAN
+|--------------------------------------------------------------------------
+*/
+
+export const sendMessage =
+  async (
+    sessionId,
+    message
+  ) => {
+    const response =
+      await api.post(
+        `/consultations/${sessionId}/messages`,
+        {
+          message,
+        }
+      );
+
+    return response.data;
+  };
+
+/*
+|--------------------------------------------------------------------------
+| ANTRIAN KONSULTASI
+|--------------------------------------------------------------------------
+*/
+
+export const getQueue =
+  async () => {
+    const response =
+      await api.get(
+        "/consultations/queue"
+      );
+
+    return response.data;
+  };
