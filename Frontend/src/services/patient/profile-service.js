@@ -1,28 +1,23 @@
 import api from "../api";
 
-/**
- * Mengambil data profil user yang sedang login
- */
 export const getProfile = async () => {
-  const response = await api.get("/auth/profile");
+  const { data } = await api.get(
+    "/auth/me"
+  );
 
-  return response.data.data;
+  return data.data;
 };
 
-/**
- * Memperbarui data profil user
- */
-export const updateProfile = async (profileData) => {
-  const response = await api.put(
-    "/auth/profile",
+export const updateProfile = async (
+  profileData
+) => {
+  const { data } = await api.put(
+    "/auth/me",
     profileData
   );
 
-  return response.data;
+  return data;
 };
 
-/**
- * Alias untuk getProfile
- * Digunakan jika ada komponen lama yang masih memanggil getCurrentUser
- */
-export const getCurrentUser = getProfile;
+export const getCurrentUser =
+  getProfile;

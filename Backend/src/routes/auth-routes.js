@@ -1,26 +1,18 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const authController = require('../controllers/auth-controller');
-const verifyToken = require('../middlewares/auth-middleware'); 
-const requireRole = require('../middlewares/role-middleware');
 
-router.post('/register-pasien', authController.registerPasien);
-router.post('/login', authController.login);
+const authController = require("../controllers/auth-controller");
 
-router.get('/me', verifyToken, (req, res) => {
-  res.json({ success: true, user_sekarang: req.user });
-});
+const verifyToken = require("../middlewares/auth-middleware");
+const requireRole = require("../middlewares/role-middleware");
 
-router.get('/admin-dashboard', verifyToken, requireRole('admin'), (req, res) => {
-  res.json({ success: true, message: 'Selamat datang di area rahasia khusus ADMIN PRIMA!' });
-});
-
-router.get('/dokter-data', verifyToken, requireRole('dokter', 'admin'), (req, res) => {
-  res.json({ success: true, message: 'Selamat datang di area rekam medis Dokter!' });
-});
-
-router.get('/profile', verifyToken, authController.getProfilSaya);
-router.put('/profile', verifyToken, authController.updateProfilSaya);
-router.delete('/users/:id', verifyToken, requireRole('admin'), authController.softDeleteUser);
+// Public Routes
+router.post("/register-pasien",authController.registerPasien);
+router.post("/login",authController.login);
+// Profile Routes
+router.get("/me",verifyToken,authController.getProfilSaya);
+router.put("/me",verifyToken,authController.updateProfilSaya);
+// Admin Only
+router.delete("/users/:id",verifyToken,requireRole("admin"),authController.softDeleteUser);
 
 module.exports = router;
