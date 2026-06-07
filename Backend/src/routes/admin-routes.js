@@ -14,6 +14,14 @@ router.delete('/dokter/:id', adminController.softDeleteDokter);
 router.post(
   "/users",
   adminController.createUser
-);  
+);    
+router.get(
+  "/dashboard-stats",
+  adminController.getDashboardStats
+);
+router.get(
+  "/users",
+  adminController.getAllUsers
+);
 
 module.exports = router;

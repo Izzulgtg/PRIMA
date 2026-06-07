@@ -287,3 +287,68 @@ exports.createUser = async (req, res) => {
   }
 
 };
+
+exports.getDashboardStats = async (req, res) => {
+
+  try {
+
+    const [pasien] = await db.query(`
+      SELECT COUNT(*) AS total
+      FROM users
+      WHERE role = 'pasien'
+      AND deleted_at IS NULL
+    `);
+
+    const [konsultasi] = await db.query(`
+      SELECT COUNT(*) AS total
+      FROM konsultasi
+    `);
+
+    return res.status(200).json({
+      totalPasien: pasien[0].total,
+      totalKonsultasi: konsultasi[0].total
+    });
+
+  } catch (error) {
+
+    console.error(error);
+
+    return res.status(500).json({
+      message: "Server Error"
+    });
+
+  }
+
+};
+
+exports.getAllUsers = async (req, res) => {
+
+  try {
+
+    const [users] = await db.query(`
+      SELECT
+        id,
+        nama_lengkap,
+        role,
+        is_active
+      FROM users
+      WHERE deleted_at IS NULL
+      ORDER BY id DESC
+    `);
+
+    return res.status(200).json({
+      success: true,
+      data: users
+    });
+
+  } catch (error) {
+
+    console.error(error);
+
+    return res.status(500).json({
+      message: "Server Error"
+    });
+
+  }
+
+};

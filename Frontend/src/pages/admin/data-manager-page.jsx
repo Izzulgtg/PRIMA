@@ -174,7 +174,7 @@ const confirmRestore = () => {
 
                 <p className="text-prima-muted mt-3">
                   Backup terakhir:
-                  Minggu, 29 Apr 2025 · 06.00 WIB
+                  Minggu, 29 Apr 2026 · 06.00 WIB
                 </p>
 
               </div>
@@ -354,7 +354,7 @@ const confirmRestore = () => {
                       <tr className="border-b border-prima-sand">
 
                         <td className="py-5">
-                          29 Apr 2025
+                          29 Apr 2026
                         </td>
 
                         <td className="py-5">
@@ -376,7 +376,7 @@ const confirmRestore = () => {
   <Button
     variant="outline"
     onClick={() =>
-      handleRestore("29 Apr 2025")
+      handleRestore("29 Apr 2026")
     }
   >
     Restore
@@ -409,7 +409,7 @@ const confirmRestore = () => {
                       <tr>
 
                         <td className="py-5">
-                          28 Apr 2025
+                          28 Apr 2026
                         </td>
 
                         <td className="py-5">

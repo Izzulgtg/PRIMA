@@ -1,4 +1,6 @@
-import { useState } from "react"
+
+
+import { useEffect, useState } from "react";
 
 import Input from "../../components/ui/input"
 import Button from "../../components/ui/button"
@@ -16,11 +18,61 @@ import {
 } from "lucide-react"
 function DashboardPage() {
 
+  const [users, setUsers] = useState([]);
+
   const [nama, setNama] = useState("");
   const [email, setEmail] = useState("");
   const [role, setRole] = useState("");
   const [password, setPassword] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const [stats, setStats] = useState({
+  totalPasien: 0,
+  totalKonsultasi: 0,
+}); 
+useEffect(() => {
+  fetchStats();
+  fetchUsers();
+}, []);
+
+const fetchStats = async () => {
+
+  try {
+
+    const response =
+      await api.get(
+        "/admin/dashboard-stats"
+      );
+
+    setStats(response.data);
+
+  } catch (error) {
+
+    console.error(error);
+
+  }
+
+};
+
+  const fetchUsers = async () => {
+
+  try {
+
+    const response =
+      await api.get(
+        "/admin/users"
+      );
+
+    setUsers(
+      response.data.data
+    );
+
+  } catch (error) {
+
+    console.error(error);
+
+  }
+
+};
 
   const handleCreateUser = async () => {
 
@@ -141,7 +193,7 @@ function DashboardPage() {
       </p>
 
       <h2 className="text-6xl font-bold mt-4">
-        120
+        {stats.totalPasien}
       </h2>
 
       <p className="text-prima-green mt-4">
@@ -177,7 +229,7 @@ function DashboardPage() {
                   mt-4
                 "
               >
-                34
+                {stats.totalKonsultasi}
               </h2>
 
               <p className="text-prima-teal mt-4 text-sm">
@@ -499,80 +551,54 @@ function DashboardPage() {
 
             <tbody>
 
-              <tr className="border-b border-prima-sand">
+  {users.map((user) => (
 
-                <td className="py-5 text-prima-text">
-                  izzul
-                </td>
+    <tr
+      key={user.id}
+      className="border-b border-prima-sand"
+    >
 
-                <td className="py-5">
+      <td className="py-5 text-prima-text">
+        {user.nama_lengkap}
+      </td>
 
-                  <Badge variant="info">
-                    Admin
-                  </Badge>
+      <td className="py-5">
 
-                </td>
+        <Badge
+          variant={
+            user.role === "admin"
+              ? "info"
+              : user.role === "dokter"
+              ? "warning"
+              : "secondary"
+          }
+        >
+          {user.role}
+        </Badge>
 
-                <td className="py-5">
+      </td>
 
-                  <Badge variant="success">
-                    Active
-                  </Badge>
+      <td className="py-5">
 
-                </td>
+        <Badge
+          variant={
+            user.is_active
+              ? "success"
+              : "danger"
+          }
+        >
+          {user.is_active
+            ? "Active"
+            : "Inactive"}
+        </Badge>
 
-              </tr>
+      </td>
 
-              <tr className="border-b border-prima-sand">
+    </tr>
 
-                <td className="py-5 text-prima-text">
-                  dr. Prima
-                </td>
+  ))}
 
-                <td className="py-5">
-
-                  <Badge variant="warning">
-                    Dokter
-                  </Badge>
-
-                </td>
-
-                <td className="py-5">
-
-                  <Badge variant="success">
-                    Active
-                  </Badge>
-
-                </td>
-
-              </tr>
-
-              <tr>
-
-                <td className="py-5 text-prima-text">
-                  pasien01
-                </td>
-
-                <td className="py-5">
-
-                  <Badge variant="secondary">
-                    Pasien
-                  </Badge>
-
-                </td>
-
-                <td className="py-5">
-
-                  <Badge variant="danger">
-                    Offline
-                  </Badge>
-
-                </td>
-
-              </tr>
-
-            </tbody>
-
+</tbody>
           </Table>
 
         </div>
