@@ -41,6 +41,7 @@ import ConsultationPage from "../pages/doctor/ConsultationPage";
 import MonitoringPage from "../pages/doctor/MonitoringPage";
 import ManajemenObat from "../pages/doctor/ManajemenObat";
 import ConsultationChatPage from "../pages/doctor/ConsultationChatPage";
+import DaftarPasien from "../pages/doctor/DaftarPasien";
 
 
 
@@ -157,10 +158,13 @@ function AppRouter() {
           <Route path="dashboard" element={<DoctorDashboard />} />
           <Route path="queue" element={<QueuePage />} />
           <Route path="schedule" element={<SchedulePage />} />
-          <Route path="/doctor/consultation" element={<ConsultationPage />} />
+          <Route path="consultation" element={<ConsultationPage />} />
           <Route path="medicine" element={<ManajemenObat />} />
+          <Route path="medical-records" element={<DaftarPasien />} />
+          <Route path="patient-list" element={<DaftarPasien />} />
         </Route>
 
+        {/* LEGAL & INFO */}
         <Route
           path="/privacy-policy"
           element={<PrivacyPolicyPage />}

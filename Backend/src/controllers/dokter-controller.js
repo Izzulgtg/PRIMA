@@ -1,23 +1,21 @@
 const db = require('../config/db');
 
 // =========================================================================
-// POST: DOKTER MENAMBAH OBAT BARU
+// 1. POST: DOKTER MENAMBAH OBAT BARU
 // =========================================================================
 exports.createObat = async (req, res) => {
-  // Samakan property ini dengan apa yang dikirim dari Frontend
-  const { 
-    nama, 
-    nama_generik, 
-    kategori_id, 
-    supplier_id, 
-    satuan, 
-    stok, 
-    batas_minimum, 
-    tanggal_kadaluarsa, 
-    harga_per_unit 
+  const {
+    nama,
+    nama_generik,
+    kategori_id,
+    supplier_id,
+    satuan,
+    stok,
+    batas_minimum,
+    tanggal_kadaluarsa,
+    harga_per_unit
   } = req.body;
 
-  // Validasi minimal nama dan stok tidak kosong
   if (!nama || stok === undefined) {
     return res.status(400).json({ message: 'Nama obat dan Stok wajib diisi!' });
   }
@@ -30,14 +28,14 @@ exports.createObat = async (req, res) => {
     `;
 
     await db.query(query, [
-      nama, 
-      nama_generik || null, 
-      kategori_id || null, 
-      supplier_id || null, 
-      satuan || 'tablet', 
-      stok, 
-      batas_minimum || 0, 
-      tanggal_kadaluarsa || null, 
+      nama,
+      nama_generik || null,
+      kategori_id || null,
+      supplier_id || null,
+      satuan || 'tablet',
+      stok,
+      batas_minimum || 0,
+      tanggal_kadaluarsa || null,
       harga_per_unit || 0
     ]);
 
@@ -53,9 +51,7 @@ exports.createObat = async (req, res) => {
 // =========================================================================
 exports.getAllObat = async (req, res) => {
   try {
-    // Pakai SELECT * dulu agar aman dan sesuai dengan tabel aslimu
-    const query = `SELECT * FROM obat ORDER BY id ASC`;
-    
+    const query = `SELECT * FROM obat WHERE deleted_at IS NULL ORDER BY id ASC`;
     const [results] = await db.query(query);
     return res.status(200).json({ success: true, data: results });
   } catch (error) {
@@ -76,21 +72,20 @@ exports.updateObat = async (req, res) => {
   }
 
   try {
-    // Jalankan query untuk mengupdate stok dan tanggal_kadaluarsa sekaligus
     const query = `
       UPDATE obat 
       SET stok = ?, tanggal_kadaluarsa = ?, updated_at = NOW() 
       WHERE id = ?
     `;
     const [result] = await db.query(query, [stok, tanggal_kadaluarsa || null, id]);
-    
+
     if (result.affectedRows === 0) {
       return res.status(404).json({ message: 'Data obat tidak ditemukan.' });
     }
-    
-    return res.status(200).json({ 
-      success: true, 
-      message: 'Data obat berhasil diperbarui oleh Dokter!' 
+
+    return res.status(200).json({
+      success: true,
+      message: 'Data obat berhasil diperbarui oleh Dokter!'
     });
   } catch (error) {
     console.error('Error saat update obat:', error);
@@ -117,8 +112,8 @@ exports.softDeleteObat = async (req, res) => {
 // 5. POST: DOKTER MENGINPUT REKAM MEDIS & RESEP OBAT (TRANSAKSI MULTI-TABEL)
 // =========================================================================
 exports.createRekamMedis = async (req, res) => {
-  const { 
-    pendaftaran_id, pasien_id, dokter_id, 
+  const {
+    pendaftaran_id, pasien_id, dokter_id,
     keluhan, diagnosis, tindakan, catatan_resep,
     item_obat
   } = req.body;
@@ -139,7 +134,6 @@ exports.createRekamMedis = async (req, res) => {
     const rekamMedisId = rmResult.insertId;
 
     if (item_obat && item_obat.length > 0) {
-      
       const resepQuery = `
         INSERT INTO resep (rekam_medis_id, catatan, created_at, updated_at)
         VALUES (?, ?, NOW(), NOW())
@@ -148,14 +142,14 @@ exports.createRekamMedis = async (req, res) => {
       const resepId = resepResult.insertId;
 
       for (const item of item_obat) {
-        const [obatCheck] = await connection.query('SELECT stok, nama_obat FROM obat WHERE id = ?', [item.obat_id]);
+        const [obatCheck] = await connection.query('SELECT stok, nama FROM obat WHERE id = ?', [item.obat_id]);
         if (obatCheck.length === 0) {
           throw new Error(`Obat dengan ID ${item.obat_id} tidak ditemukan.`);
         }
-        
+
         const stokSekarang = obatCheck[0].stok;
         if (stokSekarang < item.jumlah) {
-          throw new Error(`Stok obat ${obatCheck[0].nama_subat} tidak mencukupi! Sisa stok: ${stokSekarang}`);
+          throw new Error(`Stok obat ${obatCheck[0].nama} tidak mencukupi! Sisa stok: ${stokSekarang}`);
         }
 
         const detailQuery = `
@@ -188,7 +182,7 @@ exports.createRekamMedis = async (req, res) => {
 };
 
 // =========================================================================
-// 6. GET: DOKTER MELIHAT DAFTAR ANTREAN PASIEN
+// 6. GET: DOKTER MELIHAT DAFTAR ANTREAN PASIEN HARI INI
 // =========================================================================
 exports.getAntreanDokter = async (req, res) => {
   const { dokter_id } = req.params;
@@ -196,19 +190,19 @@ exports.getAntreanDokter = async (req, res) => {
   try {
     const hariIni = new Date().toISOString().slice(0, 10);
     const query = `
-      SELECT p.id AS pendaftaran_id, p.nomor_antrean, p.status, p.keluhan, p.created_at,
+      SELECT p.id AS pendaftaran_id, p.nomor_antrian AS nomor_antrean, p.status, p.keluhan, p.created_at,
              u.nama_lengkap AS nama_pasien, pp.jenis_kelamin, pp.tanggal_lahir
       FROM pendaftaran p
       JOIN users u ON p.pasien_id = u.id
       JOIN profil_pasien pp ON u.id = pp.user_id
       WHERE p.dokter_id = ? 
-        AND DATE(p.created_at) = ? 
+        AND DATE(p.tanggal_periksa) = ? 
         AND p.status IN ('Mengantre', 'Diperiksa')
-      ORDER BY p.nomor_antrean ASC
+      ORDER BY p.nomor_antrian ASC
     `;
 
     const [results] = await db.query(query, [dokter_id, hariIni]);
-    
+
     return res.status(200).json({
       success: true,
       count: results.length,
@@ -249,5 +243,116 @@ exports.updateStatusAntrean = async (req, res) => {
   } catch (error) {
     console.error('Error saat update status antrean:', error);
     return res.status(500).json({ message: 'Terjadi kesalahan pada server saat memperbarui status.' });
+  }
+};
+
+// =========================================================================
+// 8. GET: DOKTER MELIHAT DAFTAR SEMUA PASIEN
+// =========================================================================
+exports.getDaftarPasienForDokter = async (req, res) => {
+  try {
+    const query = `
+      SELECT 
+  u.id, 
+  u.nama_lengkap AS nama, 
+  pp.nik,
+  pp.jenis_kelamin,
+  TIMESTAMPDIFF(YEAR, pp.tanggal_lahir, CURDATE()) AS umur,
+  COUNT(DISTINCT rm.id) AS visits,
+  MAX(rm.created_at) AS lastVisit,
+  (SELECT keluhan FROM rekam_medis WHERE pasien_id = u.id ORDER BY created_at DESC LIMIT 1) AS lastComplaint
+FROM users u
+LEFT JOIN profil_pasien pp ON u.id = pp.user_id
+LEFT JOIN rekam_medis rm ON u.id = rm.pasien_id
+WHERE u.role = 'pasien'
+GROUP BY u.id, u.nama_lengkap, pp.nik, pp.jenis_kelamin, pp.tanggal_lahir
+    `;
+
+    const [rows] = await db.query(query);
+    return res.status(200).json({
+      success: true,
+      data: rows,
+    });
+  } catch (error) {
+    console.error('Error saat mengambil daftar pasien untuk dokter:', error);
+    return res.status(500).json({ message: 'Terjadi kesalahan pada server saat mengambil daftar pasien.' });
+  }
+};
+
+// =========================================================================
+// 9. GET: DOKTER MELIHAT DETAIL REKAM MEDIS PASIEN BERDASARKAN ID
+// =========================================================================
+exports.getDetailPasienForDokter = async (req, res) => {
+  const pasien_id = req.params.id;
+
+  try {
+    // A. Ambil Info Profil Dasar Pasien
+    const [pasienResult] = await db.query(
+      `
+SELECT 
+  u.id, 
+  u.nama_lengkap AS nama, 
+  pp.nik,
+  pp.jenis_kelamin, 
+  TIMESTAMPDIFF(YEAR, pp.tanggal_lahir, CURDATE()) AS umur
+FROM users u
+LEFT JOIN profil_pasien pp ON u.id = pp.user_id
+WHERE u.id = ? AND u.role = 'pasien'
+    `,
+      [pasien_id]
+    );
+
+    if (pasienResult.length === 0) {
+      return res.status(404).json({ message: "Data pasien tidak ditemukan." });
+    }
+
+    // B. Ambil Semua Riwayat Rekam Medis Pasien
+    const [rekamMedisResult] = await db.query(
+      `
+      SELECT 
+        rm.id AS rekam_medis_id,
+        rm.keluhan,
+        rm.diagnosis,
+        rm.tindakan,
+        rm.created_at AS tanggal_periksa,
+        ud.nama_lengkap AS nama_dokter
+      FROM rekam_medis rm
+      JOIN users ud ON rm.dokter_id = ud.id
+      WHERE rm.pasien_id = ?
+      ORDER BY rm.created_at DESC
+    `,
+      [pasien_id]
+    );
+
+    // C. Ambil Riwayat Resep Obat Detail Pasien
+    const [resepResult] = await db.query(
+      `
+      SELECT 
+        r.id AS resep_id,
+        rm.created_at AS tanggal_kunjungan,
+        o.nama AS nama_obat,
+        rd.jumlah,       -- ✨ DIUBAH DARI rd.dosis MENJADI rd.jumlah
+        rd.aturan_pakai
+      FROM resep r
+      JOIN rekam_medis rm ON r.rekam_medis_id = rm.id
+      JOIN resep_detail rd ON r.id = rd.resep_id
+      JOIN obat o ON rd.obat_id = o.id
+      WHERE rm.pasien_id = ?
+      ORDER BY rm.created_at DESC
+    `,
+      [pasien_id]
+    );
+
+    return res.status(200).json({
+      success: true,
+      data: {
+        profil: pasienResult[0],
+        rekamMedis: rekamMedisResult,
+        resepObat: resepResult,
+      },
+    });
+  } catch (error) {
+    console.error('Error saat mengambil detail pasien untuk dokter:', error);
+    return res.status(500).json({ message: 'Terjadi kesalahan pada server.' });
   }
 };

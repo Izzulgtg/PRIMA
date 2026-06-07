@@ -16,4 +16,7 @@ router.post('/rekam-medis', dokterController.createRekamMedis);
 router.get('/antrean/:dokter_id', dokterController.getAntreanDokter);
 router.put('/antrean/:pendaftaran_id/status', dokterController.updateStatusAntrean);
 
+router.get('/pasien', dokterController.getDaftarPasienForDokter);
+router.get('/pasien/:id', dokterController.getDetailPasienForDokter);
+
 module.exports = router;
