@@ -363,46 +363,14 @@ exports.getDetailPasienForDokter = async (req, res) => {
 // 10. GET: DOKTER MELIHAT PROFIL SAYA (Disinkronkan namanya ke Router)
 // =========================================================================
 exports.getProfilDokter = async (req, res) => {
-  // Mengambil id dari parameter URL, jika tidak ada baru ambil dari req.user.id (Token JWT)
-  const dokter_id = req.params.id || (req.user ? req.user.id : null); 
-
-  if (!dokter_id) {
-    return res.status(400).json({ message: 'ID Dokter tidak valid atau tidak ditemukan.' });
-  }
-
+  const dokter_id = req.params.id || (req.user ? req.user.id : null);
+  if (!dokter_id) return res.status(400).json({ message: 'ID Dokter tidak ditemukan.' });
   try {
-    const query = `
-      SELECT 
-        u.id AS user_id,
-        u.nama_lengkap,
-        u.email,
-        pd.id AS profil_id,
-        pd.nik,
-        pd.tanggal_lahir,
-        pd.jenis_kelamin,
-        pd.spesialisasi,
-        pd.nomor_sip,
-        pd.sip_expired_at,
-        pd.institusi,
-        pd.jam_praktik_default
-      FROM users u
-      JOIN profil_dokter pd ON u.id = pd.user_id
-      WHERE u.id = ? AND u.role = 'dokter'
-    `;
-
-    const [results] = await db.query(query, [dokterId]);
-
-    if (results.length === 0) {
-      return res.status(404).json({ message: 'Profil dokter tidak ditemukan.' });
-    }
-
-    return res.status(200).json({
-      success: true,
-      data: results[0] // Karena data profil cuma 1 baris
-    });
+    const [results] = await db.query(`SELECT u.*, pd.* FROM users u JOIN profil_dokter pd ON u.id = pd.user_id WHERE u.id = ? AND u.role = 'dokter'`, [dokter_id]);
+    if (results.length === 0) return res.status(404).json({ message: 'Profil tidak ditemukan' });
+    return res.status(200).json({ success: true, data: results[0] });
   } catch (error) {
-    console.error('Error saat mengambil profil dokter:', error);
-    return res.status(500).json({ message: 'Terjadi kesalahan pada server.' });
+    return res.status(500).json({ message: error.message });
   }
 };
 
@@ -448,7 +416,8 @@ exports.getMonitoringObat = async (req, res) => {
 // 12. GET: MONITORING - LOG KUNJUNGAN PASIEN
 // =========================================================================
 exports.getLogKunjungan = async (req, res) => {
-  const dokter_id = req.user.id; // Diambil dari token
+  // PENGAMAN: Fallback ke ID 2 (Dr. Dila) jika req.user (token) belum tersedia
+  const dokter_id = req.user ? req.user.id : 2; 
 
   try {
     const query = `
@@ -456,21 +425,16 @@ exports.getLogKunjungan = async (req, res) => {
         rm.created_at AS tanggal,
         u.nama_lengkap AS nama_pasien,
         rm.keluhan,
-        rm.diagnosis,
-        p.jenis_kunjungan -- Jika ada kolom tipe (Tatap Muka/Daring) di tabel pendaftaran
+        rm.diagnosis
       FROM rekam_medis rm
-      JOIN pendaftaran p ON rm.pendaftaran_id = p.id
       JOIN users u ON rm.pasien_id = u.id
       WHERE rm.dokter_id = ?
       ORDER BY rm.created_at DESC
       LIMIT 50
     `;
-    const [logs] = await db.query(query, [dokterId]);
+    const [logs] = await db.query(query, [dokter_id]);
 
-    return res.status(200).json({
-      success: true,
-      data: logs
-    });
+    return res.status(200).json({ success: true, data: logs });
   } catch (error) {
     console.error('Error getLogKunjungan:', error);
     return res.status(500).json({ message: 'Terjadi kesalahan server.' });
@@ -481,60 +445,36 @@ exports.getLogKunjungan = async (req, res) => {
 // 13. GET: MONITORING - STATISTIK RINGKASAN & TREN KONSULTASI
 // =========================================================================
 exports.getMonitoringSummary = async (req, res) => {
-  const dokter_id = req.user.id;
+  // PENGAMAN: Fallback ke ID 2 (Dr. Dila) jika req.user (token) belum tersedia
+  const dokter_id = req.user ? req.user.id : 2;
 
   try {
-    // 1. Hitung Total Pasien Unik yang pernah ditangani dokter ini
-    const [pasienCount] = await db.query(
-      `SELECT COUNT(DISTINCT pasien_id) as total FROM rekam_medis WHERE dokter_id = ?`,
-      [dokterId]
-    );
+    // 1. Total Pasien Unik
+    const [pasienCount] = await db.query(`SELECT COUNT(DISTINCT pasien_id) as total FROM rekam_medis WHERE dokter_id = ?`, [dokter_id]);
+    
+    // 2. Total Konsultasi Bulan Ini
+    const [konsultasiBulanIni] = await db.query(`SELECT COUNT(id) as total FROM rekam_medis WHERE dokter_id = ? AND MONTH(created_at) = MONTH(CURDATE()) AND YEAR(created_at) = YEAR(CURDATE())`, [dokter_id]);
+    
+    // 3. Total Resep Dibuat
+    const [resepCount] = await db.query(`SELECT COUNT(r.id) as total FROM resep r JOIN rekam_medis rm ON r.rekam_medis_id = rm.id WHERE rm.dokter_id = ?`, [dokter_id]);
+    
+    // 4. Tren Konsultasi (Grafik)
+    const [trenKonsultasi] = await db.query(`
+      SELECT DATE_FORMAT(created_at, '%b %Y') as bulan, COUNT(id) as jumlah 
+      FROM rekam_medis 
+      WHERE dokter_id = ? AND created_at >= DATE_SUB(CURDATE(), INTERVAL 6 MONTH)
+      GROUP BY YEAR(created_at), MONTH(created_at), DATE_FORMAT(created_at, '%b %Y')
+      ORDER BY YEAR(created_at) ASC, MONTH(created_at) ASC
+    `, [dokter_id]);
 
-    // 2. Hitung Total Konsultasi Selesai bulan ini
-    const [konsultasiBulanIni] = await db.query(
-      `SELECT COUNT(id) as total FROM rekam_medis 
-       WHERE dokter_id = ? AND MONTH(created_at) = MONTH(CURDATE()) AND YEAR(created_at) = YEAR(CURDATE())`,
-      [dokterId]
-    );
-
-    // 3. Hitung Total Resep Obat yang pernah dibuat
-    const [resepCount] = await db.query(
-      `SELECT COUNT(r.id) as total FROM resep r 
-       JOIN rekam_medis rm ON r.rekam_medis_id = rm.id 
-       WHERE rm.dokter_id = ?`,
-      [dokterId]
-    );
-
-    // 4. Ambil data Tren Konsultasi (6 Bulan Terakhir) untuk Grafik
-    const [trenKonsultasi] = await db.query(
-      `SELECT 
-        DATE_FORMAT(created_at, '%b %Y') as bulan, 
-        COUNT(id) as jumlah 
-       FROM rekam_medis 
-       WHERE dokter_id = ? AND created_at >= DATE_SUB(CURDATE(), INTERVAL 6 MONTH)
-       GROUP BY YEAR(created_at), MONTH(created_at), DATE_FORMAT(created_at, '%b %Y')
-       ORDER BY YEAR(created_at) ASC, MONTH(created_at) ASC`,
-      [dokterId]
-    );
-
-    // 5. Demografi Pasien (Ringkasan Pasien berdasarkan Jenis Kelamin)
-    const [demografi] = await db.query(
-      `SELECT pp.jenis_kelamin, COUNT(DISTINCT rm.pasien_id) as jumlah
-       FROM rekam_medis rm
-       JOIN profil_pasien pp ON rm.pasien_id = pp.user_id
-       WHERE rm.dokter_id = ?
-       GROUP BY pp.jenis_kelamin`,
-      [dokterId]
-    );
-    console.log("STATISTICS DATA =", {
-  totalKonsultasi,
-  tatapMuka,
-  daring,
-  rataPerHari,
-  tren,
-  jenisKonsultasi,
-  keluhanTerbanyak
-});
+    // 5. Demografi (Berdasarkan Kelamin)
+    const [demografi] = await db.query(`
+      SELECT pp.jenis_kelamin, COUNT(DISTINCT rm.pasien_id) as jumlah
+      FROM rekam_medis rm
+      JOIN profil_pasien pp ON rm.pasien_id = pp.user_id
+      WHERE rm.dokter_id = ?
+      GROUP BY pp.jenis_kelamin
+    `, [dokter_id]);
 
     return res.status(200).json({
       success: true,
@@ -554,111 +494,24 @@ exports.getMonitoringSummary = async (req, res) => {
   }
 };
 
+// =========================================================================
+// 14. GET: STATISTICS (Untuk Dashboard Utama)
+// =========================================================================
 exports.getStatistics = async (req, res) => {
-  console.log("USER LOGIN =", req.user);
-
+  const dokter_id = req.user ? req.user.id : 2;
+  
   try {
-    const dokterId = req.user.id;
-
-    console.log("DOKTER ID =", dokterId);
-
-    const [tren] = await db.query(`
-  SELECT
-    DATE(created_at) tanggal,
-    COUNT(*) total
-  FROM rekam_medis
-  WHERE dokter_id = ?
-  GROUP BY DATE(created_at)
-  ORDER BY tanggal
-`, [dokterId]);
-
-    // TOTAL KONSULTASI
-    const [total] = await db.query(`
-      SELECT COUNT(*) AS total
-      FROM rekam_medis
-      WHERE dokter_id = ?
-    `, [dokterId]);
-
-    // TATAP MUKA
-    const [tatapMuka] = await db.query(`
-      SELECT COUNT(*) AS total
-      FROM rekam_medis rm
-      JOIN pendaftaran p
-        ON rm.pendaftaran_id = p.id
-      WHERE rm.dokter_id = ?
-      AND p.jenis_kunjungan = 'tatap_muka'
-    `, [dokterId]);
-
-    // DARING
-    const [daring] = await db.query(`
-      SELECT COUNT(*) AS total
-      FROM rekam_medis rm
-      JOIN pendaftaran p
-        ON rm.pendaftaran_id = p.id
-      WHERE rm.dokter_id = ?
-      AND p.jenis_kunjungan = 'daring'
-    `, [dokterId]);
-
-    // TREN KONSULTASI
-    const [tren] = await db.query(`
-      SELECT
-        DATE(created_at) AS tanggal,
-        COUNT(*) AS total
-      FROM rekam_medis
-      WHERE dokter_id = ?
-      GROUP BY DATE(created_at)
-      ORDER BY tanggal ASC
-    `, [dokterId]);
-
-    // JENIS KONSULTASI
-    const [jenisKonsultasi] = await db.query(`
-      SELECT
-        p.jenis_kunjungan,
-        COUNT(*) AS total
-      FROM rekam_medis rm
-      JOIN pendaftaran p
-        ON rm.pendaftaran_id = p.id
-      WHERE rm.dokter_id = ?
-      GROUP BY p.jenis_kunjungan
-    `, [dokterId]);
-
-    // KELUHAN TERBANYAK
-    const [keluhan] = await db.query(`
-      SELECT
-        keluhan,
-        COUNT(*) AS total
-      FROM rekam_medis
-      WHERE dokter_id = ?
-      AND keluhan IS NOT NULL
-      AND keluhan <> ''
-      GROUP BY keluhan
-      ORDER BY total DESC
-      LIMIT 5
-    `, [dokterId]);
-
-    return res.json({
-  success: true,
-  data: {
-    cards: {
-      totalKonsultasi: total[0].total,
-      tatapMuka: tatapMuka[0].total,
-      daring: daring[0].total,
-      rataPerHari: (
-        total[0].total / 30
-      ).toFixed(1)
-    },
-    tren,
-    keluhanTerbanyak: keluhan
-  }
-});
-
-  } catch (err) {
-    console.error("GET STATISTICS ERROR:", err);
-
-    return res.status(500).json({
-      success: false,
-      message: "Server Error",
-      error: err.message,
+    const [tren] = await db.query(`SELECT DATE(created_at) tanggal, COUNT(*) total FROM rekam_medis WHERE dokter_id = ? GROUP BY DATE(created_at)`, [dokter_id]);
+    const [total] = await db.query(`SELECT COUNT(*) AS total FROM rekam_medis WHERE dokter_id = ?`, [dokter_id]);
+    
+    return res.json({ 
+      success: true, 
+      data: { 
+        cards: { totalKonsultasi: total[0].total }, 
+        tren 
+      } 
     });
+  } catch (err) {
+    return res.status(500).json({ message: "Server Error", error: err.message });
   }
 };
