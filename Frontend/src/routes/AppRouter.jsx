@@ -3,7 +3,7 @@ import {
   Routes,
   Route,
 } from "react-router-dom"
-import ProtectedRoute from "./ProtectedRoute"
+
 import AdminLayout from "../layouts/admin-layout"
 import PatientLayout from "../layouts/patient-layout"
 import DoctorLayout from "../layouts/doctor-layout";
@@ -36,9 +36,6 @@ import ConsultationPage from "../pages/doctor/ConsultationPage";
 import MonitoringPage from "../pages/doctor/MonitoringPage";
 import ConsultationChatPage from "../pages/doctor/ConsultationChatPage";
 
-// IMPORT FILE PROFILE DOKTER DI SINI
-import ProfileDokter from "../pages/doctor/ProfileDokter";
-import ManajemenObat from "../pages/doctor/ManajemenObat";
 
 
 function AppRouter() {
@@ -64,14 +61,11 @@ function AppRouter() {
           element={<RegisterPage />}
         />
 
-<Route
-  path="/admin"
-  element={
-    <ProtectedRoute allowedRole="admin">
-      <AdminLayout />
-    </ProtectedRoute>
-  }
-> 
+        {/* ADMIN */}
+        <Route
+          path="/admin"
+          element={<AdminLayout />}
+        >
 
           <Route
             path="dashboard"
@@ -96,14 +90,9 @@ function AppRouter() {
         </Route>
 
         {/* Patient */}
-<Route
-  path="/patient"
-  element={
-    <ProtectedRoute allowedRole="pasien">
-      <PatientLayout />
-    </ProtectedRoute>
-  }
->
+        <Route
+        path="/patient"
+        element={<PatientLayout />}>
         
           <Route
             path="dashboard"
@@ -158,24 +147,15 @@ function AppRouter() {
         </Route>
 
         {/* DOCTOR */}
-        <Route
-  path="/doctor"
-  element={
-    <ProtectedRoute allowedRole="dokter">
-      <DoctorLayout />
-    </ProtectedRoute>
-  }
->
+        <Route path="/doctor" element={<DoctorLayout />}>
           <Route path="dashboard" element={<DoctorDashboard />} />
           <Route path="queue" element={<QueuePage />} />
           <Route path="schedule" element={<SchedulePage />} />
-          <Route path="monitoring" element={<MonitoringPage />} />
-          <Route path="consultation" element={<ConsultationPage />} />
-          <Route path="/doctor/consultation-chat" element={<ConsultationChatPage />} />
-          
-          <Route path="profile" element={<ProfileDokter />} />
-          <Route path="medicine" element={<ManajemenObat />} />
+          <Route path="/doctor/consultation" element={<ConsultationPage />} />
         </Route>
+
+
+        
 
       </Routes>
 
