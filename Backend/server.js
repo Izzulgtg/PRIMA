@@ -19,21 +19,18 @@ app.use(cors({
 }));
 
 app.use(express.json());
-
-// Daftarkan API Routing PRIMA di sini
-app.use('/api/auth', authRoutes);
+app.use(express.urlencoded({ extended: true }));
 
 app.get('/', (req, res) => {
   res.json({ message: 'Welcome to PRIMA Backend API Server' });
 });
 
+// Daftarkan API Routing PRIMA di sini
+app.use('/api/auth', authRoutes);
+app.use('/api/admin', adminRoutes);
+app.use('/api/dokter', dokterRoutes);
+app.use('/api/pasien', pasienRoutes);
+
 app.listen(PORT, () => {
   console.log(`Server backend PRIMA berjalan lancar di port ${PORT}`);
 });
-
-// Pasang base URL untuk rute admin
-app.use('/api/admin', adminRoutes);
-
-app.use('/api/dokter', dokterRoutes);
-
-app.use('/api/pasien', pasienRoutes);

@@ -4,12 +4,20 @@ import {
   Phone,
   User,
   Pencil,
+  LogOut,
 } from "lucide-react";
 import { formatDate } from "@/utils/patient/format-date";
 import { formatDateOnly } from "@/utils/patient/format-date-only";
 
 const PatientProfileCard = ({ profile }) => {
   const navigate = useNavigate();
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+
+    // optional: reset state kalau nanti pakai context
+    navigate("/");
+    };
 
   const initialName =
     profile?.nama_lengkap
@@ -180,6 +188,14 @@ const PatientProfileCard = ({ profile }) => {
         Edit Profil
 
       </button>
+      <div className="mt-6 border-t border-[#F1ECE4] pt-4">
+        <button 
+        onClick={handleLogout}
+        className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-prima-text hover:bg-prima-sand transition-all duration-300">
+          <LogOut size={20} />
+          Logout
+        </button>
+      </div>
 
     </div>
   );
