@@ -35,12 +35,10 @@ const ManajemenObat = () => {
   const fetchObat = async () => {
     setIsLoading(true);
     try {
-      // PASTIKAN URL INI SESUAI DENGAN ENDPOINT BACKEND-MU!
-      // Kalau di backend router-nya '/api/obat', ganti jadi 'http://localhost:5000/api/obat'
       const response = await axios.get('http://localhost:5000/api/dokter/obat', getAuthHeaders());
-      
+
       console.log("Cek Data dari Backend:", response.data); // Cek Inspect -> Console untuk melihat ini
-      
+
       // Deteksi cerdas struktur data backend
       if (Array.isArray(response.data)) {
         // Jika backend langsung mengirimkan array: res.json(hasilDatabase)
@@ -72,7 +70,7 @@ const ManajemenObat = () => {
   const getStatus = (stok, batas_minimum, tgl_kadaluarsa) => {
     const today = new Date();
     const expDate = new Date(tgl_kadaluarsa);
-    
+
     if (stok <= 0) return { label: 'HABIS', color: 'bg-red-100 text-red-600' };
     if (expDate < today) return { label: 'KADALUARSA', color: 'bg-gray-200 text-gray-600' };
     if (stok <= batas_minimum) return { label: 'HAMPIR HABIS', color: 'bg-yellow-100 text-yellow-600' };
@@ -97,14 +95,14 @@ const ManajemenObat = () => {
       await axios.post('http://localhost:5000/api/dokter/obat', formData, getAuthHeaders());
       alert('Data obat berhasil ditambahkan!');
       setIsModalOpen(false);
-      
+
       // Reset form
       setFormData({
         nama: '', nama_generik: '', kategori_id: '', satuan: '',
         stok: '', batas_minimum: '', tanggal_kadaluarsa: '',
         supplier_id: '', harga_per_unit: ''
       });
-      
+
       // Refresh tabel setelah sukses menyimpan
       fetchObat();
     } catch (error) {
@@ -130,7 +128,7 @@ const ManajemenObat = () => {
 
   return (
     <div className="flex-1 p-8 bg-white font-sans relative h-full">
-      
+
       {/* WARNING BANNERS */}
       <div className="flex gap-4 mb-6">
         <div className="flex-1 bg-yellow-50 border border-yellow-200 rounded-xl p-4 flex items-center justify-between">
@@ -157,17 +155,16 @@ const ManajemenObat = () => {
             <button
               key={filter}
               onClick={() => setActiveFilter(filter)}
-              className={`px-4 py-1.5 rounded-full text-xs font-semibold border transition ${
-                activeFilter === filter 
-                  ? 'bg-[#2A4736] text-white border-[#2A4736]' 
-                  : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'
-              }`}
+              className={`px-4 py-1.5 rounded-full text-xs font-semibold border transition ${activeFilter === filter
+                ? 'bg-[#2A4736] text-white border-[#2A4736]'
+                : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'
+                }`}
             >
               {filter}
             </button>
           ))}
         </div>
-        <button 
+        <button
           onClick={() => setIsModalOpen(true)}
           className="flex items-center gap-2 bg-[#2A4736] text-white px-5 py-2.5 rounded-xl text-sm font-semibold hover:bg-[#1f3528] transition shadow-sm"
         >
@@ -224,15 +221,48 @@ const ManajemenObat = () => {
                       </span>
                     </td>
                     <td className="p-4 text-right">
-                      <div className="flex items-center justify-end gap-3">
-                        <button className="text-xs font-semibold text-gray-600 border border-gray-200 px-3 py-1.5 rounded-lg hover:bg-gray-50">
-                          Update Stok
-                        </button>
-                        <button className="text-gray-400 hover:text-[#2A4736]">
-                          <Edit2 size={16} />
-                        </button>
-                      </div>
-                    </td>
+  <div className="flex items-center justify-end gap-3">
+    <button 
+      onClick={async () => {
+        // 1. Ambil nama dari 'obat.nama' dan tampilkan stok lamanya
+        const stokBaru = prompt(`Masukkan jumlah stok baru untuk ${obat.nama}:`, obat.stok);
+        
+        // Jika batal mengisi atau menekan tombol cancel
+        if (stokBaru === null || stokBaru.trim() === "") return;
+
+        // Validasi inputan harus berbentuk angka bulat positif
+        const angkaStok = parseInt(stokBaru, 10);
+        if (isNaN(angkaStok) || angkaStok < 0) {
+          alert("Masukkan jumlah stok yang valid (angka bulat positif)!");
+          return;
+        }
+
+        try {
+          // 2. Tembak API ke router.put('/obat/:id') dengan membawa object 'stok'
+          const response = await axios.put(
+            `http://localhost:5000/api/dokter/obat/${obat.id}`, 
+            { stok: angkaStok },
+            getAuthHeaders()
+          );
+
+          if (response.data.success) {
+            alert("Stok berhasil diperbarui!");
+            fetchObat(); // 3. Panggil ulang fungsi fetch biar tabel langsung ter-refresh otomatis
+          }
+        } catch (error) {
+          console.error("Gagal update stok:", error);
+          alert(error.response?.data?.message || "Terjadi kesalahan pada server.");
+        }
+      }}
+      className="text-xs font-semibold text-gray-600 border border-gray-200 px-3 py-1.5 rounded-lg hover:bg-gray-50"
+    >
+      Update Stok
+    </button>
+    <button className="text-gray-400 hover:text-[#2A4736]">
+      <Edit2 size={16} />
+    </button>
+  </div>
+</td>
                   </tr>
                 );
               })
@@ -245,7 +275,7 @@ const ManajemenObat = () => {
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
           <div className="bg-white w-full max-w-2xl rounded-2xl shadow-xl overflow-hidden flex flex-col max-h-[90vh]">
-            
+
             <div className="flex justify-between items-center p-6 border-b border-gray-100">
               <h2 className="text-lg font-bold text-gray-800">Tambah Obat Baru</h2>
               <button onClick={() => setIsModalOpen(false)} className="text-gray-400 hover:text-gray-600">
@@ -255,7 +285,7 @@ const ManajemenObat = () => {
 
             <form onSubmit={handleSubmit} className="p-6 overflow-y-auto">
               <div className="grid grid-cols-2 gap-x-6 gap-y-5">
-                
+
                 <div>
                   <label className="block text-xs font-semibold text-gray-600 mb-1.5">Nama Obat</label>
                   <input type="text" name="nama" value={formData.nama} onChange={handleInputChange} placeholder="Contoh: Amoxicillin 500mg" className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-[#2A4736]" required />
@@ -325,7 +355,7 @@ const ManajemenObat = () => {
           </div>
         </div>
       )}
-      
+
     </div>
   );
 };

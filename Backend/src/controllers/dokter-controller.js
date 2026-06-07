@@ -52,25 +52,33 @@ exports.getAllObat = async (req, res) => {
 };
 
 // =========================================================================
-// 3. PUT: DOKTER MENGUBAH DATA OBAT
+// 3. PUT: DOKTER MENGUBAH STOK DATA OBAT
 // =========================================================================
 exports.updateObat = async (req, res) => {
   const { id } = req.params;
-  const { nama_obat, kategori_obat_id, supplier_id, stok, harga, deskripsi } = req.body;
+  const { stok } = req.body; // Mengambil stok dari payload frontend
+
+  // Validasi agar stok tidak kosong
+  if (stok === undefined || stok === null) {
+    return res.status(400).json({ message: 'Jumlah stok wajib diisi!' });
+  }
 
   try {
-    const query = `
-      UPDATE obat SET 
-        nama_obat = ?, kategori_obat_id = ?, supplier_id = ?, 
-        stok = ?, harga = ?, deskripsi = ?, updated_at = NOW()
-      WHERE id = ?
-    `;
-    await db.query(query, [nama_obat, kategori_obat_id, supplier_id, stok, harga, deskripsi, id]);
+    // query yang presisi hanya mengubah kolom stok
+    const query = `UPDATE obat SET stok = ?, updated_at = NOW() WHERE id = ?`;
+    const [result] = await db.query(query, [stok, id]);
     
-    return res.status(200).json({ success: true, message: 'Data obat berhasil diperbarui oleh Dokter!' });
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ message: 'Data obat tidak ditemukan.' });
+    }
+    
+    return res.status(200).json({ 
+      success: true, 
+      message: 'Stok obat berhasil diperbarui oleh Dokter!' 
+    });
   } catch (error) {
-    console.error('Error saat update obat:', error);
-    return res.status(500).json({ message: 'Terjadi kesalahan pada server.' });
+    console.error('Error internal server saat update obat:', error);
+    return res.status(500).json({ message: 'Terjadi kesalahan pada server saat memperbarui data.' });
   }
 };
 
