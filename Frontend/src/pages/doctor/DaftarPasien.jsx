@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { FaSearch, FaUser, FaArrowLeft, FaPrint, FaPlus, FaExclamationTriangle } from 'react-icons/fa';
 
-const API_URL = 'http://localhost:5000/api'; // Sesuaikan port backend tim kamu
+const API_URL = import.meta.env.VITE_API_URL ||
+    "https://apiferdi.oktanio.dev"; // Sesuaikan port backend tim kamu
 
 export default function DaftarPasien() {
     const [view, setView] = useState('list'); // 'list' atau 'detail'
