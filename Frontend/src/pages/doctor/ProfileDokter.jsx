@@ -24,7 +24,7 @@ const ProfileDokter = () => {
 
         // 2. Kirimkan token ke endpoint profil dokter
         // 📑 PERBAIKAN 2: Memastikan url menembak id dokter dengan benar
-        const res = await axios.get(`http://localhost:5000/api/dokter/profil/${user.id}`, {
+        const res = await axios.get(`https://apiferdi.oktanio.dev/api/dokter/profil/${user.id}`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },

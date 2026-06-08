@@ -35,7 +35,7 @@ const ManajemenObat = () => {
   const fetchObat = async () => {
     setIsLoading(true);
     try {
-      const response = await axios.get('http://localhost:5000/api/dokter/obat', getAuthHeaders());
+      const response = await axios.get('https://apiferdi.oktanio.dev/api/dokter/obat', getAuthHeaders());
 
       console.log("Cek Data dari Backend:", response.data);
 
@@ -112,7 +112,7 @@ const ManajemenObat = () => {
     };
 
     try {
-      await axios.post('http://localhost:5000/api/dokter/obat', payload, getAuthHeaders());
+      await axios.post('https://apiferdi.oktanio.dev/api/dokter/obat', payload, getAuthHeaders());
       alert('Data obat berhasil ditambahkan!');
       setIsModalOpen(false);
 
@@ -267,7 +267,7 @@ const ManajemenObat = () => {
                             try {
                               // 3. Kirim data update (stok & tanggal_kadaluarsa) ke backend
                               const response = await axios.put(
-                                `http://localhost:5000/api/dokter/obat/${obat.id}`,
+                                `https://apiferdi.oktanio.dev/api/dokter/obat/${obat.id}`,
                                 {
                                   stok: angkaStok,
                                   tanggal_kadaluarsa: tglKadaluarsaBaru.trim() === "" ? null : tglKadaluarsaBaru

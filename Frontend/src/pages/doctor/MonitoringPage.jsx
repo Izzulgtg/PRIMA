@@ -16,9 +16,9 @@ const MonitoringPage = () => {
 
         // Eksekusi 3 API secara paralel
         const [resSummary, resObat, resKunjungan] = await Promise.all([
-          axios.get("http://localhost:5000/api/dokter/monitoring/summary", { headers }),
-          axios.get("http://localhost:5000/api/dokter/monitoring/obat", { headers }),
-          axios.get("http://localhost:5000/api/dokter/monitoring/kunjungan", { headers })
+          axios.get("https://apiferdi.oktanio.dev/api/dokter/monitoring/summary", { headers }),
+          axios.get("https://apiferdi.oktanio.dev/api/dokter/monitoring/obat", { headers }),
+          axios.get("https://apiferdi.oktanio.dev/api/dokter/monitoring/kunjungan", { headers })
         ]);
 
         setSummaryData(resSummary.data.data);
