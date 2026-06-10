@@ -25,6 +25,11 @@ function WaitingRoomPage() {
   const [loading, setLoading] =
     useState(true);
 
+  const [
+    remainingSeconds,
+    setRemainingSeconds,
+  ] = useState(0);
+
   useEffect(() => {
     const fetchQueue =
       async () => {
@@ -59,6 +64,29 @@ function WaitingRoomPage() {
   }, []);
 
   useEffect(() => {
+    if (!queueData) return;
+
+    const updateCountdown =
+      () => {
+        setRemainingSeconds(
+          calculateRemainingSeconds()
+        );
+      };
+
+    updateCountdown();
+
+    const timer =
+      setInterval(
+        updateCountdown,
+        1000
+      );
+
+    return () =>
+      clearInterval(timer);
+
+  }, [queueData]);
+
+  useEffect(() => {
     if (
       queueData?.status ===
       "berlangsung"
@@ -75,10 +103,6 @@ function WaitingRoomPage() {
   const handleJoinConsultation =
     () => {
       if (!queueData?.id) return;
-
-      navigate(
-        `/patient/consultation-room/${queueData.id}`
-      );
     };
 
   if (loading) {
@@ -90,6 +114,35 @@ function WaitingRoomPage() {
       </div>
     );
   }
+
+  const calculateRemainingSeconds =
+    () => {
+      if (
+        !queueData?.tanggal ||
+        !queueData?.jam_mulai
+      ) {
+        return 0;
+      }
+
+      const startDateTime =
+        new Date(
+          `${queueData.tanggal}T${queueData.jam_mulai}`
+        );
+
+      const now = new Date();
+
+      const diff =
+        Math.floor(
+          (
+            startDateTime -
+            now
+          ) / 1000
+        );
+
+      return diff > 0
+        ? diff
+        : 0;
+    };
 
   if (!queueData) {
     return (
@@ -172,7 +225,13 @@ function WaitingRoomPage() {
         consultationTime={
           formattedTime
         }
-        initialSeconds={600}
+        remainingSeconds={
+          remainingSeconds
+        }
+        canJoin={
+          queueData.status ===
+          "berlangsung"
+        }
         onJoin={
           handleJoinConsultation
         }
@@ -183,7 +242,7 @@ function WaitingRoomPage() {
         queueNumber={
           queueData.nomor_antrian
         }
-        currentQueue={0}
+        currentQueue={queueData.nomor_antrian}
         estimatedTime="Menunggu"
         status={queueData.status}
         canJoin={

@@ -1,4 +1,3 @@
-import { useEffect, useState } from "react";
 import {
   Clock,
   Calendar,
@@ -10,37 +9,22 @@ const WaitingRoomCard = ({
   doctorName,
   consultationDate,
   consultationTime,
-  initialSeconds = 900,
+  remainingSeconds,
+  canJoin,
   onJoin,
 }) => {
-  const [remainingSeconds, setRemainingSeconds] =
-    useState(initialSeconds);
-
-  useEffect(() => {
-    if (remainingSeconds <= 0) return;
-
-    const timer = setInterval(() => {
-      setRemainingSeconds((prev) => prev - 1);
-    }, 1000);
-
-    return () => clearInterval(timer);
-  }, [remainingSeconds]);
 
   const minutes = Math.floor(
     remainingSeconds / 60
   );
 
-  const seconds =
-    remainingSeconds % 60;
+  const seconds = remainingSeconds % 60;
 
   const formattedTime = `${String(
     minutes
   ).padStart(2, "0")}:${String(
     seconds
   ).padStart(2, "0")}`;
-
-  const canJoin =
-    remainingSeconds <= 0;
 
   return (
     <div className="bg-prima-card rounded-[32px] border border-[#F1ECE4] p-6 shadow-sm">
@@ -132,7 +116,9 @@ const WaitingRoomCard = ({
 
           {canJoin
             ? "Dokter siap menerima konsultasi."
-            : "Silakan tunggu hingga waktu konsultasi dimulai."}
+            : remainingSeconds <= 0
+              ? "Menunggu dokter memulai sesi konsultasi."
+              : "Silakan tunggu hingga waktu konsultasi dimulai."}
 
         </p>
 

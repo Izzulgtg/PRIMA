@@ -47,3 +47,68 @@ export const finishConsultation =
 
     return response.data;
   };
+
+export const saveMedicalRecord =
+  async (
+    consultationId,
+    payload
+  ) => {
+
+    const response =
+      await api.post(
+        `/consultations/${consultationId}/medical-record`,
+        payload
+      );
+
+    return response.data;
+  };
+
+export const savePrescription =
+  async (
+    consultationId,
+    medicines
+  ) => {
+
+    const response =
+      await api.post(
+        `/consultations/${consultationId}/prescription`,
+        {
+          medicines,
+        }
+      );
+
+    return response.data;
+  };
+
+export const getPatientHistory =
+  async (patientId) => {
+
+    const response =
+      await api.get(
+        `/patients/${patientId}/history`
+      );
+
+    return response.data;
+  };
+
+export const getPatientMedicines =
+  async (patientId) => {
+
+    const response =
+      await api.get(
+        `/patients/${patientId}/medicines`
+      );
+
+    return response.data;
+  };
+
+export const startConsultation =
+  async (id) => {
+
+    const response =
+      await api.patch(
+        `/consultations/${id}/start`
+      );
+
+    return response.data;
+  };

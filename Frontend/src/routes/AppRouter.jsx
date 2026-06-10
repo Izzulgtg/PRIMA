@@ -133,7 +133,7 @@ function AppRouter() {
           />
 
           <Route
-            path="waiting-room"
+            path="waiting-room/:sessionId"
             element={<WaitingRoomPage />}
           />
 

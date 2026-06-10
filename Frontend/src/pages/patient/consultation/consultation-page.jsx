@@ -67,8 +67,9 @@ function ConsultationPage() {
 
   const handleWaitingRoom =
     () => {
+      if (!queueData?.id) return;
       navigate(
-        "/patient/waiting-room"
+        `/patient/waiting-room/${queueData.id}`
       );
     };
 
@@ -143,7 +144,7 @@ function ConsultationPage() {
               Online Consultation
             </p>
 
-            <h1 className="mt-3 text-4xl font-bold leading-tight">
+            <h1 className="mt-3 text-3xl font-bold leading-tight">
               Konsultasi Online Bersama Dokter
             </h1>
 
@@ -195,7 +196,13 @@ function ConsultationPage() {
 
             <div className="mt-6 flex items-center gap-2">
 
-              <div className="h-3 w-3 animate-pulse rounded-full bg-green-300" />
+              <div
+                className={`h-3 w-3 rounded-full ${
+                  isReady
+                    ? "bg-green-300 animate-pulse"
+                    : "bg-yellow-300"
+                }`}
+              />
 
               <span className="text-sm">
                 {

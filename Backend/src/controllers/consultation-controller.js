@@ -302,3 +302,181 @@ exports.finishConsultation =
       });
     }
   };
+
+const saveMedicalRecord =
+  async (req, res) => {
+    try {
+
+      const { id } =
+        req.params;
+
+      const {
+        subjective,
+        objective,
+        assessment,
+        plan,
+      } = req.body;
+
+      const consultation =
+        await ConsultationService.getConsultationById(
+          id
+        );
+
+      if (!consultation) {
+        return res
+          .status(404)
+          .json({
+            message:
+              "Konsultasi tidak ditemukan",
+          });
+      }
+
+      const medicalRecord =
+        await ConsultationService.createMedicalRecord({
+          consultationId: id,
+          patientId:
+            consultation.pasien_id,
+          doctorId:
+            consultation.dokter_id,
+          subjective,
+          objective,
+          assessment,
+          plan,
+        });
+
+      return res
+        .status(201)
+        .json({
+          message:
+            "Rekam medis berhasil disimpan",
+          data:
+            medicalRecord,
+        });
+
+    } catch (error) {
+
+      console.error(error);
+
+      return res
+        .status(500)
+        .json({
+          message:
+            "Terjadi kesalahan server",
+        });
+
+    }
+  };
+
+const getPatientHistory =
+  async (req, res) => {
+
+    try {
+
+      const {
+        patientId,
+      } = req.params;
+
+      const history =
+        await ConsultationService.getPatientHistory(
+          patientId
+        );
+
+      return res.json(
+        history
+      );
+
+    } catch (error) {
+
+      console.error(error);
+
+      return res
+        .status(500)
+        .json({
+          message:
+            "Terjadi kesalahan server",
+        });
+
+    }
+
+  };
+
+const savePrescription =
+  async (req, res) => {
+
+    try {
+
+      const { id } =
+        req.params;
+
+      const {
+        medicines,
+      } = req.body;
+
+      const prescription =
+        await ConsultationService.createPrescription({
+          consultationId: id,
+          medicines,
+        });
+
+      return res
+        .status(201)
+        .json({
+          message:
+            "Resep berhasil disimpan",
+          data:
+            prescription,
+        });
+
+    } catch (error) {
+
+      console.error(error);
+
+      return res
+        .status(500)
+        .json({
+          message:
+            "Terjadi kesalahan server",
+        });
+
+    }
+
+  };
+
+exports.startConsultation =
+  async (req, res) => {
+
+    try {
+
+      const { id } =
+        req.params;
+
+      await db.query(
+        `
+        UPDATE konsultasi
+        SET
+          status = 'berlangsung',
+          mulai_at = NOW()
+        WHERE id = ?
+        `,
+        [id]
+      );
+
+      return res.json({
+        success: true,
+        message:
+          "Konsultasi dimulai",
+      });
+
+    } catch (error) {
+
+      console.error(error);
+
+      return res.status(500).json({
+        success: false,
+        message:
+          "Gagal memulai konsultasi",
+      });
+
+    }
+
+  };

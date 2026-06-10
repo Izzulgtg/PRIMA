@@ -10,6 +10,7 @@ router.get("/doctor-queue",controller.getDoctorQueue);
 router.get("/:id",controller.getSessionDetail);
 router.get("/:id/messages",controller.getMessages);
 router.post("/:id/messages",controller.sendMessage);
+router.patch("/:id/start",controller.startConsultation);
 router.patch("/:id/finish",controller.finishConsultation);
 
 module.exports = router;

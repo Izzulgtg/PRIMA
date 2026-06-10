@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import {
   getQueue,
+  startConsultation,
 } from "@/services/dokter/consultation-service";
 import {
  useState,
@@ -118,10 +119,28 @@ function QueueAction({ patient, onViewResume }) {
       <div className="flex items-center gap-5">
         <div className="hidden text-right sm:block">
           <p className="text-[9px] text-[#6B7280]">Mulai dalam</p>
-          <p className="text-[11px] font-medium text-[#6B8F71]">05:22</p>
+          <p className="text-[11px] font-medium text-[#6B8F71]"> Segera </p>
         </div>
         <button
-          onClick={() => navigate(`/doctor/consultation-chat/${patient.id}`)}
+          onClick={async () => {
+            try {
+              const result =
+                await startConsultation(
+                  patient.id
+                );
+
+              console.log(result);
+
+              navigate(
+                `/doctor/consultation-chat/${patient.id}`
+              );
+            } catch (error) {
+              console.error(
+                "START ERROR",
+                error
+              );
+            }
+          }}
           className="flex h-10 items-center gap-2 rounded-[8px] bg-[#437450] px-5 text-[11px] font-semibold text-white shadow-sm hover:bg-[#365F41]"
         >
           <span className="flex h-5 w-5 items-center justify-center rounded-full bg-white/20">
@@ -262,10 +281,11 @@ function ConsultationPage() {
                 .toUpperCase(),
 
             type:
-              item.status ===
-              "selesai"
+              item.status === "selesai"
                 ? "completed"
-                : "available",
+                : item.status === "berlangsung"
+                  ? "available"
+                  : "waiting",
           }));
 
         setQueue(mappedQueue);
@@ -298,6 +318,21 @@ function ConsultationPage() {
               Hourglass,
             iconColor:
               "text-[#C18B2F]",
+          },
+          {
+            label: "Berlangsung",
+            value:
+              mappedQueue.filter(
+                item =>
+                  item.status ===
+                  "berlangsung"
+              ).length,
+            valueColor:
+              "text-[#4A7C8E]",
+            icon:
+              MessageSquare,
+            iconColor:
+              "text-[#4A7C8E]",
           },
           {
             label:
@@ -401,7 +436,8 @@ function ConsultationPage() {
               <div className="rounded-lg bg-[#F5F0E8] p-3 border border-[#EDE8DC]">
                 <p className="text-xs font-semibold text-[#4A7C8E]">Catatan Keluhan & Diagnosis Akhir:</p>
                 <p className="mt-1 text-xs text-[#1E1E1E] leading-relaxed">
-                  {selectedPatientResume.complaint}
+                  {selectedPatientResume.complaint ||
+                  "Belum ada catatan rekam medis."}
                 </p>
               </div>
             </div>
