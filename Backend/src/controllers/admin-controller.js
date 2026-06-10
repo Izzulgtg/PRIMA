@@ -352,3 +352,50 @@ exports.getAllUsers = async (req, res) => {
   }
 
 };
+
+// =========================================================================
+// RESET PASSWORD USER
+// =========================================================================
+exports.resetPasswordUser = async (req, res) => {
+
+  const { id } = req.params;
+
+  try {
+
+    const defaultPassword = "123456";
+
+    const hashedPassword =
+      await bcrypt.hash(defaultPassword, 10);
+
+    const [result] = await db.query(
+      `
+      UPDATE users
+      SET password = ?
+      WHERE id = ?
+      `,
+      [hashedPassword, id]
+    );
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({
+        message: "User tidak ditemukan"
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message:
+        "Password berhasil direset menjadi 123456"
+    });
+
+  } catch (error) {
+
+    console.error(error);
+
+    return res.status(500).json({
+      message: "Server Error"
+    });
+
+  }
+
+};

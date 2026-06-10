@@ -25,3 +25,10 @@ router.get(
 );
 
 module.exports = router;
+
+router.get("/users", adminController.getAllUsers);
+
+router.put(
+  "/users/:id/reset-password",
+  adminController.resetPasswordUser
+);
