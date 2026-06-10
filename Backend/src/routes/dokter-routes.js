@@ -27,4 +27,8 @@ router.get(
   "/statistics",
   dokterController.getStatistics
 );
+
+router.get('/antrean/:dokter_id', dokterController.getAntreanDokter);
+router.put('/antrean/:pendaftaran_id/status', dokterController.updateStatusAntrean);
+
 module.exports = router;
