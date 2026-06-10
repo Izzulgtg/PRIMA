@@ -1,76 +1,134 @@
-import React, { useState, useEffect } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
-import { X, Send, Search, Trash2, Clock, Pill, ClipboardList, PenTool, Activity, ArrowLeft, Printer } from "lucide-react";
+import React, {
+  useState,
+  useEffect,
+} from "react";
+
+import {
+  X,
+  Send,
+  Search,
+  Trash2,
+  Clock,
+  ClipboardList,
+  PenTool,
+  Activity,
+  ArrowLeft,
+  Printer,
+} from "lucide-react";
+
+import {
+  useParams,
+  useNavigate,
+} from "react-router-dom";
+
+import {
+  sendMessage,
+  getMessages,
+  getConsultation,
+  finishConsultation,
+} from "@/services/dokter/consultation-service";
 
 export default function ConsultationChatPage() {
-  const location = useLocation();
-  const navigate = useNavigate();
 
-  // --- 1. AMBIL DATA PASIEN DINAMIS (Proteksi Fallback) ---
-  const patientData = location.state || {
-    id: 1,
-    name: "Ibu Rastna Sari",
-    age: 45,
-    gender: "Perempuan",
-    complaint: "Konsultasi Diabetes Melitus • Sesi 2",
-    avatar: ""
-  };
+  const user = JSON.parse(
+    localStorage.getItem("user") || "{}"
+  );
 
-  const safeName = patientData.name || "Pasien";
-  const safeComplaint = patientData.complaint || "Tidak ada catatan keluhan.";
+  const currentUserId =
+    user?.id;
 
-  // --- DATABASE RIWAYAT PASIEN (FRD-9 & FRD-10) ---
-  const historyDatabase = {
-    // Jika yang diklik Ibu Rastna Sari (ID: 99 atau nama mengandung Rastna)
-    "Ibu Rastna Sari": {
-      diseaseHistory: [
-        { date: "10 Mei 2026", doctor: "dr. Hendra Sp.PD", diagnosis: "Diabetes Melitus Tipe 2", note: "GDS terakhir 210 mg/dL. Pasien mengeluh sering lemas di malam hari." },
-        { date: "12 Jan 2026", doctor: "dr. Hendra Sp.PD", diagnosis: "Hipertensi Stage 1", note: "TD: 140/90 mmHg. Diberikan edukasi diet rendah garam." }
-      ],
-      prescriptionHistory: [
-        { name: "Metformin 500mg", detail: "3x1 Tablet • Sesudah Makan" },
-        { name: "Amlodipine 5mg", detail: "1x1 Tablet • Malam Hari" }
-      ]
-    },
-    // Jika yang diklik Bp. Ahmad Hidayat
-    "Bp. Ahmad Hidayat": {
-      diseaseHistory: [
-        { date: "05 Apr 2026", doctor: "dr. Rian Umum", diagnosis: "Faringitis Akut", note: "Tenggorokan hiperemis (+), demam subfebris 37.8°C." },
-        { date: "20 Des 2025", doctor: "dr. Rian Umum", diagnosis: "Dispepsia Organik", note: "Nyeri ulu hati hebat, mual setelah mengonsumsi kopi kaku." }
-      ],
-      prescriptionHistory: [
-        { name: "Amoxicillin 500mg", detail: "3x1 Tablet • Habiskan" },
-        { name: "Antasida Doen", detail: "3x1 Kunyah • Sebelum Makan" }
-      ]
-    }
-  };
+  const { consultationId } =
+    useParams();
 
-  // Ambil data riwayat spesifik berdasarkan nama, kalau tidak ketemu pakai data default umum
-  const currentHistory = historyDatabase[safeName] || {
-    diseaseHistory: [
-      { date: "12 Jan 2026", doctor: "dr. Hendra Sp.PD", diagnosis: "Gastritis Erosif", note: "Pasien memiliki riwayat keluhan pencernaan berulang." }
-    ],
-    prescriptionHistory: [
-      { name: "Omeprazole 20mg", detail: "1x1 Sebelum Makan" }
-    ]
-  };
+  const navigate =
+    useNavigate();
 
-  // --- 2. STATE CHAT ---
-  const [messages, setMessages] = useState([
-    { 
-      id: 1, 
-      sender: "patient", 
-      text: `Selamat siang dokter, ini keluhan saya: ${safeComplaint}`, 
-      time: "14:01" 
-    },
-    { 
-      id: 2, 
-      sender: "doctor", 
-      text: `Selamat siang ${safeName}. Baik, saya sudah membaca keluhan Anda. Bisa tolong ceritakan lebih detail sejak kapan gejala ini dirasa paling berat?`, 
-      time: "14:02" 
-    },
+  const [messages, setMessages] =
+    useState([]);
+
+  const [
+    consultation,
+    setConsultation,
+  ] = useState(null);
+
+  const refreshMessages =
+    async () => {
+      try {
+
+        const data =
+          await getMessages(
+            consultationId
+          );
+
+        setMessages(
+          data.map((item) => ({
+            id: item.id,
+            text: item.isi,
+
+            sender:
+              item.pengirim_id ===
+              currentUserId
+                ? "doctor"
+                : "patient",
+
+            time:
+              new Date(
+                item.created_at
+              ).toLocaleTimeString(
+                "id-ID",
+                {
+                  hour: "2-digit",
+                  minute: "2-digit",
+                }
+              ),
+          }))
+        );
+
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+  useEffect(() => {
+
+    const fetchConsultation =
+      async () => {
+
+        try {
+
+          const data =
+            await getConsultation(
+              consultationId
+            );
+
+          setConsultation(data);
+
+        } catch (error) {
+
+          console.error(error);
+
+        }
+
+      };
+
+    fetchConsultation();
+
+    refreshMessages();
+
+    const interval =
+      setInterval(
+        refreshMessages,
+        3000
+      );
+
+    return () =>
+      clearInterval(interval);
+
+  }, [
+    consultationId,
+    currentUserId,
   ]);
-
+  
   const [newMessage, setNewMessage] = useState("");
   const [activeTab, setActiveTab] = useState("Catatan"); // Default langsung buka tab Catatan sesuai gambar mockup kamu
   const [isRxModalOpen, setIsRxModalOpen] = useState(false);
@@ -79,10 +137,10 @@ export default function ConsultationChatPage() {
 
   // --- 3. STATE SOAP FORM ---
   const [soapForm, setSoapForm] = useState({
-    subjective: safeComplaint,
-    objective: "Nyeri tekan (+), Kesadaran: Compos Mentis, TD: 120/80 mmHg.",
-    assessment: "Pemeriksaan Fisik Lanjutan Sesuai Gejala",
-    plan: "Edukasi pasien dan pemberian terapi farmasi."
+    subjective: "",
+    objective: "",
+    assessment: "",
+    plan: ""
   });
 
   const [medicines, setMedicines] = useState([]);
@@ -108,22 +166,58 @@ export default function ConsultationChatPage() {
     return `${minutes.toString().padStart(2, "0")}:${remainingSeconds.toString().padStart(2, "0")}`;
   };
 
-  // --- 5. HANDLERS ---
-  const handleSendMessage = () => {
-    if (!newMessage.trim()) return;
-    const timeNow = new Date().toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" });
-    setMessages([...messages, { id: Date.now(), sender: "doctor", text: newMessage, time: timeNow }]);
-    setNewMessage("");
+  // --- LOGIKA HANDLER ---
+  const handleSendMessage =
+    async () => {
+
+      if (
+        !newMessage.trim()
+      ) return;
+
+      try {
+
+        await sendMessage(
+          consultationId,
+          newMessage
+        );
+
+        await refreshMessages();
+
+        setNewMessage("");
+
+      } catch (error) {
+
+        console.error(error);
+
+      }
   };
 
-  const handleAddMedicine = (obat) => {
-    if (medicines.some(m => m.id === obat.id)) return;
-    setMedicines([...medicines, { 
-      id: obat.id, 
-      name: obat.name, 
-      detail: `${obat.jenis === "Kapsul" ? "10 Kapsul" : obat.jenis === "Botol" ? "1 Botol" : "10 Tablet"} • ${obat.aturan}` 
-    }]);
-  };
+  const handleAddMedicine =
+    (obat) => {
+
+      if (
+        medicines.some(
+          (m) => m.id === obat.id
+        )
+      ) {
+        return;
+      }
+
+      setMedicines((prev) => [
+        ...prev,
+        {
+          id: obat.id,
+          name: obat.name,
+          detail: `${
+            obat.jenis === "Kapsul"
+              ? "10 Kapsul"
+              : obat.jenis === "Botol"
+              ? "1 Botol"
+              : "10 Tablet"
+          } • ${obat.aturan}`,
+        },
+      ]);
+    };
 
   const handleRemoveMedicine = (id) => {
     setMedicines(medicines.filter((med) => med.id !== id));
@@ -131,9 +225,35 @@ export default function ConsultationChatPage() {
 
   const handleSendPrescription = () => {
     if (medicines.length === 0) return;
-    const rxNo = Math.floor(1000 + Math.random() * 9000);
-    const timeNow = new Date().toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" });
-    setMessages([...messages, { id: Date.now(), sender: "system", isRx: true, rxNo: rxNo.toString(), drugs: medicines, time: timeNow }]);
+
+    const rxNo =
+      Math.floor(
+        1000 +
+        Math.random() * 9000
+      );
+
+    const timeNow =
+      new Date().toLocaleTimeString(
+        "id-ID",
+        {
+          hour: "2-digit",
+          minute: "2-digit",
+        }
+      );
+
+    setMessages((prev) => [
+      ...prev,
+      {
+        id: Date.now(),
+        sender: "system",
+        isRx: true,
+        rxNo: rxNo.toString(),
+        drugs: medicines,
+        time: timeNow,
+      },
+    ]);
+
+    setMedicines([]);
     setIsRxModalOpen(false);
   };
 
@@ -141,58 +261,184 @@ export default function ConsultationChatPage() {
   const handlePrintPDF = () => {
     window.print();
   };
+    
+  const handleFinishConsultation =
+    async () => {
+
+      try {
+
+        await finishConsultation(
+          consultationId
+        );
+
+        navigate(
+          "/doctor/consultation"
+        );
+
+      } catch (error) {
+
+        console.error(error);
+
+      }
+  };
+
+  const handleSaveSOAP = () => {
+    const dataSimpan = {pasien: consultation?.pasien_nama, ...soapForm, resep: medicines };
+    localStorage.setItem(
+      `RM_${consultationId}`,
+      JSON.stringify(dataSimpan)
+      );
+    alert("Data Pemeriksaan (SOAP) Berhasil Disimpan!");
+  };
 
   const filteredObat = masterObat.filter(o => o.name.toLowerCase().includes(searchQuery.toLowerCase()));
 
   return (
     <div className="bg-[#F5F0E8] min-h-screen text-[#1E1E1E] font-sans flex flex-col">
       
-      {/* TAMPILAN UTAMA (Akan otomatis disembunyikan saat mode print cetak PDF aktif) */}
-      <div className="print:hidden flex flex-col flex-1">
-        
-        {/* HEADER ATAS */}
-        <div className="bg-[#F5F0E8] px-8 py-3 border-b border-gray-200 flex justify-between items-center">
-          <div className="flex items-center gap-3">
-            <button onClick={() => navigate(-1)} className="p-1 hover:bg-gray-200 rounded-full text-gray-600 transition-colors mr-1">
-              <ArrowLeft size={18} />
-            </button>
-            <div className="w-10 h-10 rounded-full bg-[#4A7C8E]/20 overflow-hidden border border-[#4A7C8E]/30 flex items-center justify-center font-bold text-[#4A7C8E]">
-              {safeName.substring(0, 2).toUpperCase()}
-            </div>
-            <div>
-              <h2 className="font-bold text-sm text-[#1E1E1E]">{safeName}</h2>
-              <p className="text-[11px] text-[#6B7280]">{patientData.age} Thn • {patientData.gender}</p>
-            </div>
+      {/* HEADER */}
+      <div className="bg-[#F5F0E8] px-8 py-3 border-b border-gray-200 flex justify-between items-center">
+
+        <div className="flex items-center gap-3">
+
+          <button
+            onClick={() => navigate(-1)}
+            className="p-1 hover:bg-gray-200 rounded-full text-gray-600 transition-colors mr-1"
+          >
+            <ArrowLeft size={18} />
+          </button>
+
+          <div className="w-10 h-10 rounded-full bg-[#4A7C8E]/20 overflow-hidden border border-[#4A7C8E]/30 flex items-center justify-center font-bold text-[#4A7C8E]">
+            {consultation?.pasien_nama
+              ?.substring(0, 2)
+              ?.toUpperCase() || "PS"}
           </div>
-          <div className="flex items-center gap-3">
-            <div className="border border-[#C4846A]/20 bg-[#C4846A]/10 px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-2 text-[#C4846A]">
-              <Clock size={14} /> {formatTime(timeLeft)}
-            </div>
-            <button onClick={() => navigate(-1)} className="bg-[#C4846A] text-white font-bold text-xs py-2 px-4 rounded-lg hover:bg-[#b37359] transition-colors">Akhiri Sesi</button>
+
+          <div>
+            <h2 className="font-bold text-sm text-[#1E1E1E]">
+              {consultation?.pasien_nama ||
+                "Pasien"}
+            </h2>
+
+            <p className="text-[11px] text-[#6B7280]">
+              ID Konsultasi:
+              {consultation?.id}
+            </p>
           </div>
+
         </div>
 
-        {/* WORKSPACE CONTENT */}
-        <div className="flex-1 grid grid-cols-12 overflow-hidden h-[calc(100vh-145px)]">
-          {/* PANEL CHAT ROOM */}
-          <div className="col-span-8 flex flex-col bg-[#F5F0E8]/40 border-r border-gray-200">
-            <div className="flex-1 p-6 overflow-y-auto space-y-4">
-              {messages.map((msg) => (
-                <div key={msg.id} className={`flex flex-col ${msg.sender === "doctor" || msg.isRx ? "items-end" : "items-start"}`}>
-                  {msg.isRx ? (
-                    <div className="bg-white border border-[#6B8F71]/30 rounded-2xl p-4 shadow-sm w-full max-w-xs mb-2">
-                      <div className="text-[#6B8F71] font-bold text-xs border-b pb-2 mb-2 flex justify-between">
-                        <span>📋 Resep Elektronik</span>
-                        <span className="text-gray-400 font-normal">#RX-{msg.rxNo}</span>
-                      </div>
-                      {msg.drugs.map((d, i) => (
-                        <div key={i} className="text-xs mb-1">
-                          <p className="font-bold text-gray-800">{d.name}</p>
-                          <p className="text-gray-500 text-[10px]">{d.detail}</p>
-                        </div>
-                      ))}
+        <div className="flex items-center gap-3">
+
+          <div
+            className={`
+            border px-3 py-1.5 rounded-lg
+            text-xs font-bold flex items-center gap-2
+            transition-colors
+            ${
+              timeLeft < 60
+                ? "bg-red-50 border-red-200 text-red-600 animate-pulse"
+                : "bg-[#C4846A]/10 border-[#C4846A]/20 text-[#C4846A]"
+            }
+          `}
+          >
+            <Clock size={14} />
+            {formatTime(timeLeft)}
+          </div>
+
+          <button
+            onClick={() =>
+              alert(
+                "Membuka Ringkasan Rekam Medis Pasien..."
+              )
+            }
+            className="
+            bg-white
+            border border-gray-300
+            text-[#4A7C8E]
+            font-bold text-xs
+            py-2 px-4
+            rounded-lg
+          "
+          >
+            Rekam Medis
+          </button>
+
+          <button
+            onClick={
+              handleFinishConsultation
+            }
+            className="
+            bg-[#C4846A]
+            text-white
+            font-bold text-xs
+            py-2 px-4
+            rounded-lg
+          "
+          >
+            Akhiri Sesi
+          </button>
+
+        </div>
+
+      </div>
+
+      {/* MAIN WORKSPACE */}
+      <div className="flex-1 grid grid-cols-12 overflow-hidden h-[calc(100vh-145px)]">
+
+        {/* CHAT AREA */}
+        <div className="col-span-8 flex flex-col bg-[#F5F0E8]/40 border-r border-gray-200">
+
+          <div className="flex-1 p-6 overflow-y-auto space-y-4">
+
+            {messages.map((msg) => (
+
+              <div
+                key={msg.id}
+                className={`flex flex-col ${
+                  msg.sender === "doctor" ||
+                  msg.isRx
+                    ? "items-end"
+                    : "items-start"
+                }`}
+              >
+
+                {msg.isRx ? (
+
+                  <div className="bg-white border border-[#6B8F71]/30 rounded-2xl p-4 shadow-sm w-full max-w-xs mb-2">
+
+                    <div className="text-[#6B8F71] font-bold text-xs border-b pb-2 mb-2 flex justify-between">
+
+                      <span>
+                        📋 Resep Elektronik
+                      </span>
+
+                      <span className="text-gray-400 font-normal">
+                        #RX-{msg.rxNo}
+                      </span>
+
                     </div>
-                  ) : (
+
+                    {msg.drugs.map(
+                      (d, i) => (
+                        <div
+                          key={i}
+                          className="text-xs mb-1"
+                        >
+                          <p className="font-bold">
+                            {d.name}
+                          </p>
+
+                          <p className="text-gray-500 text-[10px]">
+                            {d.detail}
+                          </p>
+                        </div>
+                      )
+                    )}
+
+                  </div>
+
+                ) : (
                     <div className={`p-3 rounded-2xl text-xs max-w-[75%] ${msg.sender === "doctor" ? "bg-[#6B8F71] text-white rounded-tr-none" : "bg-white border border-gray-100 rounded-tl-none shadow-sm"}`}>
                       {msg.text}
                     </div>
@@ -215,34 +461,19 @@ export default function ConsultationChatPage() {
 
             {/* TAB RIWAYAT: FRD-10 Rekap data penyakit pasien sebelumnya */}
             {activeTab === "Riwayat" && (
-              <div className="space-y-3">
-                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider px-1">Rekap Data Penyakit Sebelumnya </p>
-                {currentHistory.diseaseHistory.map((item, idx) => (
-                  <div key={idx} className="bg-white p-3 rounded-xl border border-gray-200 shadow-sm space-y-1">
-                    <div className="flex justify-between text-[9px] font-bold text-gray-400">
-                      <span>{item.date}</span>
-                      <span>{item.doctor}</span>
-                    </div>
-                    <h4 className="text-xs font-bold text-[#4A7C8E]">{item.diagnosis}</h4>
-                    <p className="text-[11px] text-gray-500 leading-relaxed">{item.note}</p>
-                  </div>
-                ))}
+              <div className="bg-white p-4 rounded-xl border">
+                <p className="text-xs text-gray-500">
+                  Riwayat penyakit pasien belum tersedia.
+                </p>
               </div>
             )}
 
             {/* TAB OBAT-OBATAN: FRD-9 Akses riwayat resep pasien sebelumnya */}
             {activeTab === "Obat-obatan" && (
-              <div className="space-y-2">
-                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider px-1">Riwayat Resep Obat Sebelumnya </p>
-                {currentHistory.prescriptionHistory.map((med, idx) => (
-                  <div key={idx} className="bg-white p-3 rounded-xl border border-emerald-100 flex items-center gap-3 shadow-sm">
-                    <Pill className="text-emerald-600 flex-shrink-0" size={16} />
-                    <div className="text-xs">
-                      <p className="font-bold text-gray-800">{med.name}</p>
-                      <p className="text-[10px] text-gray-500">{med.detail}</p>
-                    </div>
-                  </div>
-                ))}
+              <div className="bg-white p-4 rounded-xl border">
+                <p className="text-xs text-gray-500">
+                  Riwayat obat pasien belum tersedia.
+                </p>
               </div>
             )}
 
@@ -277,6 +508,21 @@ export default function ConsultationChatPage() {
                      <button onClick={()=>setIsRxModalOpen(true)} className="w-full bg-[#EDE8DC] text-[#4A7C8E] font-bold py-2 rounded-lg flex justify-center items-center gap-2 hover:bg-[#e4decb] transition-all text-xs">
                        <Search size={14}/> {medicines.length > 0 ? "Edit Racikan Obat" : "Racik Obat Elektronik"}
                      </button>
+                       <button
+                          onClick={handleSaveSOAP}
+                          className="
+                            mt-3
+                            w-full
+                            rounded-lg
+                            bg-[#4A7C8E]
+                            py-2
+                            text-xs
+                            font-semibold
+                            text-white
+                          "
+                        >
+                          Simpan SOAP
+                        </button>
                   </div>
                 </div>
               </div>
@@ -284,7 +530,7 @@ export default function ConsultationChatPage() {
           </div>
         </div>
 
-        {/* FOOTER ACTION PANEL */}
+      {/* FOOTER ACTION PANEL */}
         <div className="bg-white p-4 border-t border-gray-200 grid grid-cols-12 gap-4 items-center">
           <div className="col-span-8 flex gap-2">
             <input value={newMessage} onChange={(e)=>setNewMessage(e.target.value)} onKeyDown={(e)=>e.key==="Enter" && handleSendMessage()} type="text" placeholder="Tulis pesan atau anjuran medis..." className="flex-1 bg-gray-50 border border-gray-200 rounded-xl px-4 py-2 text-xs focus:outline-none focus:border-[#6B8F71]" />
@@ -296,7 +542,6 @@ export default function ConsultationChatPage() {
             </button>
           </div>
         </div>
-      </div>
 
       {/* --- TEMPLATE CETAK NOTA RESUME (PDF) --- */}
       <div className="hidden print:block p-10 bg-white min-h-screen text-black">
@@ -308,8 +553,15 @@ export default function ConsultationChatPage() {
 
         <div className="mb-6 grid grid-cols-2 gap-4 text-xs">
           <div>
-            <p><strong>Nama Pasien:</strong> {safeName}</p>
-            <p><strong>Usia / Gender:</strong> {patientData.age} Tahun / {patientData.gender}</p>
+            <p>
+              <strong>Nama Pasien:</strong>{" "}
+              {consultation?.pasien_nama}
+            </p>
+            <p>
+              <strong>Usia / Gender:</strong>
+              {consultation?.umur || "-"} Tahun /
+              {consultation?.jenis_kelamin || "-"}
+            </p>
           </div>
           <div className="text-right">
             <p><strong>Tanggal Konsultasi:</strong> {new Date().toLocaleDateString("id-ID")}</p>

@@ -6,9 +6,10 @@ const verifyToken = require("../middlewares/auth-middleware");
 router.use(verifyToken);
 
 router.get("/queue",controller.getQueue);
+router.get("/doctor-queue",controller.getDoctorQueue);
 router.get("/:id",controller.getSessionDetail);
 router.get("/:id/messages",controller.getMessages);
 router.post("/:id/messages",controller.sendMessage);
-router.patch("/:id/finish",verifyToken,controller.finishConsultation);
+router.patch("/:id/finish",controller.finishConsultation);
 
 module.exports = router;

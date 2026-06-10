@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   CalendarDays,
@@ -11,85 +10,13 @@ import {
   ListFilter,
   X 
 } from "lucide-react";
-
-const statistics = [
-  {
-    label: "Terjadwal",
-    value: 6,
-    valueColor: "text-[#6B8F71]", 
-    icon: CalendarDays,
-    iconColor: "text-[#6B8F71]",
-  },
-  {
-    label: "Selesai",
-    value: 2,
-    valueColor: "text-[#6B8F71]",
-    icon: CircleCheck,
-    iconColor: "text-[#6B8F71]",
-  },
-  {
-    label: "Menunggu",
-    value: 4,
-    valueColor: "text-[#4A7C8E]", 
-    icon: Hourglass,
-    iconColor: "text-[#4A7C8E]",
-  },
-];
-
-const queue = [
-  {
-    id: 1,
-    timeLabel: "MULAI",
-    time: "14:00",
-    name: "Bp. Ahmad Hidayat",
-    age: 28,
-    gender: "Laki-laki",
-    duration: "30 Menit",
-    status: "WAKTUNYA",
-    type: "available",
-    avatar: "https://i.pravatar.cc/100?img=11",
-    complaint: "Batuk berdahak disertai demam tinggi sejak 3 hari yang lalu."
-  },
-  {
-    id: 2,
-    timeLabel: "MULAI",
-    time: "14:45",
-    name: "Sdr. Siti Aminah",
-    age: 22,
-    gender: "Perempuan",
-    duration: "30 Menit",
-    status: "MENUNGGU",
-    type: "waiting",
-    avatar: "https://i.pravatar.cc/100?img=47",
-    complaint: "Nyeri ulu hati, perih seperti ditusuk-tusuk setelah konsumsi kafein/pedas."
-  },
-  {
-    id: 3,
-    timeLabel: "MULAI",
-    time: "15:30",
-    name: "Bp. Bambang Agus",
-    age: 54,
-    gender: "Laki-laki",
-    duration: "30 Menit",
-    status: "MENUNGGU",
-    type: "waiting",
-    initials: "BA",
-    complaint: "Kontrol pasca opname demam berdarah tahap pemulihan."
-  },
-  {
-    id: 4,
-    timeLabel: "PUKUL",
-    time: "11:00",
-    name: "Ibu Maria Ulfa",
-    age: 62,
-    gender: "Perempuan",
-    duration: "Selesai",
-    status: "SELESAI",
-    type: "completed",
-    avatar: "https://i.pravatar.cc/100?img=32",
-    complaint: "Pengecekan berkala kadar gula darah dan penyesuaian dosis insulin harian."
-  },
-];
+import {
+  getQueue,
+} from "@/services/dokter/consultation-service";
+import {
+ useState,
+ useEffect
+} from "react";
 
 function StatisticCard({ item }) {
   const Icon = item.icon;
@@ -108,8 +35,13 @@ function StatisticCard({ item }) {
   );
 }
 
-function ActiveConsultationCard() {
-  const navigate = useNavigate();
+function ActiveConsultationCard({
+    consultation,
+  }) {
+    const navigate = useNavigate();
+
+    if (!consultation)
+      return null;
 
   return (
     <div className="mt-4 flex min-h-[102px] items-center justify-between rounded-[13px] border-l-[5px] border-[#4A7C8E] bg-[#4A7C8E] px-5 py-4 text-white shadow-sm">
@@ -125,32 +57,32 @@ function ActiveConsultationCard() {
 
         <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-2">
-            <span className="rounded-full bg-white px-2.5 py-1 text-[9px] font-semibold text-[#4A7C8E]">
-              BERLANGSUNG
+            <span className="rounded-full bg-white px-2.5 py-1 text-[9px] font-semibold text-[#13586A]">
+              {consultation?.status
+              ?.toUpperCase()}
             </span>
-            <span className="text-[10px] text-white/70">14:25 Terlacak</span>
+            <span className="text-[10px] text-white/70">
+              Status:
+              {" "}
+              {consultation?.status}
+            </span>
           </div>
           <p className="mt-1 text-[16px] font-semibold leading-none">
-            Ibu Rastna Sari
+            {consultation?.pasien_nama}
           </p>
           <p className="mt-1.5 text-[11px] text-white/80">
-            Konsultasi Diabetes Melitus • Sesi 2
+            No. Antrian {consultation?.nomor_antrian}
           </p>
         </div>
       </div>
 
       <button
-        onClick={() => navigate("/doctor/consultation-chat", {
-          state: {
-            patientId: 99,
-            patientName: "Ibu Rastna Sari",
-            complaint: "Konsultasi Diabetes Melitus • Sesi 2",
-            age: 45,
-            gender: "Perempuan",
-            isNewSession: false
-          }
-        })}
-        className="ml-4 flex h-11 flex-shrink-0 items-center gap-2 rounded-[9px] bg-white px-5 text-[12px] font-semibold text-[#4A7C8E] hover:bg-[#F5F0E8]"
+        onClick={() =>
+          navigate(
+            `/doctor/consultation-chat/${consultation.id}`
+          )
+        }
+        className="ml-4 flex h-11 flex-shrink-0 items-center gap-2 rounded-[9px] bg-white px-5 text-[12px] font-semibold text-[#13586A] hover:bg-[#F3F4F1]"
       >
         <MessageSquare size={16} strokeWidth={2} />
         Lanjutkan Chat
@@ -189,17 +121,8 @@ function QueueAction({ patient, onViewResume }) {
           <p className="text-[11px] font-medium text-[#6B8F71]">05:22</p>
         </div>
         <button
-          onClick={() => navigate("/doctor/consultation-chat", {
-            state: {
-              patientId: patient.id,
-              patientName: patient.name,
-              complaint: patient.complaint,
-              age: patient.age,
-              gender: patient.gender,
-              isNewSession: true
-            }
-          })}
-          className="flex h-10 items-center gap-2 rounded-[8px] bg-[#6B8F71] px-5 text-[11px] font-semibold text-white shadow-sm hover:bg-[#57755c]"
+          onClick={() => navigate(`/doctor/consultation-chat/${patient.id}`)}
+          className="flex h-10 items-center gap-2 rounded-[8px] bg-[#437450] px-5 text-[11px] font-semibold text-white shadow-sm hover:bg-[#365F41]"
         >
           <span className="flex h-5 w-5 items-center justify-center rounded-full bg-white/20">
             <Play size={10} fill="currentColor" />
@@ -275,8 +198,10 @@ function QueueItem({ patient, onViewResume }) {
               {patient.status}
             </span>
           </div>
-          <p className="mt-1.5 text-[10px] text-[#6B7280]">
-            {patient.age} Thn • {patient.gender} • {patient.duration}
+
+          <p className="mt-1.5 text-[10px] text-[#737A7C]">
+            No. Antrian{" "}
+            {patient.nomor_antrian}
           </p>
         </div>
       </div>
@@ -289,6 +214,119 @@ function QueueItem({ patient, onViewResume }) {
 function ConsultationPage() {
   const [selectedPatientResume, setSelectedPatientResume] = useState(null);
 
+  const [statistics, setStatistics] = useState([]);
+  const [queue, setQueue] = useState([]);
+
+  useEffect(() => {
+    const fetchQueue = async () => {
+      try {
+        const response =
+          await getQueue();
+
+        const data =
+          Array.isArray(response)
+            ? response
+            : [response];
+
+        const mappedQueue =
+          data.map((item) => ({
+            id: item.id,
+            pasien_nama:
+              item.pasien_nama,
+            nomor_antrian:
+              item.nomor_antrian,
+            status: item.status,
+
+            name:
+              item.pasien_nama,
+
+            age: "-",
+            gender: "-",
+            duration: "-",
+
+            time:
+              item.nomor_antrian,
+
+            timeLabel:
+              "ANTRIAN",
+
+            initials:
+              item.pasien_nama
+                ?.split(" ")
+                .map(
+                  (word) =>
+                    word[0]
+                )
+                .join("")
+                .substring(0, 2)
+                .toUpperCase(),
+
+            type:
+              item.status ===
+              "selesai"
+                ? "completed"
+                : "available",
+          }));
+
+        setQueue(mappedQueue);
+
+        setStatistics([
+          {
+            label:
+              "Antrian Hari Ini",
+            value:
+              mappedQueue.length,
+            valueColor:
+              "text-[#416E50]",
+            icon:
+              CalendarDays,
+            iconColor:
+              "text-[#416E50]",
+          },
+          {
+            label:
+              "Menunggu",
+            value:
+              mappedQueue.filter(
+                (item) =>
+                  item.status ===
+                  "menunggu"
+              ).length,
+            valueColor:
+              "text-[#C18B2F]",
+            icon:
+              Hourglass,
+            iconColor:
+              "text-[#C18B2F]",
+          },
+          {
+            label:
+              "Selesai",
+            value:
+              mappedQueue.filter(
+                (item) =>
+                  item.status ===
+                  "selesai"
+              ).length,
+            valueColor:
+              "text-[#437450]",
+            icon:
+              CircleCheck,
+            iconColor:
+              "text-[#437450]",
+          },
+        ]);
+      } catch (error) {
+        console.error(
+          "Gagal mengambil antrean:",
+          error
+        );
+      }
+    };
+
+    fetchQueue();
+  }, []);
+  
   return (
     <div className="mx-auto w-full max-w-[1050px] p-4 bg-[#F5F0E8] min-h-screen">
       <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
@@ -297,7 +335,11 @@ function ConsultationPage() {
         ))}
       </div>
 
-      <ActiveConsultationCard />
+      {queue.length > 0 && (
+        <ActiveConsultationCard
+          consultation={queue[0]}
+        />
+      )}
 
       <section className="mt-5">
         <div className="mb-3 flex items-center justify-between">

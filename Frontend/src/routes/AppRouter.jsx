@@ -177,7 +177,7 @@ function AppRouter() {
           <Route path="patient-list" element={<DaftarPasien />} />
           <Route path="schedule/add" element={<AddSlotPage />} />
           <Route path="statistics" element={<StatisticsPage />} />
-          <Route path="consultation-chat" element={<ConsultationChatPage />} />
+          <Route path="consultation-chat/:consultationId" element={<ConsultationChatPage />} />
         </Route>
 
         {/* LEGAL & INFO */}

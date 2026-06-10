@@ -60,6 +60,54 @@ exports.getQueue = async (req, res) => {
 };
 
 // =========================================================================
+// GET QUEUE DOKTER
+// =========================================================================
+
+exports.getDoctorQueue =
+  async (req, res) => {
+    try {
+      const doctorId =
+        req.user.id;
+
+      const [rows] =
+        await db.query(
+          `
+          SELECT
+            k.id,
+            k.status,
+            p.nomor_antrian,
+            up.nama_lengkap
+              AS pasien_nama
+          FROM konsultasi k
+          JOIN pendaftaran p
+            ON p.id =
+              k.pendaftaran_id
+          JOIN users up
+            ON up.id =
+              k.pasien_id
+          WHERE k.dokter_id = ?
+          ORDER BY
+            k.created_at ASC
+          `,
+          [doctorId]
+        );
+
+      return res.json({
+        success: true,
+        data: rows,
+      });
+    } catch (error) {
+      console.error(error);
+
+      return res.status(500).json({
+        success: false,
+        message:
+          "Gagal mengambil antrean dokter",
+      });
+    }
+  };
+
+// =========================================================================
 // DETAIL KONSULTASI
 // =========================================================================
 
@@ -73,12 +121,25 @@ exports.getSessionDetail = async (
     const [rows] = await db.query(
       `
       SELECT
-        k.*,
-        u.nama_lengkap AS dokter_nama
-      FROM konsultasi k
-      JOIN users u
-        ON u.id = k.dokter_id
-      WHERE k.id = ?
+      k.*,
+
+      ud.nama_lengkap
+        AS dokter_nama,
+
+      up.nama_lengkap
+        AS pasien_nama
+
+    FROM konsultasi k
+
+    JOIN users ud
+      ON ud.id =
+        k.dokter_id
+
+    JOIN users up
+      ON up.id =
+        k.pasien_id
+
+    WHERE k.id = ?
       `,
       [id]
     );
