@@ -51,7 +51,7 @@ function RecentActivityList({
               {activities.map(
                 (item, index) => (
                   <div
-                    key={index}
+                    key={`${item.title}-${index}`}
                     className="flex gap-4"
                   >
 

@@ -42,7 +42,7 @@ function MedicationHistoryCard({
           </div>
 
           <p className="mt-2 text-sm text-prima-secondary">
-            Dr. {doctor}
+            {doctor}
           </p>
 
           <p className="mt-1 text-xs text-prima-secondary">

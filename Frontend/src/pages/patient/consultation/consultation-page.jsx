@@ -30,8 +30,7 @@ function ConsultationPage() {
   */
 
   useEffect(() => {
-    const fetchQueue =
-      async () => {
+    const fetchQueue = async () => {
         try {
           const response =
             await getQueue();
@@ -50,7 +49,15 @@ function ConsultationPage() {
       };
 
     fetchQueue();
-  }, []);
+      const interval =
+        setInterval(
+          fetchQueue,
+          5000
+        );
+
+      return () =>
+        clearInterval(interval);
+    }, []);
 
   /*
   |--------------------------------------------------------------------------

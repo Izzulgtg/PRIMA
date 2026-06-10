@@ -1,7 +1,5 @@
 import { useNavigate } from "react-router-dom";
 import {
-  Bell,
-  Globe,
   Lock,
   Shield,
   ChevronRight,
@@ -24,29 +22,11 @@ function AccountSettingsCard() {
       <div className="divide-y divide-[#F1ECE4]">
 
         <SettingItem
-          icon={<Bell size={18} />}
-          title="Notifikasi"
-          description="Atur pengingat antrean dan hasil lab"
-          onClick={() =>
-            navigate("/patient/security")
-          }
-        />
-
-        <SettingItem
-          icon={<Globe size={18} />}
-          title="Bahasa"
-          description="Bahasa Indonesia"
-          onClick={() =>
-            navigate("/patient/security")
-          }
-        />
-
-        <SettingItem
           icon={<Lock size={18} />}
           title="Ubah Kata Sandi"
           description="Perbarui keamanan akun"
           onClick={() =>
-            navigate("/patient/security")
+            navigate("/patient/change-password")
           }
         />
 

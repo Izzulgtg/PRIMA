@@ -11,7 +11,7 @@ export const changePassword = async ({
   newPassword,
 }) => {
   const response = await api.put(
-    "/patient/security/change-password",
+    "/pasien/security/change-password",
     {
       oldPassword,
       newPassword,
@@ -29,7 +29,7 @@ export const changePassword = async ({
 
 export const getLoginHistory = async () => {
   const response = await api.get(
-    "/patient/security/login-history"
+    "/pasien/security/login-history"
   );
 
   return response.data;
@@ -43,7 +43,7 @@ export const getLoginHistory = async () => {
 
 export const logoutAllDevices = async () => {
   const response = await api.post(
-    "/patient/security/logout-all"
+    "/pasien/security/logout-all"
   );
 
   return response.data;

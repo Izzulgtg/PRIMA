@@ -5,6 +5,15 @@ function TimeSlotPicker({
   selectedSlot,
   onSelect,
 }) {
+  if (slots.length === 0) {
+    return (
+      <div className="rounded-2xl bg-prima-background p-6 text-center">
+        <p className="text-prima-secondary">
+          Belum ada slot tersedia.
+        </p>
+      </div>
+    );
+  }
   return (
     <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
 

@@ -3,6 +3,9 @@ import {
   Eye,
   EyeOff,
 } from "lucide-react";
+import {
+  changePassword,
+} from "@/services/patient/security-service";
 
 const PasswordChangeForm = () => {
   const [oldPassword, setOldPassword] =
@@ -72,14 +75,10 @@ const PasswordChangeForm = () => {
     try {
       setIsSaving(true);
 
-      /*
-      Nanti hubungkan ke API Ainur
-
       await changePassword({
         oldPassword,
         newPassword,
       });
-      */
 
       setSuccess(
         "Password berhasil diperbarui."
@@ -92,6 +91,7 @@ const PasswordChangeForm = () => {
       console.error(error);
 
       setError(
+        error?.response?.data?.message ||
         "Gagal memperbarui password."
       );
     } finally {

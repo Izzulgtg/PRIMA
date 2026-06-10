@@ -8,6 +8,8 @@ const HealthInfoForm = ({
   setProfile,
 }) => {
   const navigate = useNavigate();
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
 
   const [formData, setFormData] =
     useState({
@@ -105,10 +107,10 @@ const HealthInfoForm = ({
   };
 
   const handleSubmit = async () => {
-    if (
-      !formData.nama_lengkap.trim()
-    ) {
-      alert(
+    setError("");
+    setSuccess("");
+    if (!formData.nama_lengkap.trim()) {
+      setError(
         "Nama lengkap wajib diisi"
       );
       return;
@@ -119,7 +121,7 @@ const HealthInfoForm = ({
       (formData.nik.length !== 16 ||
         isNaN(formData.nik))
     ) {
-      alert(
+      setError(
         "NIK harus terdiri dari 16 digit angka"
       );
       return;
@@ -129,7 +131,7 @@ const HealthInfoForm = ({
       formData.nomor_bpjs &&
       formData.nomor_bpjs.length < 10
     ) {
-      alert(
+      setError(
         "Nomor BPJS tidak valid"
       );
       return;
@@ -139,7 +141,7 @@ const HealthInfoForm = ({
       formData.tinggi_badan &&
       Number(formData.tinggi_badan) <= 0
     ) {
-      alert(
+      setError(
         "Tinggi badan tidak valid"
       );
       return;
@@ -149,7 +151,7 @@ const HealthInfoForm = ({
       formData.berat_badan &&
       Number(formData.berat_badan) <= 0
     ) {
-      alert(
+      setError(
         "Berat badan tidak valid"
       );
       return;
@@ -161,7 +163,7 @@ const HealthInfoForm = ({
         formData.nomor_hp
       )
     ) {
-      alert(
+      setError(
         "Format nomor HP tidak valid"
       );
       return;
@@ -170,31 +172,42 @@ const HealthInfoForm = ({
     try {
       setIsSaving(true);
 
+      const payload = {
+        ...formData,
+
+        kelas_bpjs:
+          formData.kelas_bpjs || null,
+
+        nomor_bpjs:
+          formData.nomor_bpjs || null,
+
+        faskes_bpjs:
+          formData.faskes_bpjs || null,
+      };
+
       const response =
-        await updateProfile({
-          ...formData,
-        });
+        await updateProfile(payload);
 
       setProfile((prev) => ({
         ...prev,
-        ...formData,
+        ...payload,
       }));
 
-      alert(
+      setSuccess(
         response.message ||
           "Profil berhasil diperbarui"
       );
 
-      navigate(
-        "/patient/profile"
-      );
-    } catch (error) {
+      setTimeout(() => {
+        navigate("/patient/profile");
+        }, 2000);
+      } catch (error) {
       console.error(
         "Update profile error:",
         error
       );
 
-      alert(
+      setError(
         error?.response?.data
           ?.message ||
           "Gagal memperbarui profil"
@@ -206,6 +219,21 @@ const HealthInfoForm = ({
 
   return (
     <div className="rounded-[28px] border border-[#F1ECE4] bg-prima-card p-8 shadow-sm">
+      {
+        error && (
+          <div className="mb-4 rounded-xl bg-red-50 p-4 text-red-500">
+            {error}
+          </div>
+        )
+      }
+
+      {
+        success && (
+          <div className="mb-4 rounded-xl bg-green-50 p-4 text-green-600">
+            {success}
+          </div>
+        )
+      }
       <h2 className="mb-6 text-2xl font-bold text-prima-text">
         Edit Informasi Profil
       </h2>

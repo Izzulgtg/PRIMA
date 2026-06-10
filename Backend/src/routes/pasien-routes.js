@@ -17,6 +17,8 @@ router.get("/profile",pasienController.getProfilePasien);
 
 router.put("/profile",pasienController.updateProfilePasien);
 
+router.put("/security/change-password",pasienController.changePassword);
+
 // Appointment
 router.post("/daftar",pasienController.buatPendaftaran);
 

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 
 import { getProfile } from "@/services/patient/profile-service";
-
+import { getDashboard } from "@/services/patient/dashboard-service";
 import DashboardHero from "@/components/patient/dashboard/dashboard-hero";
 import PatientStatsCard from "@/components/patient/dashboard/patient-stats-card";
 import UpcomingAppointmentCard from "@/components/patient/dashboard/upcoming-appointment-card";
@@ -24,27 +24,29 @@ function PatientDashboardPage() {
   useEffect(() => {
     const fetchDashboardData = async () => {
       try {
-        const profileData = await getProfile();
+        const [
+          profileData,
+          dashboardData,
+        ] = await Promise.all([
+          getProfile(),
+          getDashboard(),
+        ]);
 
         setProfile(profileData);
 
-        // sementara dummy
+        // Dashboard summary
         setStats([
           {
-            title: "Total Konsultasi",
-            value: 12,
+            title: "Total Pendaftaran",
+            value:
+              dashboardData.total_pendaftaran ||
+              0,
           },
           {
-            title: "Janji Aktif",
-            value: 2,
-          },
-          {
-            title: "Resep Aktif",
-            value: 3,
-          },
-          {
-            title: "Pemeriksaan Terakhir",
-            value: "29 Mei",
+            title: "Total Rekam Medis",
+            value:
+              dashboardData.total_rekam_medis ||
+              0,
           },
         ]);
 
@@ -67,11 +69,9 @@ function PatientDashboardPage() {
           },
         ]);
 
-        setUpcomingAppointment({
-          doctor: "Dr. Dila Andini",
-          date: "5 Juni 2026",
-          time: "13:00 WIB",
-        });
+        setUpcomingAppointment(
+          dashboardData.upcoming
+        );
 
         setArticles([
           {
@@ -119,7 +119,15 @@ function PatientDashboardPage() {
       </div>
     );
   }
-  console.log("PROFILE STATE:", profile);
+  if (loading) {
+    return (
+      <div className="py-20 text-center">
+        <p className="text-prima-secondary">
+          Memuat dashboard...
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">

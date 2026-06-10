@@ -12,11 +12,14 @@ import { formatDateOnly } from "@/utils/patient/format-date-only";
 const PatientProfileCard = ({ profile }) => {
   const navigate = useNavigate();
   const handleLogout = () => {
-    localStorage.clear();
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
 
-    // optional: reset state kalau nanti pakai context
-    navigate("/");
-    };
+    navigate(
+      "/login",
+      {replace: true}
+    );
+  };
 
   const initialName =
     profile?.nama_lengkap
@@ -222,8 +225,41 @@ const PatientProfileCard = ({ profile }) => {
               {profile?.nomor_bpjs || "-"}
             </p>
           </div>
+          <div>
+            <p className="text-xs text-prima-secondary">
+              Faskes BPJS
+            </p>
 
+            <p className="font-medium text-prima-text">
+              {profile?.faskes_bpjs || "-"}
+            </p>
+          </div>
+
+          <div>
+            <p className="text-xs text-prima-secondary">
+              Kelas BPJS
+            </p>
+
+            <p className="font-medium text-prima-text">
+              {profile?.kelas_bpjs || "-"}
+            </p>
+          </div>
         </div>
+        <div className="mt-6 border-t border-[#F1ECE4] pt-6">
+
+            <h3 className="font-semibold text-prima-text">
+              Alamat Pasien
+            </h3>
+
+            <div className="mt-4 rounded-2xl bg-prima-background p-4">
+
+              <p className="text-prima-text">
+                {profile?.alamat || "-"}
+              </p>
+
+            </div>
+
+          </div>
       </div>
 
       {/* Tombol Edit */}

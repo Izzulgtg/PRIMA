@@ -862,3 +862,102 @@ exports.getDokterSlots =
       });
     }
   };
+
+// ======================================================
+// GANTI PASSWORD
+// ======================================================
+const bcrypt = require("bcryptjs");
+exports.changePassword =
+  async (req, res) => {
+    try {
+      const userId = req.user.id;
+
+      const {
+        oldPassword,
+        newPassword,
+      } = req.body;
+
+      if (
+        !oldPassword ||
+        !newPassword
+      ) {
+        return res.status(400).json({
+          success: false,
+          message:
+            "Password lama dan password baru wajib diisi",
+        });
+      }
+
+      if (newPassword.length < 8) {
+        return res.status(400).json({
+          success: false,
+          message:
+            "Password minimal 8 karakter",
+        });
+      }
+
+      const [users] =
+        await db.query(
+          `
+          SELECT password
+          FROM users
+          WHERE id = ?
+          `,
+          [userId]
+        );
+
+      if (users.length === 0) {
+        return res.status(404).json({
+          success: false,
+          message:
+            "User tidak ditemukan",
+        });
+      }
+
+      const validPassword =
+        await bcrypt.compare(
+          oldPassword,
+          users[0].password
+        );
+
+      if (!validPassword) {
+        return res.status(400).json({
+          success: false,
+          message:
+            "Password lama salah",
+        });
+      }
+
+      const hashedPassword =
+        await bcrypt.hash(
+          newPassword,
+          10
+        );
+
+      await db.query(
+        `
+        UPDATE users
+        SET password = ?
+        WHERE id = ?
+        `,
+        [
+          hashedPassword,
+          userId,
+        ]
+      );
+
+      return res.status(200).json({
+        success: true,
+        message:
+          "Password berhasil diperbarui",
+      });
+    } catch (error) {
+      console.error(error);
+
+      return res.status(500).json({
+        success: false,
+        message:
+          "Terjadi kesalahan server",
+      });
+    }
+  };

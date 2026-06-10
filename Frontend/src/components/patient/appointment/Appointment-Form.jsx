@@ -4,6 +4,7 @@ function AppointmentForm({
   selectedDate,
   selectedSlot,
   onSubmit,
+  loading,
 }) {
   const [formData, setFormData] =
     useState({
@@ -27,25 +28,25 @@ function AppointmentForm({
     e.preventDefault();
 
     if (!formData.jenis_kunjungan) {
-      alert(
-        "Pilih jenis kunjungan terlebih dahulu"
-      );
+      alert("Pilih jenis kunjungan terlebih dahulu");
       return;
     }
 
     if (!formData.metode_bayar) {
-      alert(
-        "Pilih metode pembayaran"
-      );
+      alert("Pilih metode pembayaran");
       return;
     }
 
     if (
       !formData.keluhan_utama.trim()
     ) {
-      alert(
-        "Keluhan utama wajib diisi"
-      );
+      alert("Keluhan utama wajib diisi");
+      return;
+    }
+    if (
+      !formData.durasi_keluhan.trim()
+    ) {
+      alert("Durasi keluhan wajib diisi");
       return;
     }
 
@@ -181,9 +182,19 @@ function AppointmentForm({
 
       <button
         type="submit"
-        className="w-full rounded-2xl bg-prima-green py-3 font-medium text-white hover:opacity-90"
+        disabled={loading}
+        className="
+          w-full
+          rounded-xl
+          bg-prima-green
+          py-3
+          text-white
+          disabled:opacity-50
+        "
       >
-        Konfirmasi Pendaftaran
+        {loading
+          ? "Memproses..."
+          : "Konfirmasi Pendaftaran"}
       </button>
     </form>
   );

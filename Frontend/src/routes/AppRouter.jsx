@@ -17,7 +17,7 @@ import PatientHealthRecordsPage from "../pages/patient/health-records/health-rec
 import PatientProfilePage from "../pages/patient/profile/profile-page"
 import EditProfilePage from "../pages/patient/profile/edit-profile-page"
 import PatientSecurityPage from "../pages/patient/security/security-page"
-import PatientSettingPage from "../pages/patient/settings/account-settings-page"
+import PatientChangePW from "../pages/patient/security/change-password-page"
 import ConsultationRoomPage from "../pages/patient/consultation-room/consultation-room-page"
 import WaitingRoomPage from "../pages/patient/consultation-room/waiting-room-page"
 
@@ -158,8 +158,8 @@ function AppRouter() {
           />
 
           <Route
-            path="setting"
-            element={<PatientSettingPage />}
+            path="change-password"
+            element={<PatientChangePW />}
           />
 
         </Route>

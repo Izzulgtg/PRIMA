@@ -9,25 +9,21 @@ import AccountSettingsCard from "@/components/patient/security/account-settings-
 import {getProfile} from "@/services/patient/profile-service";
 
 const PatientProfilePage = () => {
-  const [profile, setProfile] =
-    useState(null);
-
-  const [loading, setLoading] =
-    useState(true);
+  const [profile, setProfile] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const data =
-          await getProfile();
+        const data = await getProfile();
 
         setProfile(data);
       } catch (error) {
-        console.error(
-          "Gagal mengambil profile:",
-          error
-        );
-      } finally {
+          setError(
+            "Gagal mengambil data profil"
+          );
+        } finally {
         setLoading(false);
       }
     };
@@ -40,6 +36,15 @@ const PatientProfilePage = () => {
       <div className="py-20 text-center">
         <p className="text-prima-secondary">
           Memuat profil...
+        </p>
+      </div>
+    );
+  }
+  if (error) {
+    return (
+      <div className="py-20 text-center">
+        <p className="text-red-500">
+          {error}
         </p>
       </div>
     );
@@ -83,9 +88,16 @@ const PatientProfilePage = () => {
 
           </div>
 
-          <PatientProfileCard
-            profile={profile}
-          />
+          { profile ? (
+              <PatientProfileCard
+                profile={profile}
+              />
+            ) : (
+              <div className="rounded-3xl bg-prima-card p-8 text-center">
+                Data profil tidak ditemukan
+              </div>
+            )
+          }
 
         </div>
 

@@ -59,7 +59,10 @@ function MedicalRecordCard({
           </p>
 
           <p className="text-prima-text mt-1 leading-relaxed">
-            {diagnosis}
+            {
+            diagnosis ||
+            "Belum ada diagnosis"
+            }
           </p>
 
         </div>
@@ -71,7 +74,10 @@ function MedicalRecordCard({
           </p>
 
           <p className="text-prima-text mt-1 leading-relaxed">
-            {complaint}
+            {
+            complaint ||
+            "Tidak ada keluhan"
+            }
           </p>
 
         </div>

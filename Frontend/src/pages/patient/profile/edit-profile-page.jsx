@@ -20,11 +20,9 @@ import HealthInfoForm from "@/components/patient/profile/health-info-form";
 const EditProfilePage = () => {
   const navigate = useNavigate();
 
-  const [profile, setProfile] =
-    useState(null);
-
-  const [loading, setLoading] =
-    useState(true);
+  const [profile, setProfile] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -34,7 +32,7 @@ const EditProfilePage = () => {
 
         setProfile(data);
       } catch (error) {
-        console.error(error);
+        setError("Gagal memuat data profil");
       } finally {
         setLoading(false);
       }
@@ -47,6 +45,22 @@ const EditProfilePage = () => {
     return (
       <div className="py-20 text-center">
         Memuat data...
+      </div>
+    );
+  }
+  if (!profile) {
+    return (
+      <div className="py-20 text-center">
+        Profil tidak ditemukan
+      </div>
+    );
+  }
+  if (error) {
+    return (
+      <div className="py-20 text-center">
+        <p className="text-red-500">
+          {error}
+        </p>
       </div>
     );
   }

@@ -117,14 +117,21 @@ function ConsultationRoomPage() {
   |------------------------------------------------------------------
   */
 
+  const timerInitialized = useRef(false);
   useEffect(() => {
-    if (!session?.durasi_menit)
+    if (
+      !session?.durasi_menit ||
+      timerInitialized.current
+    ) {
       return;
+    }
 
     setRemainingSeconds(
       session.durasi_menit * 60
     );
-  }, [session?.durasi_menit]);
+
+    timerInitialized.current = true;
+  }, [session]);
 
   /*
   |------------------------------------------------------------------
@@ -141,6 +148,14 @@ function ConsultationRoomPage() {
     ) {
       navigate(
         "/patient/waiting-room"
+      );
+    }
+    if (
+      session.status ===
+      "selesai"
+    ) {
+      navigate(
+        "/patient/consultation"
       );
     }
   }, [session, navigate]);

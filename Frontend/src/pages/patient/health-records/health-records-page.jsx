@@ -12,12 +12,11 @@ import MedicationHistoryCard from "@/components/patient/health-records/medicatio
 
 import { formatDate } from "@/utils/patient/format-date";
 import { getMedicalHistory } from "@/services/patient/health-record-service";
-import { getProfile } from "@/services/patient/profile-service";
 
 function HealthRecordsPage() {
   const [records, setRecords] = useState([]);
   const [loading, setLoading] = useState(true);
-
+  const [error, setError] = useState(null);
   const [filterStatus, setFilterStatus] =
     useState("");
 
@@ -32,6 +31,9 @@ function HealthRecordsPage() {
         console.error(
           "Gagal mengambil riwayat medis:",
           error
+        );
+        setError(
+          "Gagal memuat riwayat kesehatan"
         );
       } finally {
         setLoading(false);
@@ -93,6 +95,30 @@ function HealthRecordsPage() {
     records.filter(
       (record) => record.catatan_resep
     ).length;
+  
+    if (loading) {
+      return (
+        <div className="py-20 text-center">
+          <p className="text-prima-secondary">
+            Memuat riwayat kesehatan...
+          </p>
+        </div>
+      );
+    }
+    if (error) {
+      return (
+        <div className="rounded-3xl border border-red-200 bg-red-50 p-6">
+          <p className="text-red-600">
+            {error}
+          </p>
+        </div>
+      );
+    }
+  
+  const healthStatus =
+    records.length > 0
+      ? "Perlu Pemantauan"
+      : "Stabil";
 
   return (
     <div className="space-y-6">
@@ -129,12 +155,14 @@ function HealthRecordsPage() {
             </p>
 
             <h3 className="mt-3 text-3xl font-bold">
-              Stable
+              {healthStatus}
             </h3>
 
             <p className="mt-3 leading-relaxed opacity-80">
-              Kondisi kesehatan terakhir
-              dalam status baik.
+              {healthStatus ===
+              "Perlu Pemantauan"
+                ? "Terdapat riwayat pemeriksaan yang perlu diperhatikan."
+                : "Kondisi kesehatan terakhir dalam status baik."}
             </p>
 
             <div className="mt-6 flex items-center gap-2">
@@ -205,66 +233,65 @@ function HealthRecordsPage() {
 
             </div>
 
-            {loading && (
-              <div className="py-10 text-center text-prima-secondary">
-                Memuat riwayat medis...
-              </div>
-            )}
-
             {!loading &&
               records.length === 0 && (
                 <div className="py-10 text-center text-prima-secondary">
-                  Belum ada riwayat
-                  pemeriksaan.
+                  Belum ada riwayat pemeriksaan.
                 </div>
               )}
 
             {!loading &&
-              filteredRecords.length >
-                0 && (
-                <div className="mt-8 max-h-[800px] space-y-5 overflow-y-auto pr-3">
-
-                  {filteredRecords.map(
-                    (record) => (
-                      <MedicalRecordCard
-                        key={
-                          record.rekam_medis_id
-                        }
-                        date={formatDate(
-                          record.tanggal_periksa
-                        )}
-                        doctor={
-                          record.nama_dokter
-                        }
-                        specialization={
-                          record.spesialisasi ||
-                          "-"
-                        }
-                        diagnosis={
-                          record.diagnosis
-                        }
-                        complaint={
-                          record.keluhan
-                        }
-                        prescription={
-                          record.catatan_resep
-                        }
-                        medicines={
-                          record.daftar_obat
-                            ? record.daftar_obat.split(
-                                "|"
-                              )
-                            : []
-                        }
-                        status={
-                          record.status_resep ||
-                          "Selesai"
-                        }
-                      />
-                    )
-                  )}
-
+              records.length > 0 &&
+              filteredRecords.length === 0 && (
+                <div className="py-10 text-center text-prima-secondary">
+                  Tidak ada data yang sesuai filter.
                 </div>
+              )}
+
+              {!loading && 
+                filteredRecords.length > 0 && (
+                  <div className="mt-8 max-h-[800px] space-y-5 overflow-y-auto pr-3">
+
+                    {filteredRecords.map(
+                      (record) => (
+                        <MedicalRecordCard
+                          key={
+                            record.rekam_medis_id
+                          }
+                          date={formatDate(
+                            record.tanggal_periksa
+                          )}
+                          doctor={
+                            record.nama_dokter
+                          }
+                          specialization={
+                            record.spesialisasi ||
+                            "-"
+                          }
+                          diagnosis={
+                            record.diagnosis
+                          }
+                          complaint={
+                            record.keluhan
+                          }
+                          prescription={
+                            record.catatan_resep
+                          }
+                          medicines={
+                            record.daftar_obat
+                              ? record.daftar_obat.split(
+                                  "|"
+                                )
+                              : []
+                          }
+                          status={
+                            record.status_resep ||
+                            "Selesai"
+                          }
+                        />
+                      ))}
+
+                  </div>
               )}
 
           </div>

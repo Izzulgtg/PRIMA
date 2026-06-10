@@ -1,4 +1,3 @@
-import PasswordChangeForm from "@/components/patient/security/password-change-form";
 import PrivacySettingsCard from "@/components/patient/security/privacy-settings-card";
 import LoginHistoryCard from "@/components/patient/security/login-history-card";
 import { ArrowLeft } from "lucide-react";
@@ -14,6 +13,13 @@ const SecurityPage = () => {
           dummyLoginHistory[0].login_at
         ).toLocaleString("id-ID")
       : "-";
+
+  const handleLogoutAll =
+    async () => {
+      alert(
+        "Fitur belum tersedia"
+      );
+    };
 
   return (
     <div className="space-y-6">
@@ -120,9 +126,12 @@ const SecurityPage = () => {
       {/* PASSWORD + PRIVACY */}
       <section className="grid gap-6 lg:grid-cols-2">
 
-        <PasswordChangeForm />
-
-        <PrivacySettingsCard />
+        <PrivacySettingsCard
+          lastLogin={lastLogin}
+          onLogoutAllDevices={
+            handleLogoutAll
+          }
+        />
 
       </section>
 

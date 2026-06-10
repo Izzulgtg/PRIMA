@@ -14,8 +14,8 @@ const PORT = process.env.PORT || 5000;
 
 // Middleware
 app.use(cors({
-  origin: 'https://prima.biz.id', // URL Server Frontend Vite tim kalian
-  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  origin: ["http://localhost:5173",'https://prima.biz.id'], // URL Server Frontend Vite tim kalian
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
 

@@ -2,7 +2,7 @@ import {
   useEffect,
   useState,
 } from "react";
-
+import { useNavigate } from "react-router-dom";
 import AppointmentStepper from "@/components/patient/appointment/appointment-stepper";
 import AppointmentDatePicker from "@/components/patient/appointment/appointment-date-picker";
 import TimeSlotPicker from "@/components/patient/appointment/time-slot-picker";
@@ -23,16 +23,12 @@ function PatientAppointmentPage() {
     setSelectedDoctor,
   ] = useState(null);
 
-  const [slots, setSlots] =
-    useState([]);
-  const [step, setStep] =
-    useState(1);
-
-  const [selectedDate, setSelectedDate] =
-    useState("");
-
-  const [selectedSlot, setSelectedSlot] =
-    useState(null);
+  const [slots, setSlots] = useState([]);
+  const [step, setStep] = useState(1);
+  const [selectedDate, setSelectedDate] = useState("");
+  const [selectedSlot, setSelectedSlot] = useState(null);
+  const [submitting, setSubmitting] = useState(false);
+  const navigate = useNavigate();
   
   useEffect(() => {
     const fetchDoctors =
@@ -49,7 +45,10 @@ function PatientAppointmentPage() {
             );
           }
         } catch (error) {
-          console.error(error);
+          console.error(
+            "Fetch doctor error:",
+            error
+          );
         }
       };
 
@@ -69,7 +68,10 @@ function PatientAppointmentPage() {
 
           setSlots(data);
         } catch (error) {
-          console.error(error);
+          console.error(
+            "Fetch slot error:",
+            error
+          );
         }
       };
 
@@ -79,25 +81,16 @@ function PatientAppointmentPage() {
   const handleSubmit = async (
     formData
   ) => {
+    setSubmitting(true);
     try {
       const payload = {
-        dokter_id:
-          selectedDoctor.id,
-
-        slot_id:
-          selectedSlot.id,
-
-        jenis_kunjungan:
-          formData.jenis_kunjungan,
-
-        keluhan_utama:
-          formData.keluhan_utama,
-
-        durasi_keluhan:
-          formData.durasi_keluhan,
-
-        metode_bayar:
-          formData.metode_bayar,
+        dokter_id: selectedDoctor.id,
+        slot_id: selectedSlot.id,
+        tanggal: selectedDate,
+        jenis_kunjungan: formData.jenis_kunjungan,
+        keluhan_utama: formData.keluhan_utama,
+        durasi_keluhan: formData.durasi_keluhan,
+        metode_bayar: formData.metode_bayar,
       };
 
       const result =
@@ -107,20 +100,28 @@ function PatientAppointmentPage() {
 
       alert(
         result.message ||
-          "Pendaftaran berhasil"
+        "Pendaftaran berhasil"
       );
-    } catch (error) {
-      console.error(error);
-
+      setTimeout(() => {
+        navigate(
+          "/patient/waiting-room"
+        );
+      }, 1500);
+      } catch (error) {
+        console.error(
+          "Create appointment error:",
+          error
+        );
+        
       alert(
         error?.response?.data
           ?.message ||
           "Gagal membuat pendaftaran"
       );
+    } finally {
+      setSubmitting(false);
     }
-  };
-  console.log("Selected Doctor", selectedDoctor);
-  console.log("Slots", slots);
+  }; 
 
   return (
     <div className="space-y-6">
@@ -163,43 +164,21 @@ function PatientAppointmentPage() {
 
                 <div className="mb-6">
 
-                  <label className="mb-2 block text-sm font-medium text-prima-text">
-                    Pilih Dokter
-                  </label>
+                  <div className="mb-6 rounded-2xl bg-prima-background p-4">
 
-                  <select
-                    value={
-                      selectedDoctor?.id || ""
-                    }
-                    onChange={(e) => {
-                      const doctor =
-                        doctors.find(
-                          (d) =>
-                            d.id ===
-                            Number(
-                              e.target.value
-                            )
-                        );
+                    <p className="text-sm text-prima-secondary">
+                      Dokter Pemeriksa
+                    </p>
 
-                      setSelectedDoctor(
-                        doctor
-                      );
-                    }}
-                    className="w-full rounded-xl border border-[#E5E7EB] p-3"
-                  >
+                    <h3 className="mt-1 text-lg font-semibold text-prima-text">
+                      {selectedDoctor?.nama_lengkap}
+                    </h3>
 
-                    {doctors.map((doctor) => (
-                      <option
-                        key={doctor.id}
-                        value={doctor.id}
-                      >
-                        {doctor.nama_lengkap}
-                        {" - "}
-                        {doctor.spesialisasi}
-                      </option>
-                    ))}
+                    <p className="text-sm text-prima-secondary">
+                      {selectedDoctor?.spesialisasi}
+                    </p>
 
-                  </select>
+                  </div>
 
                 </div>
                 <AppointmentDatePicker
@@ -279,15 +258,10 @@ function PatientAppointmentPage() {
               <div>
 
                 <AppointmentForm
-                  selectedDate={
-                    selectedDate
-                  }
-                  selectedSlot={
-                    selectedSlot
-                  }
-                  onSubmit={
-                    handleSubmit
-                  }
+                  selectedDate={ selectedDate }
+                  selectedSlot={ selectedSlot }
+                  onSubmit={ handleSubmit }
+                  loading={ submitting }
                 />
 
                 <button
