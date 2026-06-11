@@ -53,6 +53,22 @@ const confirmRestore = () => {
   )
 }
 
+  const downloadReport = () => {
+  const blob = new Blob(
+    ["Laporan Sistem PRIMA"],
+    { type: "text/plain" }
+  );
+
+  const url = window.URL.createObjectURL(blob);
+
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "laporan-sistem.txt";
+  a.click();
+
+  window.URL.revokeObjectURL(url);
+};
+
   return (
     <div className="space-y-10">
 
@@ -868,7 +884,10 @@ const confirmRestore = () => {
               Jalankan Semua Validasi
             </Button>
 
-            <Button variant="outline">
+            <Button
+              variant="outline"
+              onClick={downloadReport}
+            >
               Unduh Laporan
             </Button>
 
