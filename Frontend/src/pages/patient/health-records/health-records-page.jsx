@@ -92,33 +92,34 @@ function HealthRecordsPage() {
     records.length;
 
   const totalPrescription =
-    records.filter(
-      (record) => record.catatan_resep
-    ).length;
-  
-    if (loading) {
-      return (
-        <div className="py-20 text-center">
-          <p className="text-prima-secondary">
-            Memuat riwayat kesehatan...
-          </p>
-        </div>
-      );
-    }
-    if (error) {
-      return (
-        <div className="rounded-3xl border border-red-200 bg-red-50 p-6">
-          <p className="text-red-600">
-            {error}
-          </p>
-        </div>
-      );
-    }
+    records.reduce(
+      (total, record) => {
+
+        if (
+          !record.daftar_obat
+        ) {
+          return total;
+        }
+
+        return (
+          total +
+          record.daftar_obat
+            .split("|")
+            .filter(
+              (item) =>
+                item.trim() !== ""
+            )
+            .length
+        );
+
+      },
+      0
+    );
   
   const healthStatus =
     records.length > 0
-      ? "Perlu Pemantauan"
-      : "Stabil";
+      ? "Aktif"
+      : "Belum Ada Data";
 
   return (
     <div className="space-y-6">
@@ -160,17 +161,25 @@ function HealthRecordsPage() {
 
             <p className="mt-3 leading-relaxed opacity-80">
               {healthStatus ===
-              "Perlu Pemantauan"
-                ? "Terdapat riwayat pemeriksaan yang perlu diperhatikan."
-                : "Kondisi kesehatan terakhir dalam status baik."}
+              "Aktif"
+                ? "Riwayat kesehatan tersedia dan dapat ditinjau kembali."
+                : "Belum terdapat riwayat pemeriksaan yang tersimpan."}
             </p>
 
             <div className="mt-6 flex items-center gap-2">
 
-              <div className="h-3 w-3 animate-pulse rounded-full bg-green-300" />
+              <div
+                className={`h-3 w-3 rounded-full ${
+                  records.length > 0
+                    ? "bg-green-300 animate-pulse"
+                    : "bg-gray-300"
+                }`}
+              />
 
               <span className="text-sm">
-                Medical Record Active
+                {records.length > 0
+                  ? "Medical Record Active"
+                  : "No Medical Record"}
               </span>
 
             </div>

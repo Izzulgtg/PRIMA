@@ -16,7 +16,6 @@ import {
 function ConsultationRoomPage() {
   const navigate = useNavigate();
   const { sessionId } = useParams();
-  const [queueData, setQueueData] = useState(null);
 
   const chatEndRef = useRef(null);
 
@@ -31,6 +30,9 @@ function ConsultationRoomPage() {
 
   const [loading, setLoading] =
     useState(true);
+  
+  const finishTriggered =
+    useRef(false);
 
   const [sending, setSending] =
     useState(false);
@@ -88,7 +90,7 @@ function ConsultationRoomPage() {
 
   const loadInitialData =
     async () => {
-      await Promise.all([
+      await Promise.allSettled([
         loadSession(),
         loadMessages(),
       ]);
@@ -119,20 +121,55 @@ function ConsultationRoomPage() {
   |------------------------------------------------------------------
   */
 
-  const timerInitialized = useRef(false);
+  const timerInitialized =
+    useRef(false);
+
+  useEffect(() => {
+    timerInitialized.current =
+      false;
+  }, [sessionId]);
+
   useEffect(() => {
     if (
+      !session?.mulai_at ||
       !session?.durasi_menit ||
       timerInitialized.current
     ) {
       return;
     }
 
+    const startTime =
+      new Date(
+        session.mulai_at
+      );
+
+    const endTime =
+      new Date(
+        startTime.getTime() +
+        session.durasi_menit *
+          60 *
+          1000
+      );
+
+    const now =
+      new Date();
+
+    const diffSeconds =
+      Math.floor(
+        (
+          endTime - now
+        ) / 1000
+      );
+
     setRemainingSeconds(
-      session.durasi_menit * 60
+      diffSeconds > 0
+        ? diffSeconds
+        : 0
     );
 
-    timerInitialized.current = true;
+    timerInitialized.current =
+      true;
+
   }, [session]);
 
   /*
@@ -149,16 +186,22 @@ function ConsultationRoomPage() {
       "menunggu"
     ) {
       navigate(
-        `/patient/waiting-room${queueData.id}`
+        `/patient/waiting-room/${session.id}`
       );
     }
     if (
       session.status ===
       "selesai"
     ) {
+
+      alert(
+        "Konsultasi telah selesai."
+      );
+
       navigate(
         "/patient/consultation"
       );
+
     }
   }, [session, navigate]);
 
@@ -181,6 +224,13 @@ function ConsultationRoomPage() {
   */
 
   useEffect(() => {
+    if (
+      session?.status !==
+      "berlangsung"
+    ) {
+      return;
+    }
+
     const timer =
       setInterval(() => {
         setRemainingSeconds(
@@ -193,7 +243,39 @@ function ConsultationRoomPage() {
 
     return () =>
       clearInterval(timer);
-  }, []);
+
+  }, [session?.status]);
+
+  useEffect(() => {
+    if (
+      finishTriggered.current
+    ) {
+      return;
+    }
+
+    if (
+      !session?.mulai_at
+    ) {
+      return;
+    }
+
+    if (
+      remainingSeconds === 0 &&
+      session?.status ===
+        "berlangsung"
+    ) {
+
+      finishTriggered.current =
+        true;
+
+      handleFinishConsultation();
+
+    }
+
+  }, [
+    remainingSeconds,
+    session,
+  ]);
 
   /*
   |------------------------------------------------------------------

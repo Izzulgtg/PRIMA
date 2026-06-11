@@ -103,9 +103,17 @@ function PatientAppointmentPage() {
         "Pendaftaran berhasil"
       );
       setTimeout(() => {
-        navigate(
-          "/patient/waiting-room"
-        );
+        const consultationId =
+          result.data
+            ?.consultation_id;
+
+        if (
+          consultationId
+        ) {
+          navigate(
+            `/patient/waiting-room/${consultationId}`
+          );
+        }
       }, 1500);
       } catch (error) {
         console.error(

@@ -63,58 +63,6 @@ function WaitingRoomPage() {
 
   }, []);
 
-  useEffect(() => {
-    if (!queueData) return;
-
-    const updateCountdown =
-      () => {
-        setRemainingSeconds(
-          calculateRemainingSeconds()
-        );
-      };
-
-    updateCountdown();
-
-    const timer =
-      setInterval(
-        updateCountdown,
-        1000
-      );
-
-    return () =>
-      clearInterval(timer);
-
-  }, [queueData]);
-
-  useEffect(() => {
-    if (
-      queueData?.status ===
-      "berlangsung"
-    ) {
-      navigate(
-        `/patient/consultation-room/${queueData.id}`
-      );
-    }
-  }, [
-    queueData,
-    navigate,
-  ]);
-
-  const handleJoinConsultation =
-    () => {
-      if (!queueData?.id) return;
-    };
-
-  if (loading) {
-    return (
-      <div className="py-20 text-center">
-        <p className="text-prima-secondary">
-          Memuat data konsultasi...
-        </p>
-      </div>
-    );
-  }
-
   const calculateRemainingSeconds =
     () => {
       if (
@@ -143,6 +91,48 @@ function WaitingRoomPage() {
         ? diff
         : 0;
     };
+
+  useEffect(() => {
+    if (!queueData) return;
+
+    const updateCountdown =
+      () => {
+        setRemainingSeconds(
+          calculateRemainingSeconds()
+        );
+      };
+
+    updateCountdown();
+
+    const timer =
+      setInterval(
+        updateCountdown,
+        1000
+      );
+
+    return () =>
+      clearInterval(timer);
+
+  }, [queueData]);
+
+  const handleJoinConsultation =
+    () => {
+      if (!queueData?.id) return;
+
+      navigate(
+        `/patient/consultation-room/${queueData.id}`
+      );
+    };
+
+  if (loading) {
+    return (
+      <div className="py-20 text-center">
+        <p className="text-prima-secondary">
+          Memuat data konsultasi...
+        </p>
+      </div>
+    );
+  }
 
   if (!queueData) {
     return (

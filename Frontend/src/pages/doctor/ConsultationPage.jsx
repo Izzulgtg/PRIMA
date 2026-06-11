@@ -283,9 +283,7 @@ function ConsultationPage() {
             type:
               item.status === "selesai"
                 ? "completed"
-                : item.status === "berlangsung"
-                  ? "available"
-                  : "waiting",
+                : "available"
           }));
 
         setQueue(mappedQueue);

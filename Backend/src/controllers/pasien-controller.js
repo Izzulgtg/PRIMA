@@ -453,24 +453,25 @@ exports.buatPendaftaran = async (req, res) => {
         metode_bayar || "umum",
       ]
     );
-    await db.query(
-      `
-      INSERT INTO konsultasi
-      (
-        pendaftaran_id,
-        pasien_id,
-        dokter_id,
-        status
-      )
-      VALUES
-      (?, ?, ?, 'menunggu')
-      `,
-      [
-        result.insertId,
-        pasien_id,
-        dokter_id,
-      ]
-    );
+    const [consultationResult] =
+      await db.query(
+        `
+        INSERT INTO konsultasi
+        (
+          pendaftaran_id,
+          pasien_id,
+          dokter_id,
+          status
+        )
+        VALUES
+        (?, ?, ?, 'menunggu')
+        `,
+        [
+          result.insertId,
+          pasien_id,
+          dokter_id,
+        ]
+      );
 
     return res.status(201).json({
       success: true,
@@ -479,6 +480,10 @@ exports.buatPendaftaran = async (req, res) => {
       data: {
         pendaftaran_id:
           result.insertId,
+
+        consultation_id:
+          consultationResult.insertId,
+
         nomor_antrian:
           nomorAntrean,
       },
