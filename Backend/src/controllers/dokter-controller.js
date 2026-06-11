@@ -516,3 +516,130 @@ exports.getStatistics = async (req, res) => {
   }
 };
 
+// =========================================================================
+// 15. POST: DOKTER MENAMBAH SLOT JADWAL BARU
+// =========================================================================
+exports.createScheduleSlots = async (req, res) => {
+  // Ambil dari token auth-middleware jika ada, jika tidak gunakan dari body
+  const dokter_id = req.user ? req.user.id : req.body.dokter_id; 
+  
+  const { 
+    tanggal,          // Menerima string format YYYY-MM-DD (bisa dari singleDate atau loop getNextDateForDay)
+    jam_mulai,        // Menggantikan startTime
+    jam_selesai,      // Menggantikan endTime
+    tipe_kunjungan,   // Menerima format lowercase database ('tatap_muka', 'daring', 'keduanya')
+    kuota,
+    keterangan,
+    status            // 'buka' atau 'tutup'
+  } = req.body;
+
+  // Validasi data wajib sesuai kriteria database
+  if (!tanggal || !jam_mulai || !jam_selesai || !tipe_kunjungan) {
+    return res.status(400).json({ 
+      success: false, 
+      message: 'Tanggal, Jam Mulai, Jam Selesai, dan Tipe Kunjungan wajib diisi!' 
+    });
+  }
+
+  try {
+    // Sesuaikan nama tabel ke `jadwal_slots` dan kolom sesuai prima_db.sql
+    const query = `
+      INSERT INTO jadwal_slots 
+      (dokter_id, tanggal, jam_mulai, jam_selesai, tipe_kunjungan, kuota, keterangan, status, created_at) 
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())
+    `;
+    
+    await db.query(query, [
+      dokter_id, 
+      tanggal, 
+      jam_mulai, 
+      jam_selesai, 
+      tipe_kunjungan, 
+      kuota || 1, 
+      keterangan || null, 
+      status || 'buka'
+    ]);
+
+    return res.status(201).json({ success: true, message: 'Slot jadwal berhasil dibuat!' });
+  } catch (error) {
+    console.error('Error saat membuat slot jadwal:', error);
+    return res.status(500).json({ 
+      success: false, 
+      message: 'Terjadi kesalahan server saat menyimpan jadwal.',
+      error: error.message 
+    });
+  }
+};
+
+// =========================================================================
+// 16. GET: MENGAMBIL DAFTAR JADWAL BERDASARKAN ID DOKTER
+// =========================================================================
+exports.getScheduleSlots = async (req, res) => {
+  const { dokter_id } = req.params;
+
+  try {
+    // Query diarahkan ke tabel `jadwal_slots`
+    const query = `SELECT * FROM jadwal_slots WHERE dokter_id = ? ORDER BY tanggal DESC, jam_mulai ASC`;
+    const [results] = await db.query(query, [dokter_id]);
+
+    return res.status(200).json({ success: true, data: results });
+  } catch (error) {
+    console.error('Error saat mengambil data slot jadwal:', error);
+    return res.status(500).json({ success: false, message: 'Terjadi kesalahan server.' });
+  }
+};
+
+// =========================================================================
+// 17. PUT: MEMPERBARUI DATA SLOT JADWAL INDIVIDU
+// =========================================================================
+exports.updateScheduleSlot = async (req, res) => {
+  const { id } = req.params;
+  const { jam_mulai, jam_selesai, tipe_kunjungan, kuota, keterangan, status } = req.body;
+
+  try {
+    const query = `
+      UPDATE jadwal_slots 
+      SET jam_mulai = ?, jam_selesai = ?, tipe_kunjungan = ?, kuota = ?, keterangan = ?, status = ?, updated_at = NOW()
+      WHERE id = ?
+    `;
+    const [result] = await db.query(query, [
+      jam_mulai, 
+      jam_selesai, 
+      tipe_kunjungan, 
+      kuota, 
+      keterangan || null, 
+      status, 
+      id
+    ]);
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ success: false, message: 'Slot jadwal tidak ditemukan.' });
+    }
+
+    return res.status(200).json({ success: true, message: 'Slot jadwal berhasil diperbarui!' });
+  } catch (error) {
+    console.error('Error saat memperbarui slot jadwal:', error);
+    return res.status(500).json({ success: false, message: 'Terjadi kesalahan server.' });
+  }
+};
+
+// =========================================================================
+// 18. DELETE: MENGHAPUS SLOT JADWAL
+// =========================================================================
+exports.deleteScheduleSlot = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const query = `DELETE FROM jadwal_slots WHERE id = ?`;
+    const [result] = await db.query(query, [id]);
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ success: false, message: 'Slot jadwal tidak ditemukan.' });
+    }
+
+    return res.status(200).json({ success: true, message: 'Slot jadwal berhasil dihapus.' });
+  } catch (error) {
+    console.error('Error saat menghapus slot jadwal:', error);
+    return res.status(500).json({ success: false, message: 'Terjadi kesalahan server.' });
+  }
+};

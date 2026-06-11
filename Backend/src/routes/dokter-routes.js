@@ -31,6 +31,9 @@ router.get(
 router.get('/antrean/:dokter_id', dokterController.getAntreanDokter);
 router.put('/antrean/:pendaftaran_id/status', dokterController.updateStatusAntrean);
 // Contoh di Backend/src/routes/dokter-routes.js
-
+router.post('/schedule/slots', dokterController.createScheduleSlots);
+router.get('/schedule/slots/:dokter_id', dokterController.getScheduleSlots);
+router.put('/schedule/slots/:id', dokterController.updateScheduleSlot);
+router.delete('/schedule/slots/:id', dokterController.deleteScheduleSlot);
 
 module.exports = router;
