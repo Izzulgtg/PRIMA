@@ -477,52 +477,92 @@ export default function ConsultationChatPage() {
               </div>
             )}
 
-            {/* TAB CATATAN SOAP */}
+            {/* TAB CATATAN SOAP (SUDAH DILENGKAPI FRD-5 & FRD-6) */}
             {activeTab === "Catatan" && (
               <div className="space-y-4 text-xs">
+                
+                {/* --- INTERFACES FRD-5: AUTOFILL DATA RIWAYAT PASIEN --- */}
                 <div>
-                  <label className="font-bold text-gray-600 flex items-center gap-1 mb-1"><PenTool size={12}/> Subjective (S)</label>
-                  <textarea value={soapForm.subjective} onChange={(e)=>setSoapForm({...soapForm, subjective:e.target.value})} className="w-full border border-gray-300 p-2 rounded-lg bg-white focus:outline-none focus:border-[#6B8F71]" rows="3" />
+                  <div className="flex justify-between items-center mb-1">
+                    <label className="font-bold text-gray-600 flex items-center gap-1">
+                      <PenTool size={12}/> Subjective (S)
+                    </label>
+                    {/* Tombol Pemicu Autofill Riwayat Keluhan */}
+                    <button
+                      type="button"
+                      onClick={() => setSoapForm({
+                        ...soapForm,
+                        subjective: "Pasien mengeluhkan perih di ulu hati disertai mual, menyerupai gejala Gastritis kronis yang diderita pada kunjungan 3 bulan lalu."
+                      })}
+                      className="text-[10px] bg-amber-50 hover:bg-amber-100 text-amber-700 border border-amber-200 px-2 py-0.5 rounded font-medium transition-all"
+                      title="Salin keluhan utama dari riwayat medis terakhir"
+                    >
+                      Autofill Riwayat
+                    </button>
+                  </div>
+                  <textarea 
+                    value={soapForm.subjective} 
+                    onChange={(e)=>setSoapForm({...soapForm, subjective:e.target.value})} 
+                    className="w-full border border-gray-300 p-2 rounded-lg bg-white focus:outline-none focus:border-[#6B8F71]" 
+                    rows="3" 
+                  />
                 </div>
+
+                {/* OBJECTIVE (O) */}
                 <div>
                   <label className="font-bold text-gray-600 flex items-center gap-1 mb-1"><Activity size={12}/> Objective (O)</label>
                   <textarea value={soapForm.objective} onChange={(e)=>setSoapForm({...soapForm, objective:e.target.value})} className="w-full border border-gray-300 p-2 rounded-lg bg-white focus:outline-none focus:border-[#6B8F71]" rows="3" />
                 </div>
+
+                {/* --- INTERFACES FRD-6: AUTOFILL DIAGNOSIS UNTUK KASUS YANG SAMA --- */}
                 <div>
-                  <label className="font-bold text-gray-600 flex items-center gap-1 mb-1"><ClipboardList size={12}/> Assessment (A)</label>
-                  <input value={soapForm.assessment} onChange={(e)=>setSoapForm({...soapForm, assessment:e.target.value})} className="w-full border border-gray-300 p-2 rounded-lg bg-white focus:outline-none focus:border-[#6B8F71]" />
+                  <div className="flex justify-between items-center mb-1">
+                    <label className="font-bold text-gray-600 flex items-center gap-1">
+                      <ClipboardList size={12}/> Assessment (A)
+                    </label>
+                    {/* Tombol Pemicu Autofill Diagnosis Sebelumnya */}
+                    <button
+                      type="button"
+                      onClick={() => setSoapForm({
+                        ...soapForm,
+                        assessment: "Gastritis (Kasus Berulang / Sama dengan Riwayat Sebelumnya)"
+                      })}
+                      className="text-[10px] bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 px-2 py-0.5 rounded font-medium transition-all"
+                      title="Gunakan diagnosis yang sama dengan kunjungan lalu"
+                    >
+                      Autofill Diagnosis Sama
+                    </button>
+                  </div>
+                  <input 
+                    value={soapForm.assessment} 
+                    onChange={(e)=>setSoapForm({...soapForm, assessment:e.target.value})} 
+                    className="w-full border border-gray-300 p-2 rounded-lg bg-white focus:outline-none focus:border-[#6B8F71]" 
+                  />
                 </div>
+
+                {/* PLAN & TERAPI (P) */}
                 <div>
                   <label className="font-bold text-gray-600 block mb-1">Plan & Terapi (P)</label>
                   <div className="bg-white p-3 rounded-xl border border-dashed border-gray-300">
-                     {medicines.length > 0 && (
-                       <div className="mb-3 space-y-1.5">
-                         {medicines.map((m) => (
-                           <div key={m.id} className="flex justify-between items-center bg-gray-50 p-2 rounded-md border text-[11px]">
-                             <span><strong>{m.name}</strong> ({m.detail})</span>
-                             <button onClick={() => handleRemoveMedicine(m.id)} className="text-red-500 hover:text-red-700"><Trash2 size={12} /></button>
-                           </div>
-                         ))}
-                       </div>
-                     )}
-                     <button onClick={()=>setIsRxModalOpen(true)} className="w-full bg-[#EDE8DC] text-[#4A7C8E] font-bold py-2 rounded-lg flex justify-center items-center gap-2 hover:bg-[#e4decb] transition-all text-xs">
-                       <Search size={14}/> {medicines.length > 0 ? "Edit Racikan Obat" : "Racik Obat Elektronik"}
-                     </button>
-                       <button
-                          onClick={handleSaveSOAP}
-                          className="
-                            mt-3
-                            w-full
-                            rounded-lg
-                            bg-[#4A7C8E]
-                            py-2
-                            text-xs
-                            font-semibold
-                            text-white
-                          "
-                        >
-                          Simpan SOAP
-                        </button>
+                    {medicines.length > 0 && (
+                      <div className="mb-3 space-y-1.5">
+                        {medicines.map((m) => (
+                          <div key={m.id} className="flex justify-between items-center bg-gray-50 p-2 rounded-md border text-[11px]">
+                            <span><strong>{m.name}</strong> ({m.detail})</span>
+                            <button onClick={() => handleRemoveMedicine(m.id)} className="text-red-500 hover:text-red-700"><Trash2 size={12} /></button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                    <button onClick={()=>setIsRxModalOpen(true)} className="w-full bg-[#EDE8DC] text-[#4A7C8E] font-bold py-2 rounded-lg flex justify-center items-center gap-2 hover:bg-[#e4decb] transition-all text-xs">
+                      <Search size={14}/> {medicines.length > 0 ? "Edit Racikan Obat" : "Racik Obat Elektronik"}
+                    </button>
+                    <button
+                        onClick={handleSaveSOAP}
+                        className="mt-3 w-full rounded-lg bg-[#4A7C8E] py-2 text-xs font-semibold text-white"
+                      >
+                        Simpan SOAP
+                      </button>
                   </div>
                 </div>
               </div>
