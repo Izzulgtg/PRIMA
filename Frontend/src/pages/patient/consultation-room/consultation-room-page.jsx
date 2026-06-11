@@ -10,11 +10,13 @@ import {
   getSessionDetail,
   sendMessage as sendMessageApi,
   finishConsultation,
+  getQueue,
 } from "@/services/patient/consultation-service";
 
 function ConsultationRoomPage() {
   const navigate = useNavigate();
   const { sessionId } = useParams();
+  const [queueData, setQueueData] = useState(null);
 
   const chatEndRef = useRef(null);
 
@@ -147,7 +149,7 @@ function ConsultationRoomPage() {
       "menunggu"
     ) {
       navigate(
-        "/patient/waiting-room"
+        `/patient/waiting-room${queueData.id}`
       );
     }
     if (
