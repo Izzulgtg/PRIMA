@@ -811,7 +811,7 @@ Status Sistem:
 - API Service: Online
 - Backup Service: Active
 
-`,t=new Blob([e],{type:`text/plain`});document.body.appendChild(r),r.click(),document.body.removeChild(r);let n=window.URL.createObjectURL(t),r=document.createElement(`a`);r.href=n,r.download=`laporan-sistem.txt`,r.click(),window.URL.revokeObjectURL(n)},children:`Unduh Laporan`})]})]}),e&&(0,M.jsxs)(`div`,{className:`\r
+`,t=new Blob([e],{type:`text/plain`}),n=window.URL.createObjectURL(t),r=document.createElement(`a`);r.href=n,r.download=`laporan-sistem.txt`,r.click(),window.URL.revokeObjectURL(n)},children:`Unduh Laporan`})]})]}),e&&(0,M.jsxs)(`div`,{className:`\r
       fixed inset-0\r
       bg-black/40\r
       flex items-center justify-center\r
