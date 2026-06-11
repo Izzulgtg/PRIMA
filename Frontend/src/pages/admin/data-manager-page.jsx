@@ -53,6 +53,48 @@ const confirmRestore = () => {
   )
 }
 
+  const downloadReport = () => {
+
+  const report = `
+LAPORAN SISTEM PRIMA
+
+Tanggal:
+${new Date().toLocaleString()}
+
+Total Aktivitas: 156
+Perubahan Data: 34
+Akses Rekam Medis: 28
+Aktivitas Mencurigakan: 0
+
+Status Sistem:
+- Database: Active
+- API Service: Online
+- Backup Service: Active
+
+`;
+
+  const blob = new Blob(
+    [report],
+    { type: "text/plain" }
+  );
+
+  document.body.appendChild(a);
+a.click();
+document.body.removeChild(a);
+
+  const url =
+    window.URL.createObjectURL(blob);
+
+  const a =
+    document.createElement("a");
+
+  a.href = url;
+  a.download = "laporan-sistem.txt";
+  a.click();
+
+  window.URL.revokeObjectURL(url);
+};
+
   return (
     <div className="space-y-10">
 
@@ -868,7 +910,10 @@ const confirmRestore = () => {
               Jalankan Semua Validasi
             </Button>
 
-            <Button variant="outline">
+            <Button
+              variant="outline"
+              onClick={downloadReport}
+            >
               Unduh Laporan
             </Button>
 
