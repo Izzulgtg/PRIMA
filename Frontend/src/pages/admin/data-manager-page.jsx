@@ -78,10 +78,6 @@ Status Sistem:
     { type: "text/plain" }
   );
 
-  document.body.appendChild(a);
-a.click();
-document.body.removeChild(a);
-
   const url =
     window.URL.createObjectURL(blob);
 
