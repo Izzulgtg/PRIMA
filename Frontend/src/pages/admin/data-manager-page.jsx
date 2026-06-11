@@ -54,14 +54,40 @@ const confirmRestore = () => {
 }
 
   const downloadReport = () => {
+
+  const report = `
+LAPORAN SISTEM PRIMA
+
+Tanggal:
+${new Date().toLocaleString()}
+
+Total Aktivitas: 156
+Perubahan Data: 34
+Akses Rekam Medis: 28
+Aktivitas Mencurigakan: 0
+
+Status Sistem:
+- Database: Active
+- API Service: Online
+- Backup Service: Active
+
+`;
+
   const blob = new Blob(
-    ["Laporan Sistem PRIMA"],
+    [report],
     { type: "text/plain" }
   );
 
-  const url = window.URL.createObjectURL(blob);
+  document.body.appendChild(a);
+a.click();
+document.body.removeChild(a);
 
-  const a = document.createElement("a");
+  const url =
+    window.URL.createObjectURL(blob);
+
+  const a =
+    document.createElement("a");
+
   a.href = url;
   a.download = "laporan-sistem.txt";
   a.click();
